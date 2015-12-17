@@ -10,18 +10,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
 @Controller
-@RequestMapping("/")
 public class IndexController {
 
-    @RequestMapping(value = "/hello", method = RequestMethod.GET)
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     public String hello(ModelMap model) {
         model.addAttribute("msg", "JCG Hello World!");
-        return "helloWorld";
+        return "index";
     }
 
     @RequestMapping(value = "/displayMessage/{msg}", method = RequestMethod.GET)
     public String displayMessage(@PathVariable String msg, ModelMap model) {
         model.addAttribute("msg", msg);
-        return "helloWorld";
+        return "index";
     }
 }
