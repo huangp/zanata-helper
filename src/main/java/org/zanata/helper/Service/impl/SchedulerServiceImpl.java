@@ -16,7 +16,11 @@ public class SchedulerServiceImpl implements
 
     public void onApplicationEvent(
         ContextRefreshedEvent contextRefreshedEvent) {
+        logger.info("=====================================================");
+        logger.info("=====================================================");
         logger.info("On startup, load data from server and start scheduler");
+        logger.info("=====================================================");
+        logger.info("=====================================================");
 
         //TODO: database connection, thread count, scheduler, queue, event
     }
