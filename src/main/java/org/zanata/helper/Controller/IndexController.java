@@ -14,7 +14,7 @@ public class IndexController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String hello(ModelMap model) {
-        model.addAttribute("msg", "JCG Hello World!");
+        model.addAttribute("msg", "Zanata Helper page");
         return "index";
     }
 
