@@ -16,6 +16,6 @@ public class AppConfiguration
    private String buildVersion;
    
    @Getter
-   @Value("${build.date}")
-   private String buildDate;
+   @Value("${build.info}")
+   private String buildInfo;
 }

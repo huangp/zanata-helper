@@ -9,6 +9,10 @@ bin/
 /*/*/target/
 *.orig
 
+# gradle
+/build/
+.gradle
+
 # eclipse scrapbook page:
 *.jpage
 
