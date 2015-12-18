@@ -1,4 +1,4 @@
-package org.zanata.helper.Service.impl;
+package org.zanata.helper.service.impl;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;

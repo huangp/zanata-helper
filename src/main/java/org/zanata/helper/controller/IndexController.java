@@ -1,4 +1,4 @@
-package org.zanata.helper.Controller;
+package org.zanata.helper.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
