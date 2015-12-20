@@ -15,17 +15,17 @@ public class SyncJob implements Job {
             (Sync) context.getJobDetail().getJobDataMap().get("value");
 
         if(sync.getType().equals(Sync.Type.SYNC_TO_REPO)) {
-
+            processSyncToRepo();
         } else if(sync.getType().equals(Sync.Type.SYNC_TO_ZANATA)) {
             processSyncToZanata((SyncToZanata) sync);
         }
     }
 
     private void processSyncToZanata(SyncToZanata syncToZanata) {
-        System.out.println("Start sync to Zanata:" + syncToZanata.toString());
+        log.info("Start sync to Zanata:" + syncToZanata.toString());
     }
 
     private void processSyncToRepo() {
-        System.out.println("Start sync to Repo");
+        log.info("Start sync to Repo");
     }
 }

@@ -2,14 +2,19 @@ package org.zanata.helper.service.impl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.quartz.SchedulerException;
 import org.quartz.TriggerKey;
 import org.quartz.UnableToInterruptJobException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.zanata.helper.events.ConfigurationChangeEvent;
+import org.zanata.helper.exception.TaskNotFoundException;
+import org.zanata.helper.model.JobStatus;
 import org.zanata.helper.model.Sync;
 import org.zanata.helper.model.SyncToZanata;
 import org.zanata.helper.quartz.CronTrigger;
@@ -24,10 +29,8 @@ import java.util.Map;
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
 @Service
+@Slf4j
 public class SchedulerServiceImpl implements SchedulerService {
-    private static final Logger logger =
-        LoggerFactory.getLogger(SchedulerServiceImpl.class);
-
     @Autowired
     private AppConfiguration appConfiguration;
 
@@ -42,21 +45,21 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     @PostConstruct
     public void onApplicationEvent() throws SchedulerException {
-        logger.info("=====================================================");
-        logger.info("=====================================================");
-        logger.info("================Zanata Helper starts=================");
-        logger.info(appConfiguration.getBuildVersion() + ":" +
+        log.info("=====================================================");
+        log.info("=====================================================");
+        log.info("================Zanata Helper starts=================");
+        log.info(appConfiguration.getBuildVersion() + ":" +
             appConfiguration.getBuildInfo());
-        logger.info("=====================================================");
-        logger.info("=====================================================");
-        logger.info("Initialising jobs...");
+        log.info("=====================================================");
+        log.info("=====================================================");
+        log.info("Initialising jobs...");
 
         List<Sync> jobs = getJobs();
         cronTrigger = new CronTrigger();
         for (Sync sync : jobs) {
             addSyncJob(sync);
         }
-        logger.info("Initialised {0} jobs.", syncMap.size());
+        log.info("Initialised {} jobs.", syncMap.size());
     }
 
     //TODO: read from database
@@ -64,11 +67,36 @@ public class SchedulerServiceImpl implements SchedulerService {
         SyncToZanata job =
             new SyncToZanata(1L, "http://github.com/aeng/zanata-helper",
                 "http://localhost:8080/zanata/project/zanata-helper/1",
-                CronHelper.CronType.FIVE_MINUTES.getExpression(), null);
-        return Lists.newArrayList(job);
+                CronHelper.CronType.THRITY_SECONDS.getExpression(), null);
+
+        SyncToZanata job2 =
+            new SyncToZanata(2L, "http://github.com/aeng/zanata-helper",
+                "http://localhost:8080/zanata/project/zanata-helper/1",
+                CronHelper.CronType.THRITY_SECONDS.getExpression(), null);
+
+        SyncToZanata job3 =
+            new SyncToZanata(3L, "http://github.com/aeng/zanata-helper",
+                "http://localhost:8080/zanata/project/zanata-helper/1",
+                CronHelper.CronType.THRITY_SECONDS.getExpression(), null);
+
+        SyncToZanata job4 =
+            new SyncToZanata(4L, "http://github.com/aeng/zanata-helper",
+                "http://localhost:8080/zanata/project/zanata-helper/1",
+                CronHelper.CronType.THRITY_SECONDS.getExpression(), null);
+
+        SyncToZanata job5 =
+            new SyncToZanata(5L, "http://github.com/aeng/zanata-helper",
+                "http://localhost:8080/zanata/project/zanata-helper/1",
+                CronHelper.CronType.THRITY_SECONDS.getExpression(), null);
+
+        SyncToZanata job6 =
+            new SyncToZanata(6L, "http://github.com/aeng/zanata-helper",
+                "http://localhost:8080/zanata/project/zanata-helper/1",
+                CronHelper.CronType.THRITY_SECONDS.getExpression(), null);
+        return Lists.newArrayList(job, job2, job3, job4, job5, job6);
     }
 
-    @Override
+    @EventListener
     public void onApplicationEvent(ConfigurationChangeEvent event) {
         if (syncMap.containsKey(event.getSync().getId())) {
             syncMap.put(event.getSync().getId(), event.getSync());
@@ -77,9 +105,22 @@ public class SchedulerServiceImpl implements SchedulerService {
                     event.getSync());
             }
             catch (SchedulerException e) {
-                logger.error("Error rescheduling job:" + e.getMessage());
+                log.error("Error rescheduling job:" + e.getMessage());
             }
         }
+    }
+
+    @Override
+    public JobStatus getStatus(String key)
+        throws SchedulerException, TaskNotFoundException {
+        if(StringUtils.isEmpty(key)) {
+            throw new TaskNotFoundException(key);
+        }
+        TriggerKey triggerKey = syncKeyMap.get(new Long(key));
+        if (triggerKey == null) {
+            throw new TaskNotFoundException(key);
+        }
+        return cronTrigger.getTriggerStatus(triggerKey);
     }
 
     @Override

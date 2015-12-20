@@ -3,9 +3,11 @@
  */
 package org.zanata.helper.quartz;
 
+import org.apache.commons.lang3.StringUtils;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -15,7 +17,11 @@ import org.quartz.TriggerKey;
 import org.quartz.UnableToInterruptJobException;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.KeyMatcher;
+import org.zanata.helper.model.JobStatus;
+import org.zanata.helper.model.JobStatusType;
 import org.zanata.helper.model.Sync;
+
+import java.util.List;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
@@ -30,11 +36,13 @@ public class CronTrigger {
 
     public TriggerKey scheduleMonitor(Sync sync) throws SchedulerException {
         if (sync != null) {
-            JobKey jobKey = new JobKey(sync.getId().toString());
+            JobKey jobKey = generateJobKey(sync);
 
             if (!scheduler.checkExists(jobKey)) {
                 JobDetail jobDetail =
-                    JobBuilder.newJob(SyncJob.class).withIdentity(jobKey)
+                    JobBuilder.newJob(SyncJob.class)
+                        .withIdentity(jobKey)
+                        .withDescription(sync.toString())
                         .build();
 
                 jobDetail.getJobDataMap().put("value", sync);
@@ -44,7 +52,6 @@ public class CronTrigger {
                     .addJobListener(new SyncJobListener(), KeyMatcher
                         .keyEquals(jobKey));
                 scheduler.scheduleJob(jobDetail, trigger);
-
                 return trigger.getKey();
             }
         }
@@ -63,6 +70,30 @@ public class CronTrigger {
         scheduler.pauseAll();
     }
 
+    public JobStatus getTriggerStatus(TriggerKey key)
+        throws SchedulerException {
+        if(scheduler.checkExists(key)) {
+            Trigger.TriggerState state = scheduler.getTriggerState(key);
+            boolean isJobRunning = isJobRunning(key);
+            Trigger trigger = scheduler.getTrigger(key);
+            return new JobStatus(JobStatusType.getType(state, isJobRunning),
+                trigger.getPreviousFireTime(), trigger.getNextFireTime());
+        }
+        return null;
+    }
+
+    public boolean isJobRunning(TriggerKey key) throws SchedulerException {
+        List<JobExecutionContext> currentJobs =
+            scheduler.getCurrentlyExecutingJobs();
+
+        for (JobExecutionContext jobCtx : currentJobs) {
+            if (jobCtx.getTrigger().getKey().equals(key)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void cancelInProgressJob(Sync sync) throws UnableToInterruptJobException {
         JobKey jobKey = new JobKey(sync.getId().toString());
         scheduler.interrupt(jobKey);
@@ -74,12 +105,20 @@ public class CronTrigger {
     }
 
     private Trigger buildTrigger(Sync sync) {
-        Trigger trigger = TriggerBuilder
+        TriggerBuilder builder = TriggerBuilder
             .newTrigger()
-            .withIdentity("Trigger:" + sync.getSourceRepositoryUrl())
-            .withSchedule(
-                CronScheduleBuilder.cronSchedule(sync.getCron()))
-            .build();
-        return trigger;
+            .withIdentity("Trigger:" + sync.getId());
+
+        if(StringUtils.isEmpty(sync.getCron())) {
+            builder.startNow();
+        } else {
+            builder.withSchedule(
+                CronScheduleBuilder.cronSchedule(sync.getCron()));
+        }
+        return builder.build();
+    }
+
+    private JobKey generateJobKey(Sync sync) {
+        return new JobKey(sync.getId().toString());
     }
 }
