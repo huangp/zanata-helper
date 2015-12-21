@@ -1,4 +1,4 @@
-package org.zanata.sync.service.impl;
+package org.zanata.helper.sync.service.impl;
 
 import java.io.File;
 import java.net.MalformedURLException;

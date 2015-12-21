@@ -18,15 +18,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.zanata.sync.service;
+package org.zanata.helper.sync.service;
+
+import java.nio.file.Path;
 
 import org.zanata.client.commands.pull.PullOptions;
+import org.zanata.client.commands.push.PushOptions;
 
 /**
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
  */
-public interface PullService {
+public interface ZanataSyncService {
 
-    void pullFromZanata(PullOptions pullOptions);
+    PullOptions getPullOptions();
 
+    PushOptions getPushOptions();
+
+    void pushToZanata(Path repoBase);
+
+    void pullFromZanata(Path repoBase);
 }

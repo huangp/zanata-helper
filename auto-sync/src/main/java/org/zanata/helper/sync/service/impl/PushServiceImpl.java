@@ -18,7 +18,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.zanata.sync.service.impl;
+package org.zanata.helper.sync.service.impl;
 
 import java.util.List;
 
@@ -27,11 +27,11 @@ import org.zanata.client.commands.push.PushCommand;
 import org.zanata.client.commands.push.PushOptions;
 import org.zanata.client.config.LocaleList;
 import org.zanata.client.config.LocaleMapping;
+import org.zanata.helper.sync.exception.ZanataSyncException;
 import org.zanata.rest.client.ProjectIterationLocalesClient;
 import org.zanata.rest.client.RestClientFactory;
 import org.zanata.rest.dto.LocaleDetails;
-import org.zanata.sync.exception.ZanataSyncException;
-import org.zanata.sync.service.PushService;
+import org.zanata.helper.sync.service.PushService;
 
 /**
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>

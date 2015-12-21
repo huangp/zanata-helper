@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.zanata.helper.exception.TaskNotFoundException;
-import org.zanata.helper.model.JobInfo;
 import org.zanata.helper.model.JobStatus;
+import org.zanata.helper.model.JobInfo;
 import org.zanata.helper.service.SchedulerService;
 
 /**

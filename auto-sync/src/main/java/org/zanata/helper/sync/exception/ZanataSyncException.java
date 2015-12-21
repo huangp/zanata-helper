@@ -1,4 +1,4 @@
-package org.zanata.sync.exception;
+package org.zanata.helper.sync.exception;
 
 /**
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>

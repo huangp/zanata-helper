@@ -1,12 +1,10 @@
-package org.zanata.sync.util;
+package org.zanata.helper.sync.util;
 
 import java.io.File;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class PushPullOptionsUtilTest {
 

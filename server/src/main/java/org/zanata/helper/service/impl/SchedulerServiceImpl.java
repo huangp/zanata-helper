@@ -12,13 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.zanata.helper.events.ConfigurationChangeEvent;
+import org.zanata.helper.model.SyncToZanata;
 import org.zanata.helper.events.EventPublisher;
 import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.exception.TaskNotFoundException;
 import org.zanata.helper.model.JobInfo;
 import org.zanata.helper.model.JobStatus;
 import org.zanata.helper.model.Sync;
-import org.zanata.helper.model.SyncToZanata;
 import org.zanata.helper.quartz.CronTrigger;
 import org.zanata.helper.service.SchedulerService;
 import org.zanata.helper.util.CronHelper;
@@ -54,7 +54,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     public void onApplicationEvent() throws SchedulerException {
         log.info("=====================================================");
         log.info("=====================================================");
-        log.info("================Zanata Helper starts=================");
+        log.info("================Zanata helper starts=================");
         log.info(appConfiguration.getBuildVersion() + ":" +
             appConfiguration.getBuildInfo());
         log.info("=====================================================");

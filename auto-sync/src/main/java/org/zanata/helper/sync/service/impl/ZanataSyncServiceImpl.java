@@ -18,7 +18,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.zanata.sync.service.impl;
+package org.zanata.helper.sync.service.impl;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -26,8 +26,8 @@ import java.util.Optional;
 
 import org.zanata.client.commands.pull.PullOptions;
 import org.zanata.client.commands.push.PushOptions;
-import org.zanata.sync.service.ZanataSyncService;
-import org.zanata.sync.util.PushPullOptionsUtil;
+import org.zanata.helper.sync.service.ZanataSyncService;
+import org.zanata.helper.sync.util.PushPullOptionsUtil;
 
 /**
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>

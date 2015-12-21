@@ -1,8 +1,6 @@
-package org.zanata.sync.service.impl;
+package org.zanata.helper.sync.service.impl;
 
-import java.util.Base64;
-
-import org.zanata.sync.service.Credentials;
+import org.zanata.helper.sync.service.Credentials;
 
 /**
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>

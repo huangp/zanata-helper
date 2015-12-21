@@ -1,4 +1,4 @@
-package org.zanata.sync.exception;
+package org.zanata.helper.sync.exception;
 
 import java.io.IOException;
 

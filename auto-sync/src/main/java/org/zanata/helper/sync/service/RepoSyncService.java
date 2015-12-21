@@ -18,11 +18,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.zanata.sync.service;
+package org.zanata.helper.sync.service;
 
-import org.zanata.client.commands.push.PushOptions;
+import java.io.File;
 
-public interface PushService {
+import org.zanata.helper.sync.exception.RepoSyncException;
 
-    void pushToZanata(PushOptions pushOptions);
+public interface RepoSyncService<P> {
+    Credentials<P> getCredentials();
+
+    void cloneRepo(String repoUrl, File destPath) throws RepoSyncException;
+
+    void syncTranslationToRepo(String repoUrl, File baseDir) throws RepoSyncException;
 }

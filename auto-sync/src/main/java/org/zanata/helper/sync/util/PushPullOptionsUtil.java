@@ -18,22 +18,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.zanata.sync.util;
+package org.zanata.helper.sync.util;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Optional;
-import java.util.function.BiPredicate;
 import java.util.stream.Stream;
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.zanata.client.commands.OptionsUtil;
 import org.zanata.client.commands.PushPullOptions;
-import org.zanata.sync.exception.ZanataSyncException;
+import org.zanata.helper.sync.exception.ZanataSyncException;
+
 import com.google.common.base.Throwables;
 
 /**

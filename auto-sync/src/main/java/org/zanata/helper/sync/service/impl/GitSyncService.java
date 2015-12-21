@@ -18,7 +18,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.zanata.sync.service.impl;
+package org.zanata.helper.sync.service.impl;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,12 +35,9 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zanata.sync.exception.RepoSyncException;
-import org.zanata.sync.exception.ZanataSyncException;
-import org.zanata.sync.service.Credentials;
-import org.zanata.sync.service.PullService;
-import org.zanata.sync.service.PushService;
-import org.zanata.sync.service.RepoSyncService;
+import org.zanata.helper.sync.exception.RepoSyncException;
+import org.zanata.helper.sync.service.Credentials;
+import org.zanata.helper.sync.service.RepoSyncService;
 
 /**
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>

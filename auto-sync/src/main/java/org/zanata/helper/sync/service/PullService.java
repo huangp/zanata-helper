@@ -18,12 +18,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.zanata.sync.service;
+package org.zanata.helper.sync.service;
+
+import org.zanata.client.commands.pull.PullOptions;
 
 /**
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
  */
-public interface Credentials<P> {
-    String getUsername();
-    P getSecret();
+public interface PullService {
+
+    void pullFromZanata(PullOptions pullOptions);
+
 }

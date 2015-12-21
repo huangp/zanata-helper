@@ -1,5 +1,5 @@
 
-description = 'auto-sync git module'
+description = 'Zanata helper auto-sync'
 dependencies {
     compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version:'4.1.1.201511131810-r'
     compile(group: 'org.zanata', name: 'zanata-client-commands', version:'3.8.0') {

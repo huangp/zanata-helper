@@ -10,7 +10,7 @@
     </encoder>
   </appender>
 
-  <logger name="org.zanata.sync" level="INFO" additivity="false">
+  <logger name="org.zanata.helper.sync" level="INFO" additivity="false">
     <appender-ref ref="STDOUT" />
   </logger>
 

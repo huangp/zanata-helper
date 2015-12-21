@@ -18,17 +18,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.zanata.sync.service;
+package org.zanata.helper.sync.service;
 
-import java.io.File;
-
-import org.zanata.sync.exception.RepoSyncException;
-import org.zanata.sync.exception.ZanataSyncException;
-
-public interface RepoSyncService<P> {
-    Credentials<P> getCredentials();
-
-    void cloneRepo(String repoUrl, File destPath) throws RepoSyncException;
-
-    void syncTranslationToRepo(String repoUrl, File baseDir) throws RepoSyncException;
+/**
+ * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
+ */
+public interface Credentials<P> {
+    String getUsername();
+    P getSecret();
 }

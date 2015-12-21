@@ -1,4 +1,4 @@
-package org.zanata.sync.service.impl;
+package org.zanata.helper.sync.service.impl;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.Assume;

@@ -4,8 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.zanata.helper.model.Sync;
 import org.zanata.helper.model.SyncToZanata;
+import org.zanata.helper.model.Sync;
 
 @Slf4j
 public class SyncJob implements Job {
