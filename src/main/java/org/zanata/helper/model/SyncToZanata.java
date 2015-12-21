@@ -23,7 +23,7 @@ public class SyncToZanata implements Sync {
     private String zanataVersionUrl;
 
     @Setter
-    private Date lastRun;
+    private Date lastCompletedTime;
 
     /**
      * see http://en.wikipedia.org/wiki/Cron#CRON_expression

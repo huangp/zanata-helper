@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.zanata.helper.events.ConfigurationChangeEvent;
+import org.zanata.helper.events.EventPublisher;
 import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.exception.TaskNotFoundException;
 import org.zanata.helper.model.JobInfo;
@@ -37,6 +38,9 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Autowired
     private AppConfiguration appConfiguration;
 
+    @Autowired
+    private EventPublisher eventPublisher;
+
     private Map<String, Sync> syncMap = Maps.newHashMap();
 
     private Map<String, TriggerKey> syncKeyMap = Maps.newHashMap();
@@ -58,7 +62,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         log.info("Initialising jobs...");
 
         List<Sync> jobs = getJobs();
-        cronTrigger = new CronTrigger();
+        cronTrigger = new CronTrigger(eventPublisher);
         for (Sync sync : jobs) {
             addSyncJob(sync);
         }
@@ -117,7 +121,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     @EventListener
     public void onJobCompleted(JobRunCompletedEvent event) {
         if (syncMap.containsKey(event.getSha())) {
-            syncMap.get(event.getSha()).setLastRun(event.getCompleteDate());
+            syncMap.get(event.getSha()).setLastCompletedTime(event.getCompletedTime());
         }
     }
 
@@ -159,7 +163,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     private JobInfo convertToJobInfo(Sync sync) {
         if(sync != null) {
             return new JobInfo(sync.getSha(), sync.getName(),
-                    sync.getDescription(), sync.getLastRun());
+                    sync.getDescription(), sync.getLastCompletedTime());
         }
         return new JobInfo();
     }

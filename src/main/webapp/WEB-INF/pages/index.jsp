@@ -50,7 +50,7 @@
                     </div>
                     <div class="list__item__actions">
                       <span class="txt--meta">
-                          Last run: <fmt:formatDate pattern="yyyy-MM-dd HH:mm:ss" value="${job.lastRun}"/>
+                          <spring:message code="jsp.lastCompletedTime"/>: <fmt:formatDate pattern="yyyy-MM-dd HH:mm:ss" value="${job.lastRun}"/>
                       </span>
                     </div>
                   </div>

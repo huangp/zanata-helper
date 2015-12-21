@@ -16,15 +16,13 @@ import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.UnableToInterruptJobException;
 import org.quartz.impl.StdSchedulerFactory;
-import org.quartz.impl.matchers.KeyMatcher;
+import org.zanata.helper.events.EventPublisher;
 import org.zanata.helper.model.JobStatus;
 import org.zanata.helper.model.JobStatusType;
 import org.zanata.helper.model.Sync;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.google.common.collect.Lists;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
@@ -33,7 +31,11 @@ public class CronTrigger {
     private final Scheduler scheduler =
         StdSchedulerFactory.getDefaultScheduler();
 
-    public CronTrigger() throws SchedulerException {
+    private final EventPublisher eventPublisher;
+
+    public CronTrigger(EventPublisher eventPublisher)
+            throws SchedulerException {
+        this.eventPublisher = eventPublisher;
         scheduler.start();
     }
 
@@ -52,8 +54,7 @@ public class CronTrigger {
 
                 Trigger trigger = buildTrigger(sync);
                 scheduler.getListenerManager()
-                    .addJobListener(new SyncJobListener(), KeyMatcher
-                        .keyEquals(jobKey));
+                    .addJobListener(new SyncJobListener(eventPublisher));
                 scheduler.scheduleJob(jobDetail, trigger);
                 return trigger.getKey();
             }
@@ -77,9 +78,8 @@ public class CronTrigger {
         throws SchedulerException {
         if(scheduler.checkExists(key)) {
             Trigger.TriggerState state = scheduler.getTriggerState(key);
-            boolean isJobRunning = isJobRunning(key);
             Trigger trigger = scheduler.getTrigger(key);
-            return new JobStatus(JobStatusType.getType(state, isJobRunning),
+            return new JobStatus(JobStatusType.getType(state, isJobRunning(key)),
                 trigger.getPreviousFireTime(), trigger.getNextFireTime());
         }
         return null;

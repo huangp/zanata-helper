@@ -14,6 +14,6 @@
       href="http://assets-zanata.rhcloud.com/master/assets/css/style.min.css"/>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-  <script type="text/javascript" src="resources/scripts/script.js"></script>
+  <script type="text/javascript" src="resources/script.js"></script>
   <title><spring:message code="Application.name"/></title>
 </head>

@@ -24,9 +24,9 @@ public interface Sync extends Serializable {
 
     String getZanataVersionUrl();
 
-    Date getLastRun();
+    Date getLastCompletedTime();
 
-    void setLastRun(Date lastRun);
+    void setLastCompletedTime(Date lastCompletedTime);
 
     static enum Type {
         SYNC_TO_ZANATA,
