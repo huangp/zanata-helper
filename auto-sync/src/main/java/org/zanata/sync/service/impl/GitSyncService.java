@@ -85,11 +85,9 @@ public class GitSyncService implements RepoSyncService<String> {
             Git git = Git.open(baseDir);
             StatusCommand statusCommand = git.status();
             Status status = statusCommand.call();
-            Set<String> changed = status.getChanged();
-            Set<String> untracked = status.getUntracked();
-            if (!changed.isEmpty() || !untracked.isEmpty()) {
-                log.info("changed files in git repo: {}", changed);
-                log.info("new files in git repo: {}", untracked);
+            Set<String> uncommittedChanges = status.getUncommittedChanges();
+            if (!uncommittedChanges.isEmpty()) {
+                log.info("uncommitted files in git repo: {}", uncommittedChanges);
                 AddCommand addCommand = git.add();
                 addCommand.addFilepattern(".");
                 addCommand.call();
