@@ -20,10 +20,15 @@
  */
 package org.zanata.sync.service;
 
-/**
- * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
- */
-public interface Credentials<P> {
-    String getUsername();
-    P getSecret();
+import java.io.File;
+
+import org.zanata.sync.exception.RepoSyncException;
+import org.zanata.sync.exception.ZanataSyncException;
+
+public interface RepoSyncService<P> {
+    Credentials<P> getCredentials();
+
+    void cloneRepo(String repoUrl, File destPath) throws RepoSyncException;
+
+    void syncTranslationToRepo(String repoUrl, File baseDir) throws RepoSyncException;
 }

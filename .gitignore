@@ -1,9 +1,41 @@
-.idea/
+# eclipse and maven stuff
+.classpath
+.metadata/
+.settings/
+.project
+bin/
+/target/
+/*/target/
+/*/*/target/
+*.orig
+
+# gradle
+/build/
+.gradle
+
+# eclipse scrapbook page:
+*.jpage
+
+*.pdf
+
+# idea
+*.idea/
 *.iml
-target/
+
+# kde related
+*.directory
 
 # vim
 *.swp
+
+
+# binary files
+*.class
+*.cli
+*.exe
+*.jar
+*.war
+*.zip
 
 # temp files
 *.log
@@ -12,4 +44,10 @@ target/
 /tmp*
 *.bak
 
-*.orig
+# Gradle files
+.gradle/
+
+# other things that really ought to go under target/
+ehcache.disk.store.dir/
+
+.zanata-cache/

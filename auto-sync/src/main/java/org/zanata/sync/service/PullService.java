@@ -20,10 +20,13 @@
  */
 package org.zanata.sync.service;
 
+import org.zanata.client.commands.pull.PullOptions;
+
 /**
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
  */
-public interface Credentials<P> {
-    String getUsername();
-    P getSecret();
+public interface PullService {
+
+    void pullFromZanata(PullOptions pullOptions);
+
 }

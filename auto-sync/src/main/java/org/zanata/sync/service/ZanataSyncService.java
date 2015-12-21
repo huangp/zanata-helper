@@ -20,10 +20,21 @@
  */
 package org.zanata.sync.service;
 
+import java.nio.file.Path;
+
+import org.zanata.client.commands.pull.PullOptions;
+import org.zanata.client.commands.push.PushOptions;
+
 /**
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
  */
-public interface Credentials<P> {
-    String getUsername();
-    P getSecret();
+public interface ZanataSyncService {
+
+    PullOptions getPullOptions();
+
+    PushOptions getPushOptions();
+
+    void pushToZanata(Path repoBase);
+
+    void pullFromZanata(Path repoBase);
 }
