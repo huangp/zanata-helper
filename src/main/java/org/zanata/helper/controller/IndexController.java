@@ -1,18 +1,13 @@
 package org.zanata.helper.controller;
 
 import java.util.Arrays;
+import java.util.List;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.zanata.helper.api.APIController;
 import org.zanata.helper.api.JobController;
 import org.zanata.helper.model.JobInfo;
@@ -23,19 +18,31 @@ import org.zanata.helper.model.JobInfo;
 @Controller
 public class IndexController {
 
-    @Autowired
-    private ServletContext context;
+    private final RestTemplate restTemplate = new RestTemplate();;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String getIndexPage(ModelMap model) {
-        RestTemplate restTemplate = new RestTemplate();
-        JobInfo[] allJobs =
-                restTemplate.getForObject(getAllJobsUrl(), JobInfo[].class);
+        model.addAttribute("allJobs", getAllJobs());
+        model.addAttribute("runningJobs", getRunningJobs());
+        return "index";
+    }
+
+    @RequestMapping(value = "/runningJobs", method = RequestMethod.GET)
+    public String getRunningJobs(ModelMap model) {
+        model.addAttribute("runningJobs", getRunningJobs());
+        return "view/running_jobs";
+    }
+
+    private List<JobInfo> getRunningJobs() {
         JobInfo[] runningJobs =
                 restTemplate.getForObject(getRunningJobsUrl(), JobInfo[].class);
-        model.addAttribute("allJobs", Arrays.asList(allJobs));
-        model.addAttribute("runningJobs", Arrays.asList(runningJobs));
-        return "index";
+        return Arrays.asList(runningJobs);
+    }
+
+    private List<JobInfo> getAllJobs() {
+        JobInfo[] allJobs =
+                restTemplate.getForObject(getAllJobsUrl(), JobInfo[].class);
+        return Arrays.asList(allJobs);
     }
 
     private String getRunningJobsUrl() {
