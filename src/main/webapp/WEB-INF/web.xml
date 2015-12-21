@@ -37,6 +37,12 @@
     </listener-class>
   </listener>
 
+  <listener>
+    <listener-class>
+      org.springframework.web.context.request.RequestContextListener
+    </listener-class>
+  </listener>
+
   <filter>
     <filter-name>monitoring</filter-name>
     <filter-class>net.bull.javamelody.MonitoringFilter</filter-class>

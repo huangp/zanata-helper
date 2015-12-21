@@ -6,9 +6,6 @@ import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,19 +15,22 @@ import org.zanata.helper.exception.TaskNotFoundException;
 import org.zanata.helper.model.JobInfo;
 import org.zanata.helper.model.JobStatus;
 import org.zanata.helper.service.SchedulerService;
-import org.zanata.helper.service.impl.AppConfiguration;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
 
 @RestController
-public class JobController {
+public class JobController extends APIController {
+
+    public final static String STATUS_URL = API_ROOT + "/jobs/status";
+    public final static String RUNNING_JOBS_URL = API_ROOT + "/jobs/running";
+    public final static String ALL_JOBS_URL = API_ROOT + "/jobs";
 
     @Autowired
     private SchedulerService schedulerServiceImpl;
 
-    @RequestMapping(value = "/api/jobs/status", method = RequestMethod.GET,
+    @RequestMapping(value = STATUS_URL, method = RequestMethod.GET,
             produces = "application/json; charset=UTF-8")
     @ResponseBody
     public ResponseEntity<JobStatus> getJobStatus(
@@ -45,7 +45,7 @@ public class JobController {
         }
     }
 
-    @RequestMapping(value = "/api/jobs/running", method = RequestMethod.GET,
+    @RequestMapping(value = RUNNING_JOBS_URL, method = RequestMethod.GET,
             produces = "application/json; charset=UTF-8")
     @ResponseBody
     public ResponseEntity<List<JobInfo>> getRunningJobs() {
@@ -57,7 +57,7 @@ public class JobController {
         }
     }
 
-    @RequestMapping(value = "/api/jobs", method = RequestMethod.GET,
+    @RequestMapping(value = ALL_JOBS_URL, method = RequestMethod.GET,
         produces = "application/json; charset=UTF-8")
     @ResponseBody
     public ResponseEntity<List<JobInfo>> getAllJobs() {

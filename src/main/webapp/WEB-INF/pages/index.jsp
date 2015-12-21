@@ -6,12 +6,6 @@
 
 <body class="new-zanata new-zanata-base">
   <main role="main" class="l--pad-v-1">
-    <script type="text/javascript">
-      $(document).ready(function () {
-        window.location.reload(true);
-      });
-    </script>
-
     <div class="l__wrapper">
       <div class="g">
         <div class="g__item w--1-m w--3-8-l w--1-4 l--push-bottom-half">
@@ -44,7 +38,7 @@
         </div>
 
         <div class="g__item w--1-m w--5-8-l w--3-4">
-          <h2 class="l--push-top-0"><spring:message code="jsp.allAvailableJobs.title"/></h2>
+          <h3 class="l--push-top-0"><spring:message code="jsp.allAvailableJobs.title"/></h3>
           <div class="l--pad-all-quarter panel">
             <ul class="list--panel">
               <c:forEach var="job" items="${allJobs}">
@@ -55,7 +49,7 @@
                       <span class="list__item__meta">${job.description}</span>
                     </div>
                     <div class="list__item__actions">
-                      <span class="txt--understated">
+                      <span class="txt--meta">
                           Last run: <fmt:formatDate pattern="yyyy-MM-dd HH:mm:ss" value="${job.lastRun}"/>
                       </span>
                     </div>

@@ -18,7 +18,6 @@ public class SyncJob implements Job {
         throws JobExecutionException {
         Sync sync =
             (Sync) context.getJobDetail().getJobDataMap().get("value");
-
         if(sync.getType().equals(Sync.Type.SYNC_TO_REPO)) {
             processSyncToRepo();
         } else if(sync.getType().equals(Sync.Type.SYNC_TO_ZANATA)) {
