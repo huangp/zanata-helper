@@ -1,1 +1,6 @@
-rootProject.name = 'zanataHelper'
+rootProject.name = 'parent'
+include ':auto-sync'
+include ':server'
+
+project(':auto-sync').projectDir = "$rootDir/auto-sync" as File
+project(':server').projectDir = "$rootDir/server" as File

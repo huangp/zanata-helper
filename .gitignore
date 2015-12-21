@@ -11,6 +11,7 @@ bin/
 
 # gradle
 /build/
+/*/build/
 .gradle
 
 # eclipse scrapbook page:
