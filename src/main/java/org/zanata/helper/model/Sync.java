@@ -12,13 +12,21 @@ public interface Sync extends Serializable {
 
     Long getId();
 
-    String getCron();
+    String getName();
 
-    Date getLastExecuted();
+    String getSha();
+
+    String getDescription();
+
+    String getCron();
 
     String getSourceRepositoryUrl();
 
     String getZanataVersionUrl();
+
+    Date getLastRun();
+
+    void setLastRun(Date lastRun);
 
     static enum Type {
         SYNC_TO_ZANATA,

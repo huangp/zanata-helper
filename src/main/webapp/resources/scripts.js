@@ -1,0 +1,1 @@
+var refreshPageInterval = 5000; //30 seconds

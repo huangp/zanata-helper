@@ -22,6 +22,9 @@ import org.zanata.helper.model.JobStatusType;
 import org.zanata.helper.model.Sync;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.google.common.collect.Lists;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
@@ -36,12 +39,12 @@ public class CronTrigger {
 
     public TriggerKey scheduleMonitor(Sync sync) throws SchedulerException {
         if (sync != null) {
-            JobKey jobKey = generateJobKey(sync);
+            JobKey jobKey = new JobKey(sync.getSha());
 
             if (!scheduler.checkExists(jobKey)) {
                 JobDetail jobDetail =
                     JobBuilder.newJob(SyncJob.class)
-                        .withIdentity(jobKey)
+                        .withIdentity(sync.getSha())
                         .withDescription(sync.toString())
                         .build();
 
@@ -94,6 +97,12 @@ public class CronTrigger {
         return false;
     }
 
+    public List<JobDetail> getRunningJobs() throws SchedulerException {
+        return scheduler.getCurrentlyExecutingJobs().stream()
+                .map(JobExecutionContext::getJobDetail)
+                .collect(Collectors.toList());
+    }
+
     public void cancelInProgressJob(Sync sync) throws UnableToInterruptJobException {
         JobKey jobKey = new JobKey(sync.getId().toString());
         scheduler.interrupt(jobKey);
@@ -116,9 +125,5 @@ public class CronTrigger {
                 CronScheduleBuilder.cronSchedule(sync.getCron()));
         }
         return builder.build();
-    }
-
-    private JobKey generateJobKey(Sync sync) {
-        return new JobKey(sync.getId().toString());
     }
 }

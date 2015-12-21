@@ -34,6 +34,7 @@ exclude(module: 'commons-logging')
     compile group: 'org.quartz-scheduler', name: 'quartz', version:'2.2.2'
     compile group: 'org.apache.commons', name: 'commons-lang3', version:'3.4'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version:'2.6.4'
+    compile group: 'commons-codec', name: 'commons-codec', version:'1.10'
     providedCompile group: 'org.projectlombok', name: 'lombok', version:'1.16.6'
 }
 
@@ -43,3 +44,6 @@ processResources {
         build: versioning.info.full
     ])
 }
+
+/* Change context path (base url). otherwise defaults to name of project */
+jettyRunWar.contextPath = ''
