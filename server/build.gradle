@@ -1,13 +1,20 @@
 plugins {
     id 'net.nemerosa.versioning' version '1.6.0'
+    id "org.akhikhl.gretty" version "1.2.4"
 }
 
 apply plugin: 'war'
-apply plugin: 'jetty'
+
+gretty {
+  // supported values:
+  // 'jetty7', 'jetty8', 'jetty9', 'tomcat7', 'tomcat8'
+  servletContainer = 'tomcat8'
+  contextPath = ''
+}
 
 description = 'auto-sync server'
 dependencies {
-  compile project(':auto-sync')
+    compile project(':auto-sync')
     compile group: 'org.slf4j', name: 'jcl-over-slf4j', version:'1.7.13'
     compile group: 'javax.servlet', name: 'jstl', version:'1.2'
     compile group: 'taglibs', name: 'standard', version:'1.1.2'
@@ -33,4 +40,3 @@ processResources {
 }
 
 /* Change context path (base url). otherwise defaults to name of project */
-jettyRunWar.contextPath = ''

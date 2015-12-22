@@ -2,6 +2,11 @@
 - To run test: `gradle dist test`
 
 - To run war: 
-    - `gradle jettyRunWar`
-    - (debug): `gradle -Dorg.gradle.jvmargs="-XX:MaxPermSize=256M -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005" jettyRunWar`
+    - `gradle appRun`, `appRunDebug`
     - [http://localhost:8080/](http://localhost:8080/)
+    - For more info, see [http://akhikhl.github.io/gretty-doc/Gretty-configuration.html]
+
+API URL:
+- [http://localhost:8080/](http://localhost:8080/api/jobs/status?id=1)
+- [http://localhost:8080/](http://localhost:8080/api/jobs/running)
+- [http://localhost:8080/](http://localhost:8080/api/jobs)

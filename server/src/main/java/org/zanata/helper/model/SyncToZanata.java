@@ -6,24 +6,21 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.zanata.helper.util.CronHelper;
-import org.zanata.helper.util.HmacUtil;
 
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
  */
 @Getter
 @ToString
-public class SyncToZanata implements Sync {
+public class SyncToZanata implements JobConfig {
     private Long id;
     private String name;
-    //Needs to be unique
-    private String sha;
     private String description;
     private String sourceRepositoryUrl;
     private String zanataVersionUrl;
 
     @Setter
-    private Date lastCompletedTime;
+    private JobStatus lastJobStatus;
 
     /**
      * see http://en.wikipedia.org/wiki/Cron#CRON_expression
@@ -38,7 +35,6 @@ public class SyncToZanata implements Sync {
         this.sourceRepositoryUrl = sourceRepositoryUrl;
         this.zanataVersionUrl = zanataVersionUrl;
         this.cron = cron;
-        this.sha = HmacUtil.hmacSha1(id.toString(), name);
     }
 
     @Override

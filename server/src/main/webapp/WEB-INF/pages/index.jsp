@@ -28,10 +28,9 @@
                       <h3 class="list__title">${job.name}</h3>
                       <span class="list__item__meta">${job.description}</span>
                     </div>
-                    <div class="list__item__actions">
-                      <span class="txt--meta">
-                          <spring:message code="jsp.lastCompletedTime"/>: <fmt:formatDate pattern="yyyy-MM-dd HH:mm:ss" value="${job.lastRun}"/>
-                      </span>
+                    <div class="list__item__actions txt--meta">
+                      <span class="l--push-right-quarter">${job.lastJobStatus.status}</span>
+                      <span>${job.lastJobStatus.lastEndTime}</span>
                     </div>
                   </div>
                 </li>

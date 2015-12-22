@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.zanata.helper.exception.TaskNotFoundException;
 import org.zanata.helper.model.JobStatus;
-import org.zanata.helper.model.JobInfo;
+import org.zanata.helper.model.JobSummary;
 import org.zanata.helper.service.SchedulerService;
+
+import com.google.common.base.Optional;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
@@ -34,10 +36,11 @@ public class JobController extends APIController {
             produces = "application/json; charset=UTF-8")
     @ResponseBody
     public ResponseEntity<JobStatus> getJobStatus(
-            @RequestParam(value = "sha", defaultValue = "") String sha) {
+            @RequestParam(value = "id", defaultValue = "") String id) {
         try {
             return new ResponseEntity<JobStatus>(
-                    schedulerServiceImpl.getStatus(sha), HttpStatus.OK);
+                    schedulerServiceImpl.getLastStatus(new Long(id)),
+                    HttpStatus.OK);
         } catch (SchedulerException e) {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (TaskNotFoundException e) {
@@ -48,9 +51,9 @@ public class JobController extends APIController {
     @RequestMapping(value = RUNNING_JOBS_URL, method = RequestMethod.GET,
             produces = "application/json; charset=UTF-8")
     @ResponseBody
-    public ResponseEntity<List<JobInfo>> getRunningJobs() {
+    public ResponseEntity<List<JobSummary>> getRunningJobs() {
         try {
-            return new ResponseEntity<List<JobInfo>>(
+            return new ResponseEntity<List<JobSummary>>(
                     schedulerServiceImpl.getRunningJob(), HttpStatus.OK);
         } catch (SchedulerException e) {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -60,9 +63,9 @@ public class JobController extends APIController {
     @RequestMapping(value = ALL_JOBS_URL, method = RequestMethod.GET,
         produces = "application/json; charset=UTF-8")
     @ResponseBody
-    public ResponseEntity<List<JobInfo>> getAllJobs() {
+    public ResponseEntity<List<JobSummary>> getAllJobs() {
         try {
-            return new ResponseEntity<List<JobInfo>>(
+            return new ResponseEntity<List<JobSummary>>(
                 schedulerServiceImpl.getAllJobs(), HttpStatus.OK);
         } catch (SchedulerException e) {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);

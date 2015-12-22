@@ -1,9 +1,10 @@
 package org.zanata.helper.service.impl;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+
 import org.quartz.JobDetail;
 import org.quartz.SchedulerException;
 import org.quartz.TriggerKey;
@@ -16,9 +17,9 @@ import org.zanata.helper.model.SyncToZanata;
 import org.zanata.helper.events.EventPublisher;
 import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.exception.TaskNotFoundException;
-import org.zanata.helper.model.JobInfo;
+import org.zanata.helper.model.JobSummary;
 import org.zanata.helper.model.JobStatus;
-import org.zanata.helper.model.Sync;
+import org.zanata.helper.model.JobConfig;
 import org.zanata.helper.quartz.CronTrigger;
 import org.zanata.helper.service.SchedulerService;
 import org.zanata.helper.util.CronHelper;
@@ -41,9 +42,9 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Autowired
     private EventPublisher eventPublisher;
 
-    private Map<String, Sync> syncMap = Maps.newHashMap();
+    private Map<Long, JobConfig> jobConfigMap = Maps.newHashMap();
 
-    private Map<String, TriggerKey> syncKeyMap = Maps.newHashMap();
+    private Map<Long, TriggerKey> jobConfigKeyMap = Maps.newHashMap();
 
     private CronTrigger cronTrigger;
 
@@ -61,16 +62,16 @@ public class SchedulerServiceImpl implements SchedulerService {
         log.info("=====================================================");
         log.info("Initialising jobs...");
 
-        List<Sync> jobs = getJobs();
+        List<JobConfig> jobConfigs = getJobs();
         cronTrigger = new CronTrigger(eventPublisher);
-        for (Sync sync : jobs) {
+        for (JobConfig sync : jobConfigs) {
             addSyncJob(sync);
         }
-        log.info("Initialised {} jobs.", syncMap.size());
+        log.info("Initialised {} jobs.", jobConfigMap.size());
     }
 
     //TODO: read from database
-    private List<Sync> getJobs() {
+    private List<JobConfig> getJobs() {
         SyncToZanata job =
             new SyncToZanata(1L, "name1", "description1", "http://github.com/aeng/zanata-helper",
                 "http://localhost:8080/zanata/project/zanata-helper/1",
@@ -100,15 +101,15 @@ public class SchedulerServiceImpl implements SchedulerService {
             new SyncToZanata(6L, "name6", "description6", "http://github.com/aeng/zanata-helper",
                 "http://localhost:8080/zanata/project/zanata-helper/1",
                 CronHelper.CronType.THRITY_SECONDS.getExpression());
-        return Lists.<Sync>newArrayList(job, job2, job3, job4, job5, job6);
+        return Lists.<JobConfig>newArrayList(job, job2, job3, job4, job5, job6);
     }
 
     @EventListener
     public void onApplicationEvent(ConfigurationChangeEvent event) {
-        if (syncMap.containsKey(event.getSync().getSha())) {
-            syncMap.put(event.getSync().getSha(), event.getSync());
+        if (jobConfigMap.containsKey(event.getSync().getId())) {
+            jobConfigMap.put(event.getSync().getId(), event.getSync());
             try {
-                cronTrigger.reschedule(syncKeyMap.get(event.getSync().getSha()),
+                cronTrigger.reschedule(jobConfigKeyMap.get(event.getSync().getId()),
                     event.getSync());
             }
             catch (SchedulerException e) {
@@ -119,67 +120,78 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     //TODO: update database record
     @EventListener
-    public void onJobCompleted(JobRunCompletedEvent event) {
-        if (syncMap.containsKey(event.getSha())) {
-            syncMap.get(event.getSha()).setLastCompletedTime(event.getCompletedTime());
+    public void onJobCompleted(JobRunCompletedEvent event)
+        throws TaskNotFoundException, SchedulerException {
+        JobConfig jobConfig = jobConfigMap.get(event.getId());
+
+        if (jobConfig != null) {
+            jobConfig.setLastJobStatus(getStatus(event.getId(), event));
         }
     }
 
     @Override
-    public JobStatus getStatus(String sha)
-        throws SchedulerException, TaskNotFoundException {
-        if(StringUtils.isEmpty(sha)) {
-            throw new TaskNotFoundException(sha);
+    public JobStatus getLastStatus(Long id) throws TaskNotFoundException {
+        JobConfig jobConfig = jobConfigMap.get(id);
+        if(jobConfig != null) {
+            return jobConfig.getLastJobStatus();
         }
-        TriggerKey triggerKey = syncKeyMap.get(sha);
-        if (triggerKey == null) {
-            throw new TaskNotFoundException(sha);
-        }
-        return cronTrigger.getTriggerStatus(triggerKey);
+        throw new TaskNotFoundException(id.toString());
     }
 
     @Override
-    public List<JobInfo> getRunningJob() throws SchedulerException {
+    public List<JobSummary> getRunningJob() throws SchedulerException {
         List<JobDetail> runningJobs = cronTrigger.getRunningJobs();
-        return runningJobs.stream().map(this::convertToJobInfo)
+        return runningJobs.stream().map(this::convertToJobSummary)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<JobInfo> getAllJobs() throws SchedulerException {
-        Collection<Sync> syncList = syncMap.values();
-        return syncList.stream().map(this::convertToJobInfo)
+    public List<JobSummary> getAllJobs() throws SchedulerException {
+        Collection<JobConfig> syncList = jobConfigMap.values();
+        return syncList.stream().map(this::convertToJobSummary)
             .collect(Collectors.toList());
     }
 
-    private JobInfo convertToJobInfo(JobDetail jobDetail) {
+    private JobStatus getStatus(Long id, JobRunCompletedEvent event)
+        throws SchedulerException, TaskNotFoundException {
+        if(id == null) {
+            throw new TaskNotFoundException("");
+        }
+        TriggerKey triggerKey = jobConfigKeyMap.get(id);
+        if (triggerKey == null) {
+            throw new TaskNotFoundException(id.toString());
+        }
+        return cronTrigger.getTriggerStatus(triggerKey, event);
+    }
+
+    private JobSummary convertToJobSummary(JobDetail jobDetail) {
         if (jobDetail != null) {
-            Sync sync = syncMap.get(jobDetail.getKey().getName());
-            return convertToJobInfo(sync);
+            JobConfig jobConfig = jobConfigMap.get(jobDetail.getKey().getName());
+            return convertToJobSummary(jobConfig);
         }
-        return new JobInfo();
+        return new JobSummary();
     }
 
-    private JobInfo convertToJobInfo(Sync sync) {
-        if(sync != null) {
-            return new JobInfo(sync.getSha(), sync.getName(),
-                    sync.getDescription(), sync.getLastCompletedTime());
+    private JobSummary convertToJobSummary(JobConfig jobConfig) {
+        if(jobConfig != null) {
+            return new JobSummary(jobConfig.getId(), jobConfig.getName(),
+                    jobConfig.getDescription(), jobConfig.getLastJobStatus());
         }
-        return new JobInfo();
+        return new JobSummary();
     }
 
     @Override
-    public void addSyncJob(Sync sync) throws SchedulerException {
-        TriggerKey key = cronTrigger.scheduleMonitor(sync);
+    public void addSyncJob(JobConfig jobConfig) throws SchedulerException {
+        TriggerKey key = cronTrigger.scheduleMonitor(jobConfig);
         if (key != null) {
-            syncMap.put(sync.getSha(), sync);
-            syncKeyMap.put(sync.getSha(), key);
+            jobConfigMap.put(jobConfig.getId(), jobConfig);
+            jobConfigKeyMap.put(jobConfig.getId(), key);
         }
     }
 
     @Override
-    public void cancelInProgressSyncJob(Sync sync)
+    public void cancelInProgressSyncJob(JobConfig jobConfig)
         throws UnableToInterruptJobException {
-        cronTrigger.cancelInProgressJob(sync);
+        cronTrigger.cancelInProgressJob(jobConfig);
     }
 }

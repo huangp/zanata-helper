@@ -6,15 +6,13 @@ import java.util.Date;
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
-public interface Sync extends Serializable {
+public interface JobConfig extends Serializable {
 
     Type getType();
 
     Long getId();
 
     String getName();
-
-    String getSha();
 
     String getDescription();
 
@@ -24,9 +22,9 @@ public interface Sync extends Serializable {
 
     String getZanataVersionUrl();
 
-    Date getLastCompletedTime();
+    JobStatus getLastJobStatus();
 
-    void setLastCompletedTime(Date lastCompletedTime);
+    void setLastJobStatus(JobStatus jobStatus);
 
     static enum Type {
         SYNC_TO_ZANATA,

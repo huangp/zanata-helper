@@ -4,18 +4,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.zanata.helper.model.JobConfig;
 import org.zanata.helper.model.SyncToZanata;
-import org.zanata.helper.model.Sync;
 
 @Slf4j
 public class SyncJob implements Job {
     public void execute(JobExecutionContext context)
         throws JobExecutionException {
-        Sync sync =
-            (Sync) context.getJobDetail().getJobDataMap().get("value");
-        if(sync.getType().equals(Sync.Type.SYNC_TO_REPO)) {
+        JobConfig sync =
+            (JobConfig) context.getJobDetail().getJobDataMap().get("value");
+        if(sync.getType().equals(JobConfig.Type.SYNC_TO_REPO)) {
             processSyncToRepo();
-        } else if(sync.getType().equals(Sync.Type.SYNC_TO_ZANATA)) {
+        } else if(sync.getType().equals(JobConfig.Type.SYNC_TO_ZANATA)) {
             processSyncToZanata((SyncToZanata) sync);
         }
     }

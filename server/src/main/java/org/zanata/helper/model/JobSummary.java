@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class JobInfo implements Serializable {
-    private String sha;
+public class JobSummary implements Serializable {
+    private Long id;
     private String name;
     private String description;
-    private Date lastRun;
+    private JobStatus lastJobStatus;
 }

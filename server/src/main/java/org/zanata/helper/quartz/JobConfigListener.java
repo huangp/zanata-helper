@@ -7,15 +7,15 @@ import org.quartz.JobExecutionException;
 import org.quartz.JobListener;
 import org.zanata.helper.events.EventPublisher;
 import org.zanata.helper.events.JobRunCompletedEvent;
-import org.zanata.helper.model.Sync;
+import org.zanata.helper.model.JobConfig;
 
 @Slf4j
-public class SyncJobListener implements JobListener {
-    public static final String LISTENER_NAME = "SyncJobListener";
+public class JobConfigListener implements JobListener {
+    public static final String LISTENER_NAME = "JobConfigListener";
 
     private final EventPublisher eventPublisher;
 
-    public SyncJobListener(EventPublisher eventPublisher) {
+    public JobConfigListener(EventPublisher eventPublisher) {
         this.eventPublisher = eventPublisher;
     }
 
@@ -25,31 +25,31 @@ public class SyncJobListener implements JobListener {
 
     // Run this if job is about to be executed.
     public void jobToBeExecuted(JobExecutionContext context) {
-        log.debug("Job : " + getSyncJob(context).getName() + " starting.");
+        log.debug("Job : " + getJobConfigJob(context).getName() + " starting.");
     }
 
     public void jobExecutionVetoed(JobExecutionContext context) {
-        log.debug("jobExecutionVetoed: " + getSyncJob(context).getName());
+        log.debug("jobExecutionVetoed: " + getJobConfigJob(context).getName());
     }
 
     public void jobWasExecuted(JobExecutionContext context,
         JobExecutionException jobException) {
-        Sync sync = getSyncJob(context);
-        log.debug("Job : " + sync.getName() + " is completed.");
+        JobConfig jobConfig = getJobConfigJob(context);
+        log.debug("Job : " + jobConfig.getName() + " is completed.");
 
-        eventPublisher
-                .fireEvent(new JobRunCompletedEvent(this, sync.getSha(),
-                        context.getJobRunTime(),
-                        context.getFireTime()));
+        eventPublisher.fireEvent(
+            new JobRunCompletedEvent(this, jobConfig.getId(),
+                    context.getJobRunTime(),
+                    context.getFireTime()));
 
         if (jobException != null &&
                 !StringUtils.isEmpty(jobException.getMessage())) {
-            log.error("Exception thrown by: " + getSyncJob(context).getName()
+            log.error("Exception thrown by: " + getJobConfigJob(context).getName()
                     + " Exception: " + jobException.getMessage());
         }
     }
 
-    private Sync getSyncJob(JobExecutionContext context) {
-        return (Sync) context.getJobDetail().getJobDataMap().get("value");
+    private JobConfig getJobConfigJob(JobExecutionContext context) {
+        return (JobConfig) context.getJobDetail().getJobDataMap().get("value");
     }
 }
