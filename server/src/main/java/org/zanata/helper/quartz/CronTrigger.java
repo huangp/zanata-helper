@@ -21,6 +21,7 @@ import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.model.JobStatus;
 import org.zanata.helper.model.JobStatusType;
 import org.zanata.helper.model.JobConfig;
+import org.zanata.helper.component.AppConfiguration;
 
 import java.util.Date;
 import java.util.List;
@@ -35,9 +36,13 @@ public class CronTrigger {
 
     private final EventPublisher eventPublisher;
 
-    public CronTrigger(EventPublisher eventPublisher)
-            throws SchedulerException {
+    private final AppConfiguration appConfiguration;
+
+    public CronTrigger(EventPublisher eventPublisher,
+        AppConfiguration appConfiguration)
+        throws SchedulerException {
         this.eventPublisher = eventPublisher;
+        this.appConfiguration = appConfiguration;
         scheduler.start();
     }
 
@@ -53,6 +58,8 @@ public class CronTrigger {
                         .build();
 
                 jobDetail.getJobDataMap().put("value", jobConfig);
+                jobDetail.getJobDataMap()
+                    .put("basedir", appConfiguration.getStorageDirectory());
 
                 Trigger trigger = buildTrigger(jobConfig);
                 

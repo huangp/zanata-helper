@@ -1,0 +1,10 @@
+
+description = 'Zanata helper zanata-cli plugin'
+group 'org.zanata.helper.plugin'
+
+dependencies {
+    compile project(':common')
+    compile(group: 'org.zanata', name: 'zanata-client-commands', version:'3.8.0') {
+exclude(module: 'slf4j-log4j12')
+    }
+}

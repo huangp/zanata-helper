@@ -1,13 +1,14 @@
 package org.zanata.helper.model;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.UUID;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.zanata.helper.util.CronHelper;
+import org.zanata.helper.common.SyncType;
+import org.zanata.helper.common.plugin.SourceRepoExecutor;
+import org.zanata.helper.common.plugin.TranslationServerExecutor;
 
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
@@ -24,7 +25,7 @@ public class JobConfig implements Serializable {
      */
     private String cron;
     private JobConfig.Type jobType;
-    private JobConfig.SyncType syncType;
+    private SyncType syncType;
     private String sourceUrl;
     private String sourceUsername;
     private String sourceApiKey;
@@ -35,8 +36,11 @@ public class JobConfig implements Serializable {
     @Setter
     private JobStatus lastJobStatus;
 
+    private SourceRepoExecutor sourceRepoExecutor;
+    private TranslationServerExecutor translationServerExecutor;
+
     public JobConfig(String name, String description, JobConfig.Type jobType,
-            JobConfig.SyncType syncType, String sourceUrl,
+            SyncType syncType, String sourceUrl,
             String sourceUsername, String sourceApiKey, String zanataUrl,
             String zanataUsername, String zanataApiKey, String cron) {
         this(UUID.randomUUID().timestamp(), name, description, jobType,
@@ -45,7 +49,7 @@ public class JobConfig implements Serializable {
     }
 
     public JobConfig(Long id, String name, String description,
-            JobConfig.Type jobType, JobConfig.SyncType syncType,
+            JobConfig.Type jobType, SyncType syncType,
             String sourceUrl, String sourceUsername, String sourceApiKey,
             String zanataUrl, String zanataUsername, String zanataApiKey,
             String cron) {
@@ -53,7 +57,7 @@ public class JobConfig implements Serializable {
         this.name = name;
         this.description = description;
         this.jobType = jobType;
-        this.syncType =syncType;
+        this.syncType = syncType;
         this.sourceUrl = sourceUrl;
         this.sourceUsername = sourceUsername;
         this.sourceApiKey = sourceApiKey;
@@ -64,13 +68,7 @@ public class JobConfig implements Serializable {
     }
 
     public static enum Type {
-        SYNC_TO_ZANATA,
+        SYNC_TO_SERVER,
         SYNC_TO_REPO;
-    }
-
-    public static enum SyncType {
-        SOURCE,
-        TRANSLATIONS,
-        BOTH;
     }
 }

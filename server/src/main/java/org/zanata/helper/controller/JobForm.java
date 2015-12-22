@@ -29,7 +29,7 @@ public class JobForm implements Serializable {
     @Size(max = 50)
     private String cron;
 
-    private JobConfig.Type jobType = JobConfig.Type.SYNC_TO_ZANATA;
+    private JobConfig.Type jobType = JobConfig.Type.SYNC_TO_SERVER;
 
     private JobConfig.SyncType syncType = JobConfig.SyncType.SOURCE;
 
