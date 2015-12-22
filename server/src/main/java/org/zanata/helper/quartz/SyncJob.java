@@ -14,8 +14,7 @@ public class SyncJob implements Job {
                 (JobConfig) context.getJobDetail().getJobDataMap().get("value");
         if (jobConfig.getJobType().equals(JobConfig.Type.SYNC_TO_REPO)) {
             processSyncToRepo(jobConfig);
-        } else
-            if (jobConfig.getJobType().equals(JobConfig.Type.SYNC_TO_ZANATA)) {
+        } else if (jobConfig.getJobType().equals(JobConfig.Type.SYNC_TO_ZANATA)) {
             processSyncToZanata(jobConfig);
         }
     }

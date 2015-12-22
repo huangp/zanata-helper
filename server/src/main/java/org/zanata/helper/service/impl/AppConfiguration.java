@@ -18,4 +18,8 @@ public class AppConfiguration
    @Getter
    @Value("${build.info}")
    private String buildInfo;
+
+   @Getter
+   @Value("${store.directory}")
+   private String storageDirectory;
 }
