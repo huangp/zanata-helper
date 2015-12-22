@@ -50,10 +50,12 @@ public class IndexController {
     }
 
     private String getRunningJobsUrl() {
-        return APIController.getBaseUrl() + JobController.RUNNING_JOBS_URL;
+        return APIController.getBaseUrl() + APIController.API_ROOT
+                + APIController.JOBS_ROOT + JobController.RUNNING_JOBS_URL;
     }
 
     private String getAllJobsUrl() {
-        return APIController.getBaseUrl() + JobController.ALL_JOBS_URL;
+        return APIController.getBaseUrl() + APIController.API_ROOT
+                + APIController.JOBS_ROOT;
     }
 }

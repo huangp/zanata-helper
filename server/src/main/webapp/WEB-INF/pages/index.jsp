@@ -19,9 +19,8 @@
 
         <div class="g__item w--1-m w--5-8-l w--3-4">
           <h3 class="l--push-top-0"><spring:message code="jsp.allAvailableJobs.title"/></h3>
-
-          <a href="#" class="button button--snug l--push-top-half" title="" data-original-title="New job">
-            <i class="i i--plus"></i>
+          <a href="jobs/new">
+            <spring:message code="jsf.newJob" var="newJobText"/>
           </a>
 
           <div class="panel">

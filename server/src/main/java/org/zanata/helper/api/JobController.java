@@ -23,14 +23,27 @@ import com.google.common.base.Optional;
  */
 
 @RestController
+@RequestMapping(value = APIController.API_ROOT + APIController.JOBS_ROOT)
 public class JobController extends APIController {
 
-    public final static String STATUS_URL = API_ROOT + "/jobs/status";
-    public final static String RUNNING_JOBS_URL = API_ROOT + "/jobs/running";
-    public final static String ALL_JOBS_URL = API_ROOT + "/jobs";
+    public final static String STATUS_URL = "/status";
+    public final static String RUNNING_JOBS_URL = "/running";
 
     @Autowired
     private SchedulerService schedulerServiceImpl;
+
+
+    @RequestMapping(method = RequestMethod.GET,
+        produces = "application/json; charset=UTF-8")
+    @ResponseBody
+    public ResponseEntity<List<JobSummary>> getAllJobs() {
+        try {
+            return new ResponseEntity<List<JobSummary>>(
+                schedulerServiceImpl.getAllJobs(), HttpStatus.OK);
+        } catch (SchedulerException e) {
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @RequestMapping(value = STATUS_URL, method = RequestMethod.GET,
             produces = "application/json; charset=UTF-8")
@@ -55,18 +68,6 @@ public class JobController extends APIController {
         try {
             return new ResponseEntity<List<JobSummary>>(
                     schedulerServiceImpl.getRunningJob(), HttpStatus.OK);
-        } catch (SchedulerException e) {
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @RequestMapping(value = ALL_JOBS_URL, method = RequestMethod.GET,
-        produces = "application/json; charset=UTF-8")
-    @ResponseBody
-    public ResponseEntity<List<JobSummary>> getAllJobs() {
-        try {
-            return new ResponseEntity<List<JobSummary>>(
-                schedulerServiceImpl.getAllJobs(), HttpStatus.OK);
         } catch (SchedulerException e) {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }

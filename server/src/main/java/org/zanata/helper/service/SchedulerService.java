@@ -20,7 +20,7 @@ public interface SchedulerService {
 
     List<JobSummary> getAllJobs() throws SchedulerException;
 
-    void addSyncJob(JobConfig sync) throws SchedulerException;
+    void persistAndScheduleJob(JobConfig sync) throws SchedulerException;
 
     void cancelInProgressSyncJob(JobConfig sync) throws UnableToInterruptJobException;
 }

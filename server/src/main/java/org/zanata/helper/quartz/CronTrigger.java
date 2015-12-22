@@ -26,8 +26,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.common.base.Optional;
-
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
@@ -43,20 +41,20 @@ public class CronTrigger {
         scheduler.start();
     }
 
-    public TriggerKey scheduleMonitor(JobConfig sync) throws SchedulerException {
-        if (sync != null) {
-            JobKey jobKey = new JobKey(sync.getId().toString());
+    public TriggerKey scheduleMonitor(JobConfig jobConfig) throws SchedulerException {
+        if (jobConfig != null) {
+            JobKey jobKey = new JobKey(jobConfig.getId().toString());
 
             if (!scheduler.checkExists(jobKey)) {
                 JobDetail jobDetail =
                     JobBuilder.newJob(org.zanata.helper.quartz.SyncJob.class)
-                        .withIdentity(sync.getId().toString())
-                        .withDescription(sync.toString())
+                        .withIdentity(jobConfig.getId().toString())
+                        .withDescription(jobConfig.toString())
                         .build();
 
-                jobDetail.getJobDataMap().put("value", sync);
+                jobDetail.getJobDataMap().put("value", jobConfig);
 
-                Trigger trigger = buildTrigger(sync);
+                Trigger trigger = buildTrigger(jobConfig);
                 
                 if (scheduler.getListenerManager().getJobListeners()
                         .isEmpty()) {
@@ -131,9 +129,7 @@ public class CronTrigger {
             .newTrigger()
             .withIdentity("Trigger:" + sync.getId());
 
-        if(StringUtils.isEmpty(sync.getCron())) {
-            builder.startNow();
-        } else {
+        if(!StringUtils.isEmpty(sync.getCron())) {
             builder.withSchedule(
                 CronScheduleBuilder.cronSchedule(sync.getCron()));
         }
