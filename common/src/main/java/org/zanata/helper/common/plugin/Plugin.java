@@ -1,7 +1,5 @@
 package org.zanata.helper.common.plugin;
 
-import org.zanata.helper.common.SyncType;
-
 import java.util.Map;
 
 /**
@@ -20,7 +18,12 @@ public interface Plugin {
     String getDescription();
 
     /**
-     * Return values for plugin
+     * Return fields for plugin
      */
-    Map<String, String> getFields();
+    Map<String, Field> getFields();
+
+    /**
+     * Initialise fields needed for this plugin before constructor
+     */
+    void initFields();
 }

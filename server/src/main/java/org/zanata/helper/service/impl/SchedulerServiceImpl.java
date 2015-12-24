@@ -15,11 +15,12 @@ import org.zanata.helper.events.ConfigurationChangeEvent;
 import org.zanata.helper.model.JobConfig;
 import org.zanata.helper.events.EventPublisher;
 import org.zanata.helper.events.JobRunCompletedEvent;
-import org.zanata.helper.exception.TaskNotFoundException;
+import org.zanata.helper.exception.JobNotFoundException;
 import org.zanata.helper.model.JobSummary;
 import org.zanata.helper.model.JobStatus;
 import org.zanata.helper.quartz.CronTrigger;
 import org.zanata.helper.component.AppConfiguration;
+import org.zanata.helper.service.PluginsService;
 import org.zanata.helper.service.SchedulerService;
 import org.zanata.helper.util.CronHelper;
 
@@ -42,6 +43,9 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Autowired
     private EventPublisher eventPublisher;
 
+    @Autowired
+    private PluginsService pluginsServiceImpl;
+
     private Map<Long, JobConfig> jobConfigMap = Maps.newHashMap();
 
     private Map<Long, TriggerKey> jobConfigKeyMap = Maps.newHashMap();
@@ -62,7 +66,8 @@ public class SchedulerServiceImpl implements SchedulerService {
         log.info("Initialising jobs...");
 
         List<JobConfig> jobConfigs = getJobs();
-        cronTrigger = new CronTrigger(eventPublisher, appConfiguration);
+        cronTrigger = new CronTrigger(eventPublisher, appConfiguration,
+            pluginsServiceImpl);
         for (JobConfig jobConfig : jobConfigs) {
             scheduleJob(jobConfig);
         }
@@ -114,7 +119,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     // TODO: update database record
     @EventListener
     public void onJobCompleted(JobRunCompletedEvent event)
-        throws TaskNotFoundException, SchedulerException {
+        throws JobNotFoundException, SchedulerException {
         JobConfig jobConfig = jobConfigMap.get(event.getId());
 
         if (jobConfig != null) {
@@ -123,12 +128,12 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public JobStatus getLastStatus(Long id) throws TaskNotFoundException {
+    public JobStatus getLastStatus(Long id) throws JobNotFoundException {
         JobConfig jobConfig = jobConfigMap.get(id);
         if (jobConfig != null) {
             return jobConfig.getLastJobStatus();
         }
-        throw new TaskNotFoundException(id.toString());
+        throw new JobNotFoundException(id.toString());
     }
 
     @Override
@@ -167,13 +172,13 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     private JobStatus getStatus(Long id, JobRunCompletedEvent event)
-        throws SchedulerException, TaskNotFoundException {
+        throws SchedulerException, JobNotFoundException {
         if (id == null) {
-            throw new TaskNotFoundException("");
+            throw new JobNotFoundException("");
         }
         TriggerKey triggerKey = jobConfigKeyMap.get(id);
         if (triggerKey == null) {
-            throw new TaskNotFoundException(id.toString());
+            throw new JobNotFoundException(id.toString());
         }
         return cronTrigger.getTriggerStatus(triggerKey, event);
     }

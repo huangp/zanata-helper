@@ -11,12 +11,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.zanata.helper.exception.TaskNotFoundException;
+import org.zanata.helper.exception.JobNotFoundException;
 import org.zanata.helper.model.JobStatus;
 import org.zanata.helper.model.JobSummary;
 import org.zanata.helper.service.SchedulerService;
-
-import com.google.common.base.Optional;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
@@ -56,7 +54,7 @@ public class JobController extends APIController {
                     HttpStatus.OK);
         } catch (SchedulerException e) {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (TaskNotFoundException e) {
+        } catch (JobNotFoundException e) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
     }

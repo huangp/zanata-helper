@@ -1,10 +1,12 @@
 package org.zanata.helper.controller;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.NotEmpty;
-import org.hibernate.validator.constraints.URL;
+import org.zanata.helper.common.SyncType;
 import org.zanata.helper.model.JobConfig;
 
 import lombok.Getter;
@@ -31,30 +33,19 @@ public class JobForm implements Serializable {
 
     private JobConfig.Type jobType = JobConfig.Type.SYNC_TO_SERVER;
 
-    private JobConfig.SyncType syncType = JobConfig.SyncType.SOURCE;
-
-    @NotEmpty
-    @Size(max = 2083)
-    private String sourceUrl;
-
-    @NotEmpty
-    @Size(max = 100)
-    private String sourceUsername;
+    private SyncType syncType = SyncType.SOURCE;
 
     @NotEmpty
     @Size(max = 255)
-    private String sourceApiKey;
-
-    @NotEmpty
-    @Size(max = 2083)
-    @URL
-    private String zanataUrl;
-
-    @NotEmpty
-    @Size(max = 100)
-    private String zanataUsername;
+    private String sourceRepoExecutorName;
 
     @NotEmpty
     @Size(max = 255)
-    private String zanataApiKey;
+    private String translationServerExecutorName;
+
+    private Map<String, String> sourceRepoConfig =
+        new HashMap<String, String>();
+
+    private Map<String, String> transServerConfig =
+        new HashMap<String, String>();
 }

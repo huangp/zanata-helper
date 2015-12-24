@@ -3,24 +3,25 @@ package org.zanata.helper.plugin.zanata;
 import org.zanata.client.commands.pull.PullOptionsImpl;
 import org.zanata.client.commands.push.PushOptionsImpl;
 import org.zanata.helper.common.SyncType;
+import org.zanata.helper.common.plugin.Field;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.plugin.zanata.service.impl.ZanataSyncServiceImpl;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
  */
-public class Plugin implements TranslationServerExecutor {
+public class Plugin extends TranslationServerExecutor {
 
     private final String name = "Zanata plugin";
     private final String description =
         "Zanata plugin for push and pull files";
 
-
-    private final Map<String, String> fields = new HashMap<>();
+    private final Field urlField = new Field("url", "URL");
+    private final Field usernameField = new Field("username", "Username");
+    private final Field apiKeyField = new Field("apiKey", "API Key");
 
     private final ZanataSyncServiceImpl zanataSyncService;
 
@@ -28,16 +29,21 @@ public class Plugin implements TranslationServerExecutor {
     private PullOptionsImpl pullOptions;
 
 
-    public Plugin() {
+    public Plugin(Map<String, String> fields) {
+        super(fields);
         pushOptions = new PushOptionsImpl();
         pullOptions = new PullOptionsImpl();
         zanataSyncService =
             new ZanataSyncServiceImpl(pullOptions, pushOptions,
-                fields.get("Username"), fields.get("ApiKey"));
+                this.fields.get("username").getValue(),
+                this.fields.get("apiKey").getValue());
+    }
 
-        fields.put("Username", "");
-        fields.put("ApiKey", "");
-        fields.put("URL", "");
+    @Override
+    public void initFields() {
+        fields.put(urlField.getKey(), urlField);
+        fields.put(usernameField.getKey(), usernameField);
+        fields.put(apiKeyField.getKey(), apiKeyField);
     }
 
     @Override
@@ -51,15 +57,15 @@ public class Plugin implements TranslationServerExecutor {
     }
 
     @Override
-    public Map<String, String> getFields() {
+    public Map<String, Field> getFields() {
         return fields;
     }
 
     @Override
     public void pullFromServer(File dir, SyncType syncType) {
-        if(syncType.equals(SyncType.BOTH)) {
+        if (syncType.equals(SyncType.BOTH)) {
             pullOptions.setPullType("both");
-        } else if(syncType.equals(SyncType.SOURCE)) {
+        } else if (syncType.equals(SyncType.SOURCE)) {
             pullOptions.setPullType("source");
         } else {
             pullOptions.setPullType("trans");
@@ -70,9 +76,9 @@ public class Plugin implements TranslationServerExecutor {
 
     @Override
     public void pushToServer(File dir, SyncType syncType) {
-        if(syncType.equals(SyncType.BOTH)) {
+        if (syncType.equals(SyncType.BOTH)) {
             pushOptions.setPushType("both");
-        } else if(syncType.equals(SyncType.SOURCE)) {
+        } else if (syncType.equals(SyncType.SOURCE)) {
             pushOptions.setPushType("source");
         } else {
             pushOptions.setPushType("trans");

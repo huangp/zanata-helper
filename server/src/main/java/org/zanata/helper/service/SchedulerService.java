@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.quartz.SchedulerException;
 import org.quartz.UnableToInterruptJobException;
-import org.zanata.helper.exception.TaskNotFoundException;
+import org.zanata.helper.exception.JobNotFoundException;
 import org.zanata.helper.model.JobSummary;
 import org.zanata.helper.model.JobStatus;
 import org.zanata.helper.model.JobConfig;
@@ -14,7 +14,7 @@ import org.zanata.helper.model.JobConfig;
  */
 public interface SchedulerService {
     JobStatus getLastStatus(Long id)
-        throws SchedulerException, TaskNotFoundException;
+        throws SchedulerException, JobNotFoundException;
 
     List<JobSummary> getRunningJob() throws SchedulerException;
 

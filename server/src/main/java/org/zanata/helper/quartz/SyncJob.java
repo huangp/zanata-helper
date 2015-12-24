@@ -22,21 +22,27 @@ public class SyncJob implements Job {
         basedir =
             (String) context.getJobDetail().getJobDataMap().get("basedir");
 
+        SourceRepoExecutor srcExecutor =
+            (SourceRepoExecutor) context.getJobDetail().getJobDataMap()
+                .get("sourceRepoExecutor");
+
+        TranslationServerExecutor transServerExecutor =
+            (TranslationServerExecutor) context.getJobDetail().getJobDataMap()
+                .get("translationServerExecutor");
+
         if (jobConfig.getJobType().equals(JobConfig.Type.SYNC_TO_REPO)) {
-            processSyncToRepo(jobConfig);
+            processSyncToRepo(jobConfig, srcExecutor, transServerExecutor);
         } else if (jobConfig.getJobType()
             .equals(JobConfig.Type.SYNC_TO_SERVER)) {
-            processSyncToServer(jobConfig);
+            processSyncToServer(jobConfig, srcExecutor, transServerExecutor);
         }
     }
 
-    private void processSyncToRepo(JobConfig jobConfig) {
+    private void processSyncToRepo(JobConfig jobConfig,
+        SourceRepoExecutor srcExecutor,
+        TranslationServerExecutor transServerExecutor) {
 
-        SourceRepoExecutor srcExecutor = jobConfig.getSourceRepoExecutor();
-        TranslationServerExecutor transExecutor =
-            jobConfig.getTranslationServerExecutor();
-
-        if (srcExecutor == null || transExecutor == null) {
+        if (srcExecutor == null || transServerExecutor == null) {
             log.info("No plugin in job. Skipping." + jobConfig.toString());
             return;
         }
@@ -47,20 +53,18 @@ public class SyncJob implements Job {
         log.info("Cloning repository to " + destDir);
         srcExecutor.cloneRepo(destDir);
         log.info("Pulling files to server from " + destDir);
-        transExecutor.pullFromServer(destDir, jobConfig.getSyncType());
+        transServerExecutor.pullFromServer(destDir, jobConfig.getSyncType());
         log.info("Commits to repository from " + destDir);
         srcExecutor.pushToRepo(destDir, jobConfig.getSyncType());
 
         log.info("Sync to repository completed:" + jobConfig.toString());
     }
 
-    private void processSyncToServer(JobConfig jobConfig) {
+    private void processSyncToServer(JobConfig jobConfig,
+        SourceRepoExecutor srcExecutor,
+        TranslationServerExecutor transServerExecutor) {
 
-        SourceRepoExecutor srcExecutor = jobConfig.getSourceRepoExecutor();
-        TranslationServerExecutor transExecutor =
-            jobConfig.getTranslationServerExecutor();
-
-        if (srcExecutor == null || transExecutor == null) {
+        if (srcExecutor == null || transServerExecutor == null) {
             log.info("No plugin in job. Skipping." + jobConfig.toString());
             return;
         }
@@ -71,7 +75,7 @@ public class SyncJob implements Job {
         log.info("Cloning repository to " + destDir);
         srcExecutor.cloneRepo(destDir);
         log.info("Pushing files to server from " + destDir);
-        transExecutor.pushToServer(destDir, jobConfig.getSyncType());
+        transServerExecutor.pushToServer(destDir, jobConfig.getSyncType());
 
         log.info("Sync to server completed:" + jobConfig.toString());
     }
@@ -81,21 +85,4 @@ public class SyncJob implements Job {
         dest.mkdir();
         return dest;
     }
-
-
-    //See SyncRepoITCase#canSyncToZanataThenSyncToRepo
-
-//    // 1. clone repo
-//    repoSyncService.cloneRepo(githubRepo, baseDir);
-//
-//    // 2. push to zanata
-//    pushOptions.setPushType("both");
-//    zanataSyncService.pushToZanata(baseDir.toPath());
-//
-//    // 3. pull from zanata
-//    pullOptions.setPullType("trans");
-//    zanataSyncService.pullFromZanata(baseDir.toPath());
-//
-//    // 4. push back to repo
-//    repoSyncService.syncTranslationToRepo(githubRepo, baseDir);
 }

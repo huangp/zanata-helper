@@ -1,28 +1,45 @@
 package org.zanata.helper.common.plugin;
 
+import lombok.Getter;
 import org.zanata.helper.common.SyncType;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
  */
-public interface SourceRepoExecutor extends Plugin, Serializable {
+public abstract class SourceRepoExecutor implements Plugin, Serializable {
+
+    @Getter
+    public final Map<String, Field> fields = new HashMap<String, Field>();
+
+    public SourceRepoExecutor(Map<String, String> fields) {
+        initFields();
+        if (fields != null) {
+            fields.entrySet().stream()
+                .filter(entry -> this.fields.containsKey(entry.getKey()))
+                .forEach(entry -> {
+                    this.fields.get(entry.getKey()).setValue(entry.getValue());
+                });
+        }
+    }
 
     /**
      * Clone from source repository
      *
-     * @param basedir - directory to clone to
+     * @param dir - directory to clone to
      */
-    void cloneRepo(File dir);
+    public abstract void cloneRepo(File dir);
 
     /**
      * Push changes to source repository
      *
-     * @param basedir - directory to push from
+     * @param dir - directory to push from
      * @param syncType - source only, translations only, or both
      * @return push successful
      */
-    void pushToRepo(File dir, SyncType syncType);
+    public abstract void pushToRepo(File dir, SyncType syncType);
 }

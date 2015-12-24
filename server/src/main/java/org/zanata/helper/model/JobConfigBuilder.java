@@ -1,8 +1,12 @@
 package org.zanata.helper.model;
 
+import org.zanata.helper.common.SyncType;
 import org.zanata.helper.controller.JobForm;
 
 import lombok.NoArgsConstructor;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
@@ -14,13 +18,13 @@ public class JobConfigBuilder {
     private String description;
     private String cron;
     private JobConfig.Type jobType;
-    private JobConfig.SyncType syncType;
-    private String sourceUrl;
-    private String sourceUsername;
-    private String sourceApiKey;
-    private String zanataUrl;
-    private String zanataUsername;
-    private String zanataApiKey;
+    private SyncType syncType;
+    private String sourceRepoExecutorName;
+    private Map<String, String> sourceRepoConfig =
+        new HashMap<String, String>();
+    private String translationServerExecutorName;
+    private Map<String, String> transServerConfig =
+        new HashMap<String, String>();
 
     public JobConfigBuilder(JobForm jobForm) {
         this.name = jobForm.getName();
@@ -28,12 +32,11 @@ public class JobConfigBuilder {
         this.cron = jobForm.getCron();
         this.jobType = jobForm.getJobType();
         this.syncType = jobForm.getSyncType();
-        this.sourceUrl = jobForm.getSourceUrl();
-        this.sourceUsername = jobForm.getSourceUsername();
-        this.sourceApiKey = jobForm.getSourceApiKey();
-        this.zanataUrl = jobForm.getZanataUrl();
-        this.zanataUsername = jobForm.getZanataUsername();
-        this.zanataApiKey = jobForm.getZanataApiKey();
+        this.sourceRepoExecutorName = jobForm.getSourceRepoExecutorName();
+        this.translationServerExecutorName =
+            jobForm.getTranslationServerExecutorName();
+        this.sourceRepoConfig = jobForm.getSourceRepoConfig();
+        this.transServerConfig = jobForm.getTransServerConfig();
     }
 
     public JobConfigBuilder setName(String name) {
@@ -56,44 +59,38 @@ public class JobConfigBuilder {
         return this;
     }
 
-    public JobConfigBuilder setSyncType(JobConfig.SyncType syncType) {
+    public JobConfigBuilder setSyncType(SyncType syncType) {
         this.syncType = syncType;
         return this;
     }
 
-    public JobConfigBuilder setSourceUrl(String sourceUrl) {
-        this.sourceUrl = sourceUrl;
+    public JobConfigBuilder setSourceRepoConfig(
+        Map<String, String> sourceRepoConfig) {
+        this.sourceRepoConfig = sourceRepoConfig;
         return this;
     }
 
-    public JobConfigBuilder setSourceUsername(String sourceUsername) {
-        this.sourceUsername = sourceUsername;
+    public JobConfigBuilder setTransServerConfig(
+        Map<String, String> transServerConfig) {
+        this.transServerConfig = transServerConfig;
         return this;
     }
 
-    public JobConfigBuilder setSourceApiKey(String sourceApiKey) {
-        this.sourceApiKey = sourceApiKey;
+    public JobConfigBuilder setSourceRepoExecutorName(
+        String sourceRepoExecutorName) {
+        this.sourceRepoExecutorName = sourceRepoExecutorName;
         return this;
     }
 
-    public JobConfigBuilder setZanataUrl(String zanataUrl) {
-        this.zanataUrl = zanataUrl;
-        return this;
-    }
-
-    public JobConfigBuilder setZanataUsername(String zanataUsername) {
-        this.zanataUsername = zanataUsername;
-        return this;
-    }
-
-    public JobConfigBuilder setZanataApiKey(String zanataApiKey) {
-        this.zanataApiKey = zanataApiKey;
+    public JobConfigBuilder setTranslationServerExecutorName(
+        String translationServerExecutorName) {
+        this.translationServerExecutorName = translationServerExecutorName;
         return this;
     }
 
     public JobConfig build() {
-        return new JobConfig(name, description, jobType, syncType, sourceUrl,
-                sourceUsername, sourceApiKey, zanataUrl, zanataUsername,
-                zanataApiKey, cron);
+        return new JobConfig(name, description, jobType, syncType,
+            sourceRepoConfig, sourceRepoExecutorName, transServerConfig,
+            translationServerExecutorName, cron);
     }
 }
