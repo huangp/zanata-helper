@@ -17,10 +17,6 @@ public class Plugin extends SourceRepoExecutor {
     private final String description =
         "Git plugin for push and pull to git repository";
 
-    private static final Field urlField = new Field("url", "URL");
-    private static final Field usernameField = new Field("username", "Username");
-    private static final Field apiKeyField = new Field("apiKey", "API Key");
-
     private final GitSyncService gitSyncService;
 
     public Plugin(Map<String, String> fields) {
@@ -34,6 +30,10 @@ public class Plugin extends SourceRepoExecutor {
 
     @Override
     public void initFields() {
+        Field urlField = new Field("url", "URL");
+        Field usernameField = new Field("username", "Username");
+        Field apiKeyField = new Field("apiKey", "API Key");
+
         fields.put(urlField.getKey(), urlField);
         fields.put(usernameField.getKey(), usernameField);
         fields.put(apiKeyField.getKey(), apiKeyField);

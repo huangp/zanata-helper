@@ -1,3 +1,6 @@
+description = 'Zanata helper common module'
+group 'org.zanata.helper.common'
+
 dependencies {
-    providedCompile group: 'org.projectlombok', name: 'lombok', version:'1.16.6'
+    compile group: 'org.projectlombok', name: 'lombok', version:'1.16.6'
 }

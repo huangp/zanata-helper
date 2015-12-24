@@ -27,6 +27,7 @@ import org.zanata.helper.util.CronHelper;
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -86,14 +87,23 @@ public class SchedulerServiceImpl implements SchedulerService {
             String name = "name" + i;
             String description = "description" + i;
 
+            Map<String, String> srcConfig = new HashMap<>();
+            srcConfig.put("url", "http://github.com/aeng/zanata-helper");
+            srcConfig.put("username", username);
+            srcConfig.put("apiKey", apiKey);
+
+            Map<String, String> transConfig = new HashMap<>();
+            transConfig.put("url", "http://localhost:8080/zanata/project/zanata-helper/" + i);
+            transConfig.put("username", username);
+            transConfig.put("apiKey", apiKey);
+
             JobConfig job =
                 new JobConfig(id, name, description,
                     JobConfig.Type.SYNC_TO_SERVER,
                     SyncType.TRANSLATIONS,
-                    "http://github.com/aeng/zanata-helper", username,
-                    apiKey,
-                    "http://localhost:8080/zanata/project/zanata-helper/" + i,
-                    username, apiKey,
+                    srcConfig, "org.zanata.helper.plugin.git.Plugin",
+                    transConfig,
+                    "org.zanata.helper.plugin.zanata.Plugin",
                     CronHelper.CronType.THRITY_SECONDS.getExpression());
             configs.add(job);
 

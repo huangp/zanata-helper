@@ -2,13 +2,17 @@ package org.zanata.helper.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.zanata.helper.common.plugin.Plugin;
 import org.zanata.helper.common.plugin.SourceRepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.exception.UnableLoadPluginException;
 import org.zanata.helper.service.PluginsService;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,6 +50,36 @@ public final class PluginsServiceImpl implements PluginsService {
     }
 
     @Override
+    public List<SourceRepoExecutor> getAvailableSourceRepoPlugins() {
+        List<SourceRepoExecutor> result = new ArrayList<>();
+        for (Class plugin : sourceRepoPluginMap.values()) {
+            try {
+                SourceRepoExecutor executor =
+                    getNewSourceRepoPlugin(plugin.getName(), null);
+                result.add(executor);
+            } catch (UnableLoadPluginException e) {
+                log.warn("Unable to load plugin " + e.getMessage());
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<TranslationServerExecutor> getAvailableTransServerPlugins() {
+        List<TranslationServerExecutor> result = new ArrayList<>();
+        for (Class plugin : transServerPluginMap.values()) {
+            try {
+                TranslationServerExecutor executor =
+                    getNewTransServerPlugin(plugin.getName(), null);
+                result.add(executor);
+            } catch (UnableLoadPluginException e) {
+                log.warn("Unable to load plugin " + e.getMessage());
+            }
+        }
+        return result;
+    }
+
+    @Override
     public SourceRepoExecutor getNewSourceRepoPlugin(String className,
         Map<String, String> fields) throws UnableLoadPluginException {
         Class<? extends SourceRepoExecutor>
@@ -54,6 +88,7 @@ public final class PluginsServiceImpl implements PluginsService {
             return executor.getDeclaredConstructor(Map.class)
                 .newInstance(fields);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new UnableLoadPluginException(className);
         }
     }
@@ -68,6 +103,7 @@ public final class PluginsServiceImpl implements PluginsService {
             return executor.getDeclaredConstructor(Map.class)
                 .newInstance(fields);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new UnableLoadPluginException(className);
         }
     }

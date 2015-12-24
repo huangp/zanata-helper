@@ -19,10 +19,6 @@ public class Plugin extends TranslationServerExecutor {
     private final String description =
         "Zanata plugin for push and pull files";
 
-    private final Field urlField = new Field("url", "URL");
-    private final Field usernameField = new Field("username", "Username");
-    private final Field apiKeyField = new Field("apiKey", "API Key");
-
     private final ZanataSyncServiceImpl zanataSyncService;
 
     private PushOptionsImpl pushOptions;
@@ -41,6 +37,10 @@ public class Plugin extends TranslationServerExecutor {
 
     @Override
     public void initFields() {
+        Field urlField = new Field("url", "URL");
+        Field usernameField = new Field("username", "Username");
+        Field apiKeyField = new Field("apiKey", "API Key");
+
         fields.put(urlField.getKey(), urlField);
         fields.put(usernameField.getKey(), usernameField);
         fields.put(apiKeyField.getKey(), apiKeyField);

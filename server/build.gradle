@@ -12,7 +12,7 @@ gretty {
   contextPath = ''
 }
 
-description = 'auto-sync server'
+description = 'Zanata helper server'
 dependencies {
     compile project(':common')
     compile project(':gitPlugin')
