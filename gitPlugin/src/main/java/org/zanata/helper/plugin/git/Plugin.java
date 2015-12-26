@@ -11,6 +11,8 @@ import java.util.Map;
 
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
+ *
+ * TODO: internationalise this class
  */
 public class Plugin extends SourceRepoExecutor {
     private final String name = "Git plugin";
@@ -30,11 +32,13 @@ public class Plugin extends SourceRepoExecutor {
 
     @Override
     public void initFields() {
-        Field urlField = new Field("url", "URL");
-        Field usernameField = new Field("username", "Username");
-        Field apiKeyField = new Field("apiKey", "API Key");
+        Field urlField = new Field("url", "URL", "https://github.com/zanata/zanata-server.git", null);
+        Field branchField = new Field("branch", "Branch", "master", "Default to master branch");
+        Field usernameField = new Field("username", "Username", "", "Username for repository");
+        Field apiKeyField = new Field("apiKey", "API Key", "", "API key for repository");
 
         fields.put(urlField.getKey(), urlField);
+        fields.put(branchField.getKey(), branchField);
         fields.put(usernameField.getKey(), usernameField);
         fields.put(apiKeyField.getKey(), apiKeyField);
     }

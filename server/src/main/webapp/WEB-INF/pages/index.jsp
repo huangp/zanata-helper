@@ -20,26 +20,38 @@
         <div class="g__item w--1-m w--5-8-l w--3-4">
           <h3 class="l--push-top-0"><spring:message code="jsp.allAvailableJobs.title"/></h3>
           <a href="jobs/new">
-            <spring:message code="jsf.newJob" var="newJobText"/>
+            <spring:message code="jsf.newJob"/>
           </a>
 
           <div class="panel">
-            <ul class="list--panel">
-              <c:forEach var="job" items="${allJobs}">
-                <li class="l--pad-all-quarter">
-                  <div class="list__item__content">
-                    <div class="list__item__info">
-                      <h3 class="list__title">${job.name}</h3>
-                      <span class="list__item__meta">${job.description}</span>
+            <c:if test="${empty allJobs}">
+              <div class="l--pad-all-half">
+                <p class="txt--meta">
+                  <spring:message code="jsp.noJobs"/>
+                </p>
+                <a href="jobs/new" class="button button--primary">
+                  <spring:message code="jsf.newJob"/>
+                </a>
+              </div>
+            </c:if>
+            <c:if test="${not empty allJobs}">
+              <ul class="list--panel">
+                <c:forEach var="job" items="${allJobs}">
+                  <li class="l--pad-all-quarter">
+                    <div class="list__item__content">
+                      <div class="list__item__info">
+                        <h3 class="list__title">${job.name}</h3>
+                        <span class="list__item__meta">${job.description}</span>
+                      </div>
+                      <div class="list__item__actions txt--meta">
+                        <span class="l--push-right-quarter">${job.lastJobStatus.status}</span>
+                        <span>${job.lastJobStatus.lastEndTime}</span>
+                      </div>
                     </div>
-                    <div class="list__item__actions txt--meta">
-                      <span class="l--push-right-quarter">${job.lastJobStatus.status}</span>
-                      <span>${job.lastJobStatus.lastEndTime}</span>
-                    </div>
-                  </div>
-                </li>
-              </c:forEach>
-            </ul>
+                  </li>
+                </c:forEach>
+              </ul>
+            </c:if>
           </div>
         </div>
       </div>

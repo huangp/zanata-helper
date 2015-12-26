@@ -12,6 +12,8 @@ import java.util.Map;
 
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
+ *
+ * TODO: internationalise this class
  */
 public class Plugin extends TranslationServerExecutor {
 
@@ -37,9 +39,9 @@ public class Plugin extends TranslationServerExecutor {
 
     @Override
     public void initFields() {
-        Field urlField = new Field("url", "URL");
-        Field usernameField = new Field("username", "Username");
-        Field apiKeyField = new Field("apiKey", "API Key");
+        Field urlField = new Field("url", "URL", "https://translate.zanata.org/zanata/iteration/view/zanata-server/master", null);
+        Field usernameField = new Field("username", "Username", "", "Username for repository");
+        Field apiKeyField = new Field("apiKey", "API Key", "", "API key for repository");
 
         fields.put(urlField.getKey(), urlField);
         fields.put(usernameField.getKey(), usernameField);

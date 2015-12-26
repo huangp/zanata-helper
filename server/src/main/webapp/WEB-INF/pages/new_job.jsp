@@ -49,8 +49,10 @@
                 <form:option value="BOTH" label="${syncBothLabel}"/>
               </form:select>
             </div>
-
             <div class="form__item">
+              <input type="checkbox" name="repeatJob" onclick="toggleSection(this, 'cronConfigSection')"> Repeat job
+            </div>
+            <div class="form__item is-hidden" id="cronConfigSection">
               <spring:message code="jsf.newJob.cron.placeholder" var="cronPlaceholder"/>
               <label for="cron"><spring:message code="jsf.newJob.cron.label"/>
                 <a href="http://en.wikipedia.org/wiki/Cron#CRON_expression" target="_blank"><i class="i i--info"></i></a></label>
@@ -61,68 +63,31 @@
             <h2 class="heading--secondary l--push-top-half">
               <spring:message code="jsf.newJob.source_repo"/>
             </h2>
-            <form:select path="sourceRepoExecutorName" id="sourceRepoExecutorName">
+            <form:select path="sourceRepoExecutorName" id="sourceRepoExecutorName" onchange="onPluginChanged(this, 'repo')">
               <c:forEach var="plugin" items="${repoPluginOptions}">
                 <form:option value="${plugin.getClass().getName()}" label="${plugin.getName()}"/>
               </c:forEach>
+              <form:option value="testValue" label="test"/>
             </form:select>
-            <hr class="l--push-top-quarter"/>
-            <div id="sourceRepoConfig">
-              <%--<div class="form__item">--%>
-                <%--<spring:message code="jsf.newJob.source_repo_url.placeholder" var="sourceRepoPlaceholder"/>--%>
-                <%--<form:input path="sourceUrl" id="sourceUrl" placeholder="${sourceRepoPlaceholder}"/>--%>
-                <%--<form:errors path="sourceUrl" cssClass="l--pad-all-quarter message--danger"/>--%>
-              <%--</div>--%>
 
-              <%--<div class="form__item">--%>
-                <%--<label for="sourceUsername"><spring:message code="jsf.newJob.username"/></label>--%>
-                <%--<spring:message code="jsf.newJob.username.tooltip" var="sourceRepoUsername"/>--%>
-                <%--<form:input path="sourceUsername" id="sourceUsername" title="${sourceRepoUsername}"/>--%>
-                <%--<form:errors path="sourceUsername" cssClass="l--pad-all-quarter message--danger"/>--%>
-              <%--</div>--%>
-
-              <%--<div class="form__item">--%>
-                <%--<label for="sourceApiKey"><spring:message code="jsf.newJob.apiKey"/></label>--%>
-                <%--<spring:message code="jsf.newJob.apikey.tooltip" var="sourceRepoApi"/>--%>
-                <%--<form:input path="sourceApiKey" id="sourceApiKey" title="${sourceRepoApi}"/>--%>
-                <%--<form:errors path="sourceApiKey" cssClass="l--pad-all-quarter message--danger"/>--%>
-              <%--</div>--%>
+            <div id="sourceRepoSettings">
+              <jsp:include page="view/repo_settings.jsp" />
             </div>
-
 
             <h2 class="heading--secondary l--push-top-half">
               <spring:message code="jsf.newJob.trans_server"/>
             </h2>
-            <form:select path="translationServerExecutorName" id="translationServerExecutorName">
+            <form:select path="translationServerExecutorName" id="translationServerExecutorName" onchange="onPluginChanged(this, 'trans')">
               <c:forEach var="plugin" items="${serverPluginOptions}">
                 <form:option value="${plugin.getClass().getName()}" label="${plugin.getName()}"/>
               </c:forEach>
             </form:select>
-            <hr class="l--push-top-quarter"/>
 
-            <div id="transServerConfig">
-              <%--<div class="form__item">--%>
-                <%--<spring:message code="jsf.newJob.trans_server.placeholder" var="zanataRepoPlaceholder"/>--%>
-                <%--<form:input path="zanataUrl" id="zanataUrl" placeholder="${zanataRepoPlaceholder}"/>--%>
-                <%--<form:errors path="zanataUrl" cssClass="l--pad-all-quarter message--danger"/>--%>
-              <%--</div>--%>
-
-              <%--<div class="form__item">--%>
-                <%--<label for="zanataUsername"><spring:message code="jsf.newJob.username"/></label>--%>
-                <%--<spring:message code="jsf.newJob.username.tooltip" var="zanataUsername"/>--%>
-                <%--<form:input path="zanataUsername" id="zanataUsername" title="${zanataUsername}"/>--%>
-                <%--<form:errors path="zanataUsername" cssClass="l--pad-all-quarter message--danger"/>--%>
-              <%--</div>--%>
-
-              <%--<div class="form__item">--%>
-                <%--<label for="zanataApiKey"><spring:message code="jsf.newJob.apiKey"/></label>--%>
-                <%--<spring:message code="jsf.newJob.apikey.tooltip" var="zanataApiKey"/>--%>
-                <%--<form:input path="zanataApiKey" id="sourceApiKey" title="${zanataApiKey}"/>--%>
-                <%--<form:errors path="zanataApiKey" cssClass="l--pad-all-quarter message--danger"/>--%>
-              <%--</div>--%>
+            <div id="transServerSettings" class="form__item">
+              <jsp:include page="view/trans_settings.jsp" />
             </div>
 
-            <div class="form__item">
+            <div class="form__item l--push-top-1">
               <button class="button button--primary button--full">
                 <spring:message code="jsf.newJob.createJob.button"/>
               </button>

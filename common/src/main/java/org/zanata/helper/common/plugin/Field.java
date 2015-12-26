@@ -14,8 +14,13 @@ public class Field {
     @Setter
     private String value;
 
-    public Field(String key, String label) {
+    private String placeholder;
+    private String tooltip;
+
+    public Field(String key, String label, String placeholder, String tooltip) {
         this.key = key;
         this.label = label;
+        this.placeholder = placeholder;
+        this.tooltip = tooltip;
     }
 }

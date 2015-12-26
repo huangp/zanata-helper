@@ -6,6 +6,7 @@ import org.zanata.helper.common.SyncType;
 import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -14,7 +15,8 @@ import java.util.Map;
 public abstract class SourceRepoExecutor implements Plugin, Serializable {
 
     @Getter
-    public final Map<String, Field> fields = new HashMap<String, Field>();
+    public final HashMap<String, Field> fields =
+        new LinkedHashMap<String, Field>();
 
     public SourceRepoExecutor(Map<String, String> fields) {
         initFields();
