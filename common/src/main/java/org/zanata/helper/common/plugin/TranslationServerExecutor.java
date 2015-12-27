@@ -33,7 +33,8 @@ public abstract class TranslationServerExecutor implements Plugin {
      * @param dir - directory to pull to
      * @param syncType - source only, translations only, or both
      */
-    public abstract void pullFromServer(File dir, SyncType syncType);
+    public abstract void pullFromServer(File dir, SyncType syncType)
+        throws Exception;
 
     /**
      * Push files to server from given directory
@@ -41,5 +42,6 @@ public abstract class TranslationServerExecutor implements Plugin {
      * @param dir - directory to push from
      * @param syncType - source only, translations only, or both
      */
-    public abstract void pushToServer(File dir, SyncType syncType);
+    public abstract void pushToServer(File dir, SyncType syncType)
+        throws Exception;
 }

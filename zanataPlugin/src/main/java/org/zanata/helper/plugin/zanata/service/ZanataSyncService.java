@@ -24,6 +24,7 @@ import java.nio.file.Path;
 
 import org.zanata.client.commands.pull.PullOptions;
 import org.zanata.client.commands.push.PushOptions;
+import org.zanata.helper.plugin.zanata.exception.ZanataSyncException;
 
 /**
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
@@ -34,7 +35,7 @@ public interface ZanataSyncService {
 
     PushOptions getPushOptions();
 
-    void pushToZanata(Path repoBase);
+    void pushToZanata(Path repoBase) throws ZanataSyncException;
 
-    void pullFromZanata(Path repoBase);
+    void pullFromZanata(Path repoBase) throws Exception;
 }

@@ -2,6 +2,7 @@ package org.zanata.helper.plugin.git;
 
 import org.zanata.helper.common.SyncType;
 import org.zanata.helper.common.UsernamePasswordCredential;
+import org.zanata.helper.common.exception.RepoSyncException;
 import org.zanata.helper.common.plugin.Field;
 import org.zanata.helper.common.plugin.SourceRepoExecutor;
 import org.zanata.helper.common.validator.StringValidator;
@@ -56,12 +57,13 @@ public class Plugin extends SourceRepoExecutor {
     }
 
     @Override
-    public void cloneRepo(File dir) {
+    public void cloneRepo(File dir) throws RepoSyncException {
         gitSyncService.cloneRepo(getFields().get("url").getValue(), dir);
     }
 
     @Override
-    public void pushToRepo(File dir, SyncType syncType) {
+    public void pushToRepo(File dir, SyncType syncType)
+        throws RepoSyncException {
         gitSyncService
             .syncTranslationToRepo(getFields().get("url").getValue(), dir);
     }

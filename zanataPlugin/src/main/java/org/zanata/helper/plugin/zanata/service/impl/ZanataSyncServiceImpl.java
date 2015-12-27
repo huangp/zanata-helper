@@ -26,6 +26,7 @@ import java.util.Optional;
 
 import org.zanata.client.commands.pull.PullOptions;
 import org.zanata.client.commands.push.PushOptions;
+import org.zanata.helper.plugin.zanata.exception.ZanataSyncException;
 import org.zanata.helper.plugin.zanata.service.ZanataSyncService;
 import org.zanata.helper.plugin.zanata.util.PushPullOptionsUtil;
 
@@ -60,7 +61,7 @@ public class ZanataSyncServiceImpl implements ZanataSyncService {
     }
 
     @Override
-    public void pushToZanata(Path repoBase) {
+    public void pushToZanata(Path repoBase) throws ZanataSyncException {
         Optional<File> projectConfig =
                 PushPullOptionsUtil.findProjectConfig(repoBase.toFile());
 
@@ -72,7 +73,7 @@ public class ZanataSyncServiceImpl implements ZanataSyncService {
     }
 
     @Override
-    public void pullFromZanata(Path repoBase) {
+    public void pullFromZanata(Path repoBase) throws Exception {
         Optional<File> projectConfig =
                 PushPullOptionsUtil.findProjectConfig(repoBase.toFile());
 

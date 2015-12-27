@@ -66,7 +66,7 @@ public class Plugin extends TranslationServerExecutor {
     }
 
     @Override
-    public void pullFromServer(File dir, SyncType syncType) {
+    public void pullFromServer(File dir, SyncType syncType) throws Exception {
         if (syncType.equals(SyncType.BOTH)) {
             pullOptions.setPullType("both");
         } else if (syncType.equals(SyncType.SOURCE)) {
@@ -79,7 +79,7 @@ public class Plugin extends TranslationServerExecutor {
     }
 
     @Override
-    public void pushToServer(File dir, SyncType syncType) {
+    public void pushToServer(File dir, SyncType syncType) throws Exception {
         if (syncType.equals(SyncType.BOTH)) {
             pushOptions.setPushType("both");
         } else if (syncType.equals(SyncType.SOURCE)) {
