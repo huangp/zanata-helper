@@ -8,12 +8,23 @@
 <div class="form__item">
   <c:if test="${not empty selectedSrcPlugin}">
     <c:forEach var="srcRepoField" items="${selectedSrcPlugin.fields.values()}">
-      <div class="form__item" title="${srcRepoField.tooltip}">
+      <c:set var="key" value="${repoSettingsPrefix}${srcRepoField.key}" />
+
+      <c:choose>
+        <c:when test="${not empty errors && errors.containsKey(key)}">
+          <c:set var="errorClass" value="form__item--error" />
+        </c:when>
+        <c:otherwise>
+          <c:set var="errorClass" value="" />
+        </c:otherwise>
+      </c:choose>
+
+      <div class="form__item ${errorClass}" title="${srcRepoField.tooltip}">
         <label for="${srcRepoField.key}">${srcRepoField.label}</label>
-        <form:input path="sourceRepoConfig['${srcRepoField.key}']"
-            id="${srcRepoField.key}" placeholder="${srcRepoField.placeholder}"/>
-        <form:errors path="sourceRepoConfig['${srcRepoField.key}']"
-            cssClass="l--pad-all-quarter message--danger"/>
+        <input id="${key}" name="${key}" type="text" placeholder="${srcRepoField.placeholder}" class="l--push-bottom-quarter"/>
+        <c:if test="${not empty errors && errors.containsKey(key)}">
+          <span class="l--pad-all-quarter message--danger">${errors.get(key)}</span>
+        </c:if>
       </div>
     </c:forEach>
   </c:if>

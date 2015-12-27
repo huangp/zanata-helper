@@ -14,39 +14,35 @@
         </p>
         <h1 class="l--push-all-0"><spring:message code="jsf.newJob"/></h1>
 
-        <form:form commandName="jobForm" action="/jobs/new">
+        <form:form commandName="jobForm" action="/jobs/new" method="post">
           <div class="g__item l--push-top-1">
             <div class="form__item">
               <label for="name"><spring:message code="jsf.newJob.name"/></label>
-              <form:input path="name" id="name" maxlength="100"/>
+              <form:input path="name" id="name" maxlength="100" cssClass="l--push-bottom-quarter"/>
               <form:errors path="name" cssClass="l--pad-all-quarter message--danger"/>
             </div>
 
             <div class="form__item">
               <label for="description"><spring:message code="jsf.newJob.description"/></label>
-              <form:textarea path="description" id="description"/>
+              <form:textarea path="description" id="description" cssClass="l--push-bottom-quarter"/>
               <form:errors path="description" cssClass="l--pad-all-quarter message--danger">
               </form:errors>
             </div>
 
             <div class="form__item">
               <label for="jobType"><spring:message code="jsf.newJob.jobType"/></label>
-              <spring:message code="jsf.newJob.jobType.SyncToZanata.explanation" var="SyncToZanataLabel"/>
-              <spring:message code="jsf.newJob.jobType.SyncToRepo.explanation" var="SyncToRepoLabel"/>
               <form:select path="jobType" id="jobType">
-                <form:option value="SYNC_TO_ZANATA" label="${SyncToZanataLabel}"/>
-                <form:option value="SYNC_TO_REPO" label="${SyncToRepoLabel}"/>
+                <c:forEach var="option" items="${jobTypes}">
+                  <form:option value="${option.key}" label="${option.label}"/>
+                </c:forEach>
               </form:select>
             </div>
             <div class="form__item">
               <label for="jobType"><spring:message code="jsf.newJob.syncType"/></label>
-              <spring:message code="jsf.newJob.syncType.sourceOnly.explanation" var="sourceOnlyLabel"/>
-              <spring:message code="jsf.newJob.syncType.translationsOnly.explanation" var="translationsOnlyLabel"/>
-              <spring:message code="jsf.newJob.syncType.both.explanation" var="syncBothLabel"/>
               <form:select path="syncType" id="syncType">
-                <form:option value="SOURCE" label="${sourceOnlyLabel}"/>
-                <form:option value="TRANSLATIONS" label="${translationsOnlyLabel}"/>
-                <form:option value="BOTH" label="${syncBothLabel}"/>
+                <c:forEach var="option" items="${syncTypes}">
+                  <form:option value="${option.key}" label="${option.label}"/>
+                </c:forEach>
               </form:select>
             </div>
             <div class="form__item">

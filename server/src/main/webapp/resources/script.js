@@ -32,7 +32,7 @@ function onPluginChanged(list, type) {
 
   $.ajax({
     url : contextPath + '/jobs/new/settings?selectedPlugin=' + selectedClass + '&type=' + type,
-    type: 'POST',
+    type: 'GET',
     cache : false,
     success : function(response) {
       pluginConfigContent.html(response);

@@ -7,13 +7,23 @@
 <div class="form__item">
   <c:if test="${not empty selectedTransPlugin}">
     <c:forEach var="transPluginField" items="${selectedTransPlugin.fields.values()}">
-      <div class="form__item" title="${transPluginField.tooltip}">
+      <c:set var="key" value="${transSettingsPrefix}${transPluginField.key}" />
+
+      <c:choose>
+        <c:when test="${not empty errors && errors.containsKey(key)}">
+          <c:set var="errorClass" value="form__item--error" />
+        </c:when>
+        <c:otherwise>
+          <c:set var="errorClass" value="" />
+        </c:otherwise>
+      </c:choose>
+
+      <div class="form__item ${errorClass}" title="${transPluginField.tooltip}">
         <label for="${transPluginField.key}">${transPluginField.label}</label>
-        <form:input path="transServerConfig['${transPluginField.key}']"
-            id="${transPluginField.key}"
-            placeholder="${transPluginField.placeholder}"/>
-        <form:errors path="transServerConfig['${transPluginField.key}']"
-            cssClass="l--pad-all-quarter message--danger"/>
+        <input id="${key}" name="${key}" type="text" placeholder="${transPluginField.placeholder}" class="l--push-bottom-quarter"/>
+        <c:if test="${not empty errors && errors.containsKey(key)}">
+          <span class="l--pad-all-quarter message--danger">${errors.get(key)}</span>
+        </c:if>
       </div>
     </c:forEach>
   </c:if>
