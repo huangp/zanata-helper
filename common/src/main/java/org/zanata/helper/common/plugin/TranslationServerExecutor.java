@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
  */
-public abstract class TranslationServerExecutor implements Plugin, Serializable {
+public abstract class TranslationServerExecutor implements Plugin {
 
     @Getter
     public final Map<String, Field> fields = new LinkedHashMap<String, Field>();

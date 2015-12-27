@@ -5,6 +5,8 @@ import org.zanata.client.commands.push.PushOptionsImpl;
 import org.zanata.helper.common.SyncType;
 import org.zanata.helper.common.plugin.Field;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
+import org.zanata.helper.common.validator.StringValidator;
+import org.zanata.helper.common.validator.UrlValidator;
 import org.zanata.helper.plugin.zanata.service.impl.ZanataSyncServiceImpl;
 
 import java.io.File;
@@ -39,8 +41,8 @@ public class Plugin extends TranslationServerExecutor {
 
     @Override
     public void initFields() {
-        Field urlField = new Field("url", "URL", "https://translate.zanata.org/zanata/iteration/view/zanata-server/master", null);
-        Field usernameField = new Field("username", "Username", "", "Username for repository");
+        Field urlField = new Field("url", "URL", "https://translate.zanata.org/zanata/iteration/view/zanata-server/master", null, new UrlValidator());
+        Field usernameField = new Field("username", "Username", "", "Username for repository", new StringValidator(null, null, true));
         Field apiKeyField = new Field("apiKey", "API Key", "", "API key for repository");
 
         fields.put(urlField.getKey(), urlField);

@@ -1,8 +1,10 @@
 package org.zanata.helper.model;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 import lombok.Getter;
@@ -49,7 +51,7 @@ public class JobConfig implements Serializable {
         SyncType syncType, Map<String, String> sourceRepoConfig,
         String sourceRepoExecutorName, Map<String, String> transServerConfig,
         String translationServerExecutorName, String cron) {
-        this(UUID.randomUUID().timestamp(), name, description, jobType,
+        this(new Date().getTime(), name, description, jobType,
             syncType, sourceRepoConfig, sourceRepoExecutorName,
             transServerConfig, translationServerExecutorName, cron);
     }

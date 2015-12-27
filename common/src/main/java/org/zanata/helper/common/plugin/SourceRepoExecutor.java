@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
  */
-public abstract class SourceRepoExecutor implements Plugin, Serializable {
+public abstract class SourceRepoExecutor implements Plugin {
 
     @Getter
     public final HashMap<String, Field> fields =

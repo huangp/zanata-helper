@@ -20,7 +20,7 @@
 
       <div class="form__item ${errorClass}" title="${transPluginField.tooltip}">
         <label for="${transPluginField.key}">${transPluginField.label}</label>
-        <input id="${key}" name="${key}" type="text" placeholder="${transPluginField.placeholder}" class="l--push-bottom-quarter"/>
+        <input id="${key}" name="${key}" type="text" placeholder="${transPluginField.placeholder}" class="l--push-bottom-quarter" value="${transPluginField.value}"/>
         <c:if test="${not empty errors && errors.containsKey(key)}">
           <span class="l--pad-all-quarter message--danger">${errors.get(key)}</span>
         </c:if>

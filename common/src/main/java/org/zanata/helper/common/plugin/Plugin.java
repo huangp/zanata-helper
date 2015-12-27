@@ -1,11 +1,12 @@
 package org.zanata.helper.common.plugin;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
  */
-public interface Plugin {
+public interface Plugin extends Serializable {
 
     /**
      * @return name of this plugin

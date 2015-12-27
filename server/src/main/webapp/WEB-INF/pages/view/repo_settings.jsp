@@ -21,7 +21,7 @@
 
       <div class="form__item ${errorClass}" title="${srcRepoField.tooltip}">
         <label for="${srcRepoField.key}">${srcRepoField.label}</label>
-        <input id="${key}" name="${key}" type="text" placeholder="${srcRepoField.placeholder}" class="l--push-bottom-quarter"/>
+        <input id="${key}" name="${key}" type="text" placeholder="${srcRepoField.placeholder}" class="l--push-bottom-quarter" value="${srcRepoField.value}"/>
         <c:if test="${not empty errors && errors.containsKey(key)}">
           <span class="l--pad-all-quarter message--danger">${errors.get(key)}</span>
         </c:if>

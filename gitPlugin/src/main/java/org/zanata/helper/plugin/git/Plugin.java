@@ -4,7 +4,9 @@ import org.zanata.helper.common.SyncType;
 import org.zanata.helper.common.UsernamePasswordCredential;
 import org.zanata.helper.common.plugin.Field;
 import org.zanata.helper.common.plugin.SourceRepoExecutor;
+import org.zanata.helper.common.validator.StringValidator;
 import org.zanata.helper.plugin.git.service.impl.GitSyncService;
+import org.zanata.helper.common.validator.UrlValidator;
 
 import java.io.File;
 import java.util.Map;
@@ -32,9 +34,9 @@ public class Plugin extends SourceRepoExecutor {
 
     @Override
     public void initFields() {
-        Field urlField = new Field("url", "URL", "https://github.com/zanata/zanata-server.git", null);
+        Field urlField = new Field("url", "URL", "https://github.com/zanata/zanata-server.git", null, new UrlValidator());
         Field branchField = new Field("branch", "Branch", "master", "Default to master branch");
-        Field usernameField = new Field("username", "Username", "", "Username for repository");
+        Field usernameField = new Field("username", "Username", "", "Username for repository", new StringValidator(null, null, true));
         Field apiKeyField = new Field("apiKey", "API Key", "", "API key for repository");
 
         fields.put(urlField.getKey(), urlField);
