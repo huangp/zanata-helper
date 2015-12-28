@@ -1,5 +1,6 @@
 package org.zanata.helper.common.validator;
 
+import org.zanata.helper.common.Messages;
 import org.zanata.helper.common.plugin.Validator;
 
 /**
@@ -16,6 +17,6 @@ public class UrlValidator implements Validator {
         if(urlValidator.isValid(value)) {
            return null;
         }
-        return "Invalid url:" + value;
+        return Messages.getString("validation.url.invalid", value);
     }
 }

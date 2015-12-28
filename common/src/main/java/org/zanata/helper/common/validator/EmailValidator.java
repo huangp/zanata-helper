@@ -1,5 +1,6 @@
 package org.zanata.helper.common.validator;
 
+import org.zanata.helper.common.Messages;
 import org.zanata.helper.common.plugin.Validator;
 
 /**
@@ -15,6 +16,6 @@ public class EmailValidator implements Validator {
         if(emailValidator.isValid(value)) {
             return null;
         }
-        return "Invalid email:" + value;
+        return Messages.getString("validation.email.invalid", value);
     }
 }

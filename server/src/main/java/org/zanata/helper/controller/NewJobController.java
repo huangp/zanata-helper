@@ -109,6 +109,7 @@ public class NewJobController {
             errors.putAll(validateTransFields(jobForm.getTransServerConfig(),
                 jobForm.getTranslationServerExecutorName()));
             if(!errors.isEmpty()) {
+                model.put("errors", errors);
                 initModel(model);
                 return "new_job";
             }
@@ -212,7 +213,7 @@ public class NewJobController {
 
     private List<Field> getJobTypes() {
         if (jobTypes == null) {
-            List<Field> jobTypes = new ArrayList<>();
+            jobTypes = new ArrayList<>();
             jobTypes.add(
                 new Field(JobConfig.Type.SYNC_TO_REPO.name(), messageResource
                     .getMessage("jsf.newJob.jobType.SyncToRepo.explanation"),
@@ -229,7 +230,7 @@ public class NewJobController {
 
     private List<Field> getSyncTypes() {
         if (syncTypes == null) {
-            List<Field> syncTypes = new ArrayList<>();
+            syncTypes = new ArrayList<>();
             syncTypes.add(new Field(SyncType.SOURCE.name(), messageResource
                 .getMessage("jsf.newJob.syncType.sourceOnly.explanation"), "",
                 ""));

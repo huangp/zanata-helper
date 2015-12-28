@@ -1,6 +1,7 @@
 package org.zanata.helper.common.validator;
 
 import lombok.AllArgsConstructor;
+import org.zanata.helper.common.Messages;
 import org.zanata.helper.common.plugin.Validator;
 
 /**
@@ -15,19 +16,19 @@ public class StringValidator implements Validator {
 
     @Override
     public String validate(String value) {
-        if (notEmpty != null) {
+        if (notEmpty != null && notEmpty) {
             if (value == null || value.length() <= 0) {
-                return "must not empty";
+                return Messages.getString("validation.string.notEmpty");
             }
         }
         if (minLength != null) {
             if (value == null || value.length() < minLength) {
-                return "must have at least " + minLength + " character";
+                return Messages.getString("validation.string.minlength", minLength);
             }
         }
         if (maxLength != null) {
             if (value == null || value.length() > maxLength) {
-                return "must not more than " + minLength + " character";
+                return Messages.getString("validation.string.maxlength", maxLength);
             }
         }
         return null;
