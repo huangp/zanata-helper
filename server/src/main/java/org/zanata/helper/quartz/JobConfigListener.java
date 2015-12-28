@@ -7,6 +7,7 @@ import org.quartz.JobExecutionException;
 import org.quartz.JobListener;
 import org.zanata.helper.events.EventPublisher;
 import org.zanata.helper.events.JobRunCompletedEvent;
+import org.zanata.helper.events.JobRunStartsEvent;
 import org.zanata.helper.model.JobConfig;
 
 @Slf4j
@@ -25,7 +26,10 @@ public class JobConfigListener implements JobListener {
 
     // Run this if job is about to be executed.
     public void jobToBeExecuted(JobExecutionContext context) {
-        log.debug("Job : " + getJobConfigJob(context).getName() + " starting.");
+        JobConfig jobConfig = getJobConfigJob(context);
+        eventPublisher.fireEvent(
+            new JobRunStartsEvent(this, jobConfig.getId(),
+                context.getFireTime()));
     }
 
     public void jobExecutionVetoed(JobExecutionContext context) {
@@ -35,7 +39,6 @@ public class JobConfigListener implements JobListener {
     public void jobWasExecuted(JobExecutionContext context,
         JobExecutionException jobException) {
         JobConfig jobConfig = getJobConfigJob(context);
-        log.debug("Job : " + jobConfig.getName() + " is completed.");
 
         eventPublisher.fireEvent(
             new JobRunCompletedEvent(this, jobConfig.getId(),

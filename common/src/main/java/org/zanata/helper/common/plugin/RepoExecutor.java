@@ -13,13 +13,13 @@ import java.util.Map;
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
  */
-public abstract class SourceRepoExecutor implements Plugin {
+public abstract class RepoExecutor implements Plugin {
 
     @Getter
     public final HashMap<String, Field> fields =
         new LinkedHashMap<String, Field>();
 
-    public SourceRepoExecutor(Map<String, String> fields) {
+    public RepoExecutor(Map<String, String> fields) {
         initFields();
         if (fields != null) {
             fields.entrySet().stream()

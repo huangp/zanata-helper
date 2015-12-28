@@ -7,6 +7,7 @@ import org.zanata.helper.common.plugin.Field;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.common.validator.StringValidator;
 import org.zanata.helper.common.validator.UrlValidator;
+import org.zanata.helper.plugin.zanata.exception.ZanataSyncException;
 import org.zanata.helper.plugin.zanata.service.impl.ZanataSyncServiceImpl;
 
 import java.io.File;
@@ -66,7 +67,8 @@ public class Plugin extends TranslationServerExecutor {
     }
 
     @Override
-    public void pullFromServer(File dir, SyncType syncType) throws Exception {
+    public void pullFromServer(File dir, SyncType syncType) throws
+        ZanataSyncException {
         if (syncType.equals(SyncType.BOTH)) {
             pullOptions.setPullType("both");
         } else if (syncType.equals(SyncType.SOURCE)) {
@@ -79,7 +81,8 @@ public class Plugin extends TranslationServerExecutor {
     }
 
     @Override
-    public void pushToServer(File dir, SyncType syncType) throws Exception {
+    public void pushToServer(File dir, SyncType syncType)
+        throws ZanataSyncException {
         if (syncType.equals(SyncType.BOTH)) {
             pushOptions.setPushType("both");
         } else if (syncType.equals(SyncType.SOURCE)) {

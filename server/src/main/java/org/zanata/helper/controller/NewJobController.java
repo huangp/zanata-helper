@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.zanata.helper.common.SyncType;
 import org.zanata.helper.common.plugin.Field;
 import org.zanata.helper.common.plugin.Plugin;
-import org.zanata.helper.common.plugin.SourceRepoExecutor;
+import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.common.plugin.Validator;
 import org.zanata.helper.component.MessageResource;
@@ -51,7 +51,7 @@ public class NewJobController {
     private final String repoSettingsPrefix = "repoSettings-";
     private final String transSettingsPrefix = "transSettings-";
 
-    private List<SourceRepoExecutor> sourceRepoExecutors;
+    private List<RepoExecutor> repoExecutors;
     private List<TranslationServerExecutor> transServerExecutors;
     private List<Field> syncTypes;
     private List<Field> jobTypes;
@@ -75,7 +75,7 @@ public class NewJobController {
             model.addAttribute("selectedTransPlugin", selectedExecutor);
             return "view/trans_settings";
         } else {
-            SourceRepoExecutor selectedExecutor =
+            RepoExecutor selectedExecutor =
                 getSourceRepoExecutor(className);
             model.addAttribute("selectedSrcPlugin", selectedExecutor);
             return "view/repo_settings";
@@ -126,7 +126,7 @@ public class NewJobController {
 
     private Map<String, String> validateRepoFields(
         Map<String, String> config, String executorClass) {
-        SourceRepoExecutor executor = getSourceRepoExecutor(executorClass);
+        RepoExecutor executor = getSourceRepoExecutor(executorClass);
         if(executor == null) {
             return new HashMap<>();
         }
@@ -160,8 +160,8 @@ public class NewJobController {
         return errors;
     }
 
-    private SourceRepoExecutor getSourceRepoExecutor(String className) {
-        for (SourceRepoExecutor executor : getSourceRepoExecutors()) {
+    private RepoExecutor getSourceRepoExecutor(String className) {
+        for (RepoExecutor executor : getRepoExecutors()) {
             if (executor.getClass().getName().equals(className)) {
                 return executor;
             }
@@ -183,8 +183,8 @@ public class NewJobController {
         model.addAttribute("repoSettingsPrefix", repoSettingsPrefix);
         model.addAttribute("transSettingsPrefix", transSettingsPrefix);
 
-        model.addAttribute("repoPluginOptions", getSourceRepoExecutors());
-        model.addAttribute("selectedSrcPlugin", getSourceRepoExecutors().get(0));
+        model.addAttribute("repoPluginOptions", getRepoExecutors());
+        model.addAttribute("selectedSrcPlugin", getRepoExecutors().get(0));
 
         model.addAttribute("serverPluginOptions", getTransServerExecutors());
         model.addAttribute("selectedTransPlugin", getTransServerExecutors().get(
@@ -202,12 +202,12 @@ public class NewJobController {
         return transServerExecutors;
     }
 
-    private List<SourceRepoExecutor> getSourceRepoExecutors() {
-        if (sourceRepoExecutors == null) {
-            sourceRepoExecutors =
+    private List<RepoExecutor> getRepoExecutors() {
+        if (repoExecutors == null) {
+            repoExecutors =
                 pluginsServiceImpl.getAvailableSourceRepoPlugins();
         }
-        return sourceRepoExecutors;
+        return repoExecutors;
     }
 
     private List<Field> getJobTypes() {

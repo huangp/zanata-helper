@@ -2,15 +2,13 @@ package org.zanata.helper.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.zanata.helper.common.plugin.Plugin;
-import org.zanata.helper.common.plugin.SourceRepoExecutor;
+import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.exception.UnableLoadPluginException;
 import org.zanata.helper.service.PluginsService;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,9 +20,9 @@ import java.util.Map;
 @Slf4j
 public final class PluginsServiceImpl implements PluginsService {
 
-    private final static Map<String, Class<? extends SourceRepoExecutor>>
+    private final static Map<String, Class<? extends RepoExecutor>>
         sourceRepoPluginMap =
-        new HashMap<String, Class<? extends SourceRepoExecutor>>();
+        new HashMap<String, Class<? extends RepoExecutor>>();
 
     private final static Map<String, Class<? extends TranslationServerExecutor>>
         transServerPluginMap =
@@ -50,11 +48,11 @@ public final class PluginsServiceImpl implements PluginsService {
     }
 
     @Override
-    public List<SourceRepoExecutor> getAvailableSourceRepoPlugins() {
-        List<SourceRepoExecutor> result = new ArrayList<>();
+    public List<RepoExecutor> getAvailableSourceRepoPlugins() {
+        List<RepoExecutor> result = new ArrayList<>();
         for (Class plugin : sourceRepoPluginMap.values()) {
             try {
-                SourceRepoExecutor executor =
+                RepoExecutor executor =
                     getNewSourceRepoPlugin(plugin.getName(), null);
                 result.add(executor);
             } catch (UnableLoadPluginException e) {
@@ -80,9 +78,9 @@ public final class PluginsServiceImpl implements PluginsService {
     }
 
     @Override
-    public SourceRepoExecutor getNewSourceRepoPlugin(String className,
+    public RepoExecutor getNewSourceRepoPlugin(String className,
         Map<String, String> fields) throws UnableLoadPluginException {
-        Class<? extends SourceRepoExecutor>
+        Class<? extends RepoExecutor>
             executor = sourceRepoPluginMap.get(className);
         try {
             return executor.getDeclaredConstructor(Map.class)

@@ -4,8 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.zanata.helper.component.ContextBeanProvider;
+import org.zanata.helper.events.EventPublisher;
+import org.zanata.helper.events.JobProgressEvent;
 import org.zanata.helper.model.JobConfig;
-import org.zanata.helper.common.plugin.SourceRepoExecutor;
+import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
 
 import java.io.File;
@@ -15,15 +18,19 @@ public class SyncJob implements Job {
 
     private String basedir;
 
+    private final EventPublisher eventPublisher =
+        ContextBeanProvider.getBean(EventPublisher.class);
+
     public void execute(JobExecutionContext context)
         throws JobExecutionException {
+
         JobConfig jobConfig =
             (JobConfig) context.getJobDetail().getJobDataMap().get("value");
         basedir =
             (String) context.getJobDetail().getJobDataMap().get("basedir");
 
-        SourceRepoExecutor srcExecutor =
-            (SourceRepoExecutor) context.getJobDetail().getJobDataMap()
+        RepoExecutor srcExecutor =
+            (RepoExecutor) context.getJobDetail().getJobDataMap()
                 .get("sourceRepoExecutor");
 
         TranslationServerExecutor transServerExecutor =
@@ -39,45 +46,63 @@ public class SyncJob implements Job {
     }
 
     private void processSyncToRepo(JobConfig jobConfig,
-        SourceRepoExecutor srcExecutor,
-        TranslationServerExecutor transServerExecutor) {
+        RepoExecutor srcExecutor,
+        TranslationServerExecutor transServerExecutor)
+        throws JobExecutionException {
 
         if (srcExecutor == null || transServerExecutor == null) {
             log.info("No plugin in job. Skipping." + jobConfig.toString());
             return;
         }
 
-        log.info("Sync to repository starts:" + jobConfig.toString());
+        try {
+            updateProgress(jobConfig.getId(), "Sync to repository starts");
+            File destDir = getDestDirectory(jobConfig.getId().toString());
+            updateProgress(jobConfig.getId(),
+                "Cloning repository to " + destDir);
+            srcExecutor.cloneRepo(destDir);
+            updateProgress(jobConfig.getId(),
+                "Pulling files to server from " + destDir);
+            transServerExecutor
+                .pullFromServer(destDir, jobConfig.getSyncType());
+            updateProgress(jobConfig.getId(),
+                "Commits to repository from " + destDir);
+            srcExecutor.pushToRepo(destDir, jobConfig.getSyncType());
+            updateProgress(jobConfig.getId(), "Sync to repository completed");
+        } catch (Exception e) {
+            throw new JobExecutionException(e);
+        }
+    }
 
-        File destDir = getDestDirectory(jobConfig.getId().toString());
-        log.info("Cloning repository to " + destDir);
-        srcExecutor.cloneRepo(destDir);
-        log.info("Pulling files to server from " + destDir);
-        transServerExecutor.pullFromServer(destDir, jobConfig.getSyncType());
-        log.info("Commits to repository from " + destDir);
-        srcExecutor.pushToRepo(destDir, jobConfig.getSyncType());
-
-        log.info("Sync to repository completed:" + jobConfig.toString());
+    private void updateProgress(Long id, String description) {
+        eventPublisher.fireEvent(
+            new JobProgressEvent(this, id, description));
     }
 
     private void processSyncToServer(JobConfig jobConfig,
-        SourceRepoExecutor srcExecutor,
-        TranslationServerExecutor transServerExecutor) {
+        RepoExecutor repoExecutor,
+        TranslationServerExecutor transServerExecutor)
+        throws JobExecutionException {
 
-        if (srcExecutor == null || transServerExecutor == null) {
+        if (repoExecutor == null || transServerExecutor == null) {
             log.info("No plugin in job. Skipping." + jobConfig.toString());
             return;
         }
 
-        log.info("Sync to server starts:" + jobConfig.toString());
-
-        File destDir = getDestDirectory(jobConfig.getId().toString());
-        log.info("Cloning repository to " + destDir);
-        srcExecutor.cloneRepo(destDir);
-        log.info("Pushing files to server from " + destDir);
-        transServerExecutor.pushToServer(destDir, jobConfig.getSyncType());
-
-        log.info("Sync to server completed:" + jobConfig.toString());
+        try {
+            updateProgress(jobConfig.getId(), "Sync to server starts");
+            File destDir = getDestDirectory(jobConfig.getId().toString());
+            updateProgress(jobConfig.getId(),
+                "Cloning repository to " + destDir);
+            repoExecutor.cloneRepo(destDir);
+            updateProgress(jobConfig.getId(),
+                "Pushing files to server from " + destDir);
+            transServerExecutor.pushToServer(destDir, jobConfig.getSyncType());
+            updateProgress(jobConfig.getId(), "Sync to server completed");
+        }
+        catch (Exception e) {
+            throw new JobExecutionException(e);
+        }
     }
 
     private File getDestDirectory(String name) {

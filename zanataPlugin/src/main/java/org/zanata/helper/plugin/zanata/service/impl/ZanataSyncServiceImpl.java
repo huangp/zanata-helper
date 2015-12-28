@@ -73,7 +73,7 @@ public class ZanataSyncServiceImpl implements ZanataSyncService {
     }
 
     @Override
-    public void pullFromZanata(Path repoBase) throws Exception {
+    public void pullFromZanata(Path repoBase) throws ZanataSyncException {
         Optional<File> projectConfig =
                 PushPullOptionsUtil.findProjectConfig(repoBase.toFile());
 

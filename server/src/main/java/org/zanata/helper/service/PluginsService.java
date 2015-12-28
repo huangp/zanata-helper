@@ -1,7 +1,6 @@
 package org.zanata.helper.service;
 
-import org.zanata.helper.common.plugin.Plugin;
-import org.zanata.helper.common.plugin.SourceRepoExecutor;
+import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.exception.UnableLoadPluginException;
 
@@ -13,11 +12,11 @@ import java.util.Map;
  */
 public interface PluginsService {
 
-    List<SourceRepoExecutor> getAvailableSourceRepoPlugins();
+    List<RepoExecutor> getAvailableSourceRepoPlugins();
 
     List<TranslationServerExecutor> getAvailableTransServerPlugins();
 
-    SourceRepoExecutor getNewSourceRepoPlugin(String className,
+    RepoExecutor getNewSourceRepoPlugin(String className,
         Map<String, String> fields) throws UnableLoadPluginException;
 
     TranslationServerExecutor getNewTransServerPlugin(

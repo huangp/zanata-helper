@@ -12,6 +12,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.zanata.helper.common.SyncType;
 import org.zanata.helper.events.ConfigurationChangeEvent;
+import org.zanata.helper.events.JobProgressEvent;
+import org.zanata.helper.events.JobRunStartsEvent;
 import org.zanata.helper.model.JobConfig;
 import org.zanata.helper.events.EventPublisher;
 import org.zanata.helper.events.JobRunCompletedEvent;
@@ -126,13 +128,33 @@ public class SchedulerServiceImpl implements SchedulerService {
         }
     }
 
-    // TODO: update database record
+    // TODO: update job details
+    @EventListener
+    public void onJobProgressUpdate(JobProgressEvent event) {
+        JobConfig jobConfig = jobConfigMap.get(event.getId());
+        if (jobConfig != null) {
+            log.info(jobConfig.getName() + ":" + event.getDescription());
+        }
+    }
+
+    // TODO: fire websocket event
+    @EventListener
+    public void onJobStarts(JobRunStartsEvent event) {
+        JobConfig jobConfig = jobConfigMap.get(event.getId());
+        if (jobConfig != null) {
+            log.debug(
+                "Job : " + jobConfig.getName() + " starting.");
+        }
+    }
+
+    // TODO: update database record, create history
     @EventListener
     public void onJobCompleted(JobRunCompletedEvent event)
         throws JobNotFoundException, SchedulerException {
         JobConfig jobConfig = jobConfigMap.get(event.getId());
 
         if (jobConfig != null) {
+            log.debug("Job : " + jobConfig.getName() + " is completed.");
             jobConfig.setLastJobStatus(getStatus(event.getId(), event));
         }
     }

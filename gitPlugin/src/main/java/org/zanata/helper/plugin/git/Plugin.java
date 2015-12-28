@@ -4,7 +4,7 @@ import org.zanata.helper.common.SyncType;
 import org.zanata.helper.common.UsernamePasswordCredential;
 import org.zanata.helper.common.exception.RepoSyncException;
 import org.zanata.helper.common.plugin.Field;
-import org.zanata.helper.common.plugin.SourceRepoExecutor;
+import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.validator.StringValidator;
 import org.zanata.helper.plugin.git.service.impl.GitSyncService;
 import org.zanata.helper.common.validator.UrlValidator;
@@ -17,7 +17,7 @@ import java.util.Map;
  *
  * TODO: internationalise this class
  */
-public class Plugin extends SourceRepoExecutor {
+public class Plugin extends RepoExecutor {
     private final String name = "Git plugin";
     private final String description =
         "Git plugin for push and pull to git repository";
