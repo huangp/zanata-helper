@@ -22,7 +22,7 @@ package org.zanata.helper.plugin.git.service;
 
 import java.io.File;
 
-import org.zanata.helper.common.Credentials;
+import org.zanata.helper.common.model.Credentials;
 import org.zanata.helper.common.exception.RepoSyncException;
 
 public interface RepoSyncService<P> {

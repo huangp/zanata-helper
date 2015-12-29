@@ -2,8 +2,8 @@ package org.zanata.helper.plugin.zanata;
 
 import org.zanata.client.commands.pull.PullOptionsImpl;
 import org.zanata.client.commands.push.PushOptionsImpl;
-import org.zanata.helper.common.SyncType;
-import org.zanata.helper.common.plugin.Field;
+import org.zanata.helper.common.model.SyncType;
+import org.zanata.helper.common.model.Field;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.common.validator.StringValidator;
 import org.zanata.helper.common.validator.UrlValidator;
@@ -21,14 +21,11 @@ import java.util.Map;
 public class Plugin extends TranslationServerExecutor {
 
     private final String name = "Zanata plugin";
-    private final String description =
-        "Zanata plugin for push and pull files";
-
+    private final String description = Messages.getString("plugin.description");
     private final ZanataSyncServiceImpl zanataSyncService;
 
     private PushOptionsImpl pushOptions;
     private PullOptionsImpl pullOptions;
-
 
     public Plugin(Map<String, String> fields) {
         super(fields);
@@ -42,9 +39,16 @@ public class Plugin extends TranslationServerExecutor {
 
     @Override
     public void initFields() {
-        Field urlField = new Field("url", "URL", "https://translate.zanata.org/zanata/iteration/view/zanata-server/master", null, new UrlValidator());
-        Field usernameField = new Field("username", "Username", "", "Username for repository", new StringValidator(null, null, true));
-        Field apiKeyField = new Field("apiKey", "API Key", "", "API key for repository");
+        Field urlField = new Field("url", Messages.getString("field.url.label"),
+            "https://translate.zanata.org/zanata/iteration/view/zanata-server/master",
+            null, new UrlValidator());
+        Field usernameField =
+            new Field("username", Messages.getString("field.username.label"),
+                "", Messages.getString("field.username.tooltip"),
+                new StringValidator(null, null, true));
+        Field apiKeyField =
+            new Field("apiKey", Messages.getString("field.apiKey.label"), "",
+                Messages.getString("field.apiKey.tooltip"));
 
         fields.put(urlField.getKey(), urlField);
         fields.put(usernameField.getKey(), usernameField);

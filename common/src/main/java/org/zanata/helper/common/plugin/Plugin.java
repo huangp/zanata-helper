@@ -1,5 +1,7 @@
 package org.zanata.helper.common.plugin;
 
+import org.zanata.helper.common.model.Field;
+
 import java.io.Serializable;
 import java.util.Map;
 

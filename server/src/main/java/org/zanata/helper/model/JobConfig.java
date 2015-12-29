@@ -4,13 +4,11 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.zanata.helper.common.SyncType;
+import org.zanata.helper.common.model.SyncType;
 
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>

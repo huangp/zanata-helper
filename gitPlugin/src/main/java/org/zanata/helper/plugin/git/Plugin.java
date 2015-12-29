@@ -1,9 +1,9 @@
 package org.zanata.helper.plugin.git;
 
-import org.zanata.helper.common.SyncType;
-import org.zanata.helper.common.UsernamePasswordCredential;
+import org.zanata.helper.common.model.SyncType;
+import org.zanata.helper.common.model.UsernamePasswordCredential;
 import org.zanata.helper.common.exception.RepoSyncException;
-import org.zanata.helper.common.plugin.Field;
+import org.zanata.helper.common.model.Field;
 import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.validator.StringValidator;
 import org.zanata.helper.plugin.git.service.impl.GitSyncService;
@@ -19,9 +19,7 @@ import java.util.Map;
  */
 public class Plugin extends RepoExecutor {
     private final String name = "Git plugin";
-    private final String description =
-        "Git plugin for push and pull to git repository";
-
+    private final String description = Messages.getString("plugin.description");
     private final GitSyncService gitSyncService;
 
     public Plugin(Map<String, String> fields) {
@@ -35,10 +33,19 @@ public class Plugin extends RepoExecutor {
 
     @Override
     public void initFields() {
-        Field urlField = new Field("url", "URL", "https://github.com/zanata/zanata-server.git", null, new UrlValidator());
-        Field branchField = new Field("branch", "Branch", "master", "Default to master branch");
-        Field usernameField = new Field("username", "Username", "", "Username for repository", new StringValidator(null, null, true));
-        Field apiKeyField = new Field("apiKey", "API Key", "", "API key for repository");
+        Field urlField = new Field("url", Messages.getString("field.url.label"),
+            "https://github.com/zanata/zanata-server.git", null,
+            new UrlValidator());
+        Field branchField =
+            new Field("branch", Messages.getString("field.branch.label"),
+                "master", Messages.getString("field.branch.tooltip"));
+        Field usernameField =
+            new Field("username", Messages.getString("field.username.label"),
+                "", Messages.getString("field.username.tooltip"),
+                new StringValidator(null, null, true));
+        Field apiKeyField =
+            new Field("apiKey", Messages.getString("field.apiKey.label"), "",
+                Messages.getString("field.apiKey.tooltip"));
 
         fields.put(urlField.getKey(), urlField);
         fields.put(branchField.getKey(), branchField);

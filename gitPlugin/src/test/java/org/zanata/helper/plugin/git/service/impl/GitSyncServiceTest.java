@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.zanata.helper.common.UsernamePasswordCredential;
+import org.zanata.helper.common.model.UsernamePasswordCredential;
 
 public class GitSyncServiceTest {
     @Rule

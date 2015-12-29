@@ -31,7 +31,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zanata.helper.common.Credentials;
+import org.zanata.helper.common.model.Credentials;
 import org.zanata.helper.common.exception.RepoSyncException;
 import org.zanata.helper.plugin.git.service.RepoSyncService;
 

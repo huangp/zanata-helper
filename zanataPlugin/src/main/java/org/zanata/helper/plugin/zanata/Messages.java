@@ -1,4 +1,4 @@
-package org.zanata.helper.common;
+package org.zanata.helper.plugin.zanata;
 
 import java.text.MessageFormat;
 import java.util.Locale;
@@ -7,8 +7,8 @@ import java.util.ResourceBundle;
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
  */
-public class Messages {
-    private static final String BASENAME = "org.zanata.helper.common.messages";
+public final class Messages {
+    private static final String BASENAME = "org.zanata.helper.plugin.zanata.messages";
     private static ResourceBundle resourceBundle =
         ResourceBundle.getBundle(BASENAME);
 

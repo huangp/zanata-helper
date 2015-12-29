@@ -1,7 +1,8 @@
-package org.zanata.helper.common.plugin;
+package org.zanata.helper.common.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.zanata.helper.common.plugin.Validator;
 
 import java.io.Serializable;
 

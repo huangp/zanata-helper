@@ -1,11 +1,10 @@
 package org.zanata.helper.common.plugin;
 
 import lombok.Getter;
-import org.zanata.helper.common.SyncType;
+import org.zanata.helper.common.model.Field;
+import org.zanata.helper.common.model.SyncType;
 
 import java.io.File;
-import java.io.Serializable;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 

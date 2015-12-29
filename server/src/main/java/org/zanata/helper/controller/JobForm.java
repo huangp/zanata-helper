@@ -6,7 +6,7 @@ import java.util.Map;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.NotEmpty;
-import org.zanata.helper.common.SyncType;
+import org.zanata.helper.common.model.SyncType;
 import org.zanata.helper.model.JobConfig;
 
 import lombok.Getter;

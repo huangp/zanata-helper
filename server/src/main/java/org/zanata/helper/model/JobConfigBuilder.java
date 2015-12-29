@@ -1,6 +1,6 @@
 package org.zanata.helper.model;
 
-import org.zanata.helper.common.SyncType;
+import org.zanata.helper.common.model.SyncType;
 import org.zanata.helper.controller.JobForm;
 
 import lombok.NoArgsConstructor;

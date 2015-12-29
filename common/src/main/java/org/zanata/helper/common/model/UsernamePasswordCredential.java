@@ -1,4 +1,4 @@
-package org.zanata.helper.common;
+package org.zanata.helper.common.model;
 
 /**
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
