@@ -1,8 +1,8 @@
-var refreshPageInterval = 5000; //30 seconds
+var refreshPageInterval = 10000; //10 seconds
 var contextPath;
 
 function refreshRunningJobs() {
-  console.info('refresh running jobs');
+  console.debug('refresh running jobs');
 
   $.ajax({
     url : contextPath + '/runningJobs',

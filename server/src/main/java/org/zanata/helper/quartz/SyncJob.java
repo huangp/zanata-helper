@@ -21,6 +21,9 @@ public class SyncJob implements Job {
     private final EventPublisher eventPublisher =
         ContextBeanProvider.getBean(EventPublisher.class);
 
+    private final int syncToRepoTotalSteps = 5;
+    private final int syncToServerTotalSteps = 4;
+
     public void execute(JobExecutionContext context)
         throws JobExecutionException {
 
@@ -56,27 +59,33 @@ public class SyncJob implements Job {
         }
 
         try {
-            updateProgress(jobConfig.getId(), "Sync to repository starts");
+            updateProgress(jobConfig.getId(), 1, syncToRepoTotalSteps,
+                "Sync to repository starts");
             File destDir = getDestDirectory(jobConfig.getId().toString());
             updateProgress(jobConfig.getId(),
-                "Cloning repository to " + destDir);
+                2, syncToRepoTotalSteps, "Cloning repository to " + destDir);
             srcExecutor.cloneRepo(destDir);
             updateProgress(jobConfig.getId(),
+                3, syncToRepoTotalSteps,
                 "Pulling files to server from " + destDir);
             transServerExecutor
                 .pullFromServer(destDir, jobConfig.getSyncType());
             updateProgress(jobConfig.getId(),
+                4, syncToRepoTotalSteps,
                 "Commits to repository from " + destDir);
             srcExecutor.pushToRepo(destDir, jobConfig.getSyncType());
-            updateProgress(jobConfig.getId(), "Sync to repository completed");
+            updateProgress(jobConfig.getId(), 5, syncToRepoTotalSteps,
+                "Sync to repository completed");
         } catch (Exception e) {
             throw new JobExecutionException(e);
         }
     }
 
-    private void updateProgress(Long id, String description) {
+    private void updateProgress(Long id, int currentStep, int totalSteps,
+        String description) {
         eventPublisher.fireEvent(
-            new JobProgressEvent(this, id, description));
+            new JobProgressEvent(this, id, currentStep, totalSteps,
+                description));
     }
 
     private void processSyncToServer(JobConfig jobConfig,
@@ -90,17 +99,19 @@ public class SyncJob implements Job {
         }
 
         try {
-            updateProgress(jobConfig.getId(), "Sync to server starts");
+            updateProgress(jobConfig.getId(), 1, syncToServerTotalSteps,
+                "Sync to server starts");
             File destDir = getDestDirectory(jobConfig.getId().toString());
             updateProgress(jobConfig.getId(),
-                "Cloning repository to " + destDir);
+                2, syncToServerTotalSteps, "Cloning repository to " + destDir);
             repoExecutor.cloneRepo(destDir);
             updateProgress(jobConfig.getId(),
+                3, syncToServerTotalSteps,
                 "Pushing files to server from " + destDir);
             transServerExecutor.pushToServer(destDir, jobConfig.getSyncType());
-            updateProgress(jobConfig.getId(), "Sync to server completed");
-        }
-        catch (Exception e) {
+            updateProgress(jobConfig.getId(), 4, syncToServerTotalSteps,
+                "Sync to server completed");
+        } catch (Exception e) {
             throw new JobExecutionException(e);
         }
     }

@@ -3,7 +3,7 @@
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <c:if test="${empty runningJobs}">
-  <p class="txt--meta"><spring:message code="jsp.noRunningJobs"/></p>
+  <p class="txt--meta l--push-top-half"><spring:message code="jsp.noRunningJobs"/></p>
 </c:if>
 <c:if test="${not empty runningJobs}">
   <ul class="list--panel">

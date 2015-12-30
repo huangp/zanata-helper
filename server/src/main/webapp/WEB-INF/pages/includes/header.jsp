@@ -14,6 +14,7 @@
       href="http://assets-zanata.rhcloud.com/master/assets/css/style.min.css"/>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="http://assets-zanata.rhcloud.com/master/assets/js/script.js"></script>
   <script type="text/javascript" src="/resources/script.js"></script>
   <script>contextPath = "${pageContext.request.contextPath}"</script>
   <title><spring:message code="Application.name"/></title>

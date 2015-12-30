@@ -9,12 +9,16 @@ import org.springframework.context.ApplicationEvent;
 @Getter
 public class JobProgressEvent extends ApplicationEvent {
     private Long id;
+    private int currentStep;
+    private int totalSteps;
     private String description;
 
     public JobProgressEvent(Object source, Long id,
-        String description) {
+        int currentStep, int totalSteps, String description) {
         super(source);
         this.id = id;
+        this.currentStep = currentStep;
+        this.totalSteps = totalSteps;
         this.description = description;
     }
 }

@@ -63,7 +63,6 @@
               <c:forEach var="plugin" items="${repoPluginOptions}">
                 <form:option value="${plugin.getClass().getName()}" label="${plugin.getName()}"/>
               </c:forEach>
-              <form:option value="testValue" label="test"/>
             </form:select>
 
             <div id="sourceRepoSettings">
@@ -84,8 +83,10 @@
             </div>
 
             <div class="form__item l--push-top-1">
-              <button class="button button--primary button--full">
-                <spring:message code="jsf.newJob.createJob.button"/>
+              <button class="button button--primary button--full loader">
+                <span class="loader__label">
+                  <spring:message code="jsf.newJob.createJob.button"/>
+                </span>
               </button>
             </div>
           </div>
