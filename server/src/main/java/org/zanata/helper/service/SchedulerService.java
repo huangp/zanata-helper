@@ -22,5 +22,6 @@ public interface SchedulerService {
 
     void persistAndScheduleJob(JobConfig sync) throws SchedulerException;
 
-    void cancelInProgressSyncJob(JobConfig sync) throws UnableToInterruptJobException;
+    void cancelRunningJob(Long id)
+        throws UnableToInterruptJobException, JobNotFoundException;
 }

@@ -17,12 +17,33 @@ function refreshRunningJobs() {
   });
 }
 
+function cancelRunningJob(id) {
+  console.debug('cancelling job:', id);
+  $.ajax({
+    url : contextPath + '/api/job/cancel?id=' + id,
+    type: 'POST',
+    cache : false,
+    success : function(response) {
+      refreshRunningJobs();
+    },
+    error : function(XMLHttpRequest, textStatus, errorThrown) {
+      console.log(errorThrown);
+    }
+  });
+}
+
+/**
+ * New job form
+ *
+ * @param checkbox
+ * @param sectionId
+ */
 function toggleSection(checkbox, sectionId) {
   $("#" + sectionId).toggleClass("is-hidden", !checkbox.checked);
 }
 
 /**
- *
+ * New job form
  * @param list
  * @param type - 'trans' or 'repo'
  */

@@ -40,11 +40,18 @@ public class SyncJob implements Job {
             (TranslationServerExecutor) context.getJobDetail().getJobDataMap()
                 .get("translationServerExecutor");
 
+        //TODO: remove this, this is for test only
+        try {
+            Thread.sleep(100000);
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+
         if (jobConfig.getJobType().equals(JobConfig.Type.SYNC_TO_REPO)) {
-            processSyncToRepo(jobConfig, srcExecutor, transServerExecutor);
+//            processSyncToRepo(jobConfig, srcExecutor, transServerExecutor);
         } else if (jobConfig.getJobType()
             .equals(JobConfig.Type.SYNC_TO_SERVER)) {
-            processSyncToServer(jobConfig, srcExecutor, transServerExecutor);
+//            processSyncToServer(jobConfig, srcExecutor, transServerExecutor);
         }
     }
 

@@ -10,6 +10,7 @@ import org.quartz.UnableToInterruptJobException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import org.zanata.helper.common.model.SyncType;
 import org.zanata.helper.events.ConfigurationChangeEvent;
 import org.zanata.helper.events.JobProgressEvent;
 import org.zanata.helper.events.JobRunStartsEvent;
@@ -23,10 +24,12 @@ import org.zanata.helper.quartz.CronTrigger;
 import org.zanata.helper.component.AppConfiguration;
 import org.zanata.helper.service.PluginsService;
 import org.zanata.helper.service.SchedulerService;
+import org.zanata.helper.util.CronHelper;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -81,32 +84,32 @@ public class SchedulerServiceImpl implements SchedulerService {
 
         List<JobConfig> configs = new ArrayList<JobConfig>();
 
-//        for (int i = 0; i < 7; i++) {
-//            Long id = new Long(i);
-//            String name = "name" + i;
-//            String description = "description" + i;
-//
-//            Map<String, String> srcConfig = new HashMap<>();
-//            srcConfig.put("url", "http://github.com/aeng/zanata-helper");
-//            srcConfig.put("username", username);
-//            srcConfig.put("apiKey", apiKey);
-//
-//            Map<String, String> transConfig = new HashMap<>();
-//            transConfig.put("url", "http://localhost:8080/zanata/project/zanata-helper/" + i);
-//            transConfig.put("username", username);
-//            transConfig.put("apiKey", apiKey);
-//
-//            JobConfig job =
-//                new JobConfig(id, name, description,
-//                    JobConfig.Type.SYNC_TO_SERVER,
-//                    SyncType.TRANSLATIONS,
-//                    srcConfig, "org.zanata.helper.plugin.git.Plugin",
-//                    transConfig,
-//                    "org.zanata.helper.plugin.zanata.Plugin",
-//                    CronHelper.CronType.THRITY_SECONDS.getExpression());
-//            configs.add(job);
-//
-//        }
+        for (int i = 0; i < 7; i++) {
+            Long id = new Long(i);
+            String name = "name" + i;
+            String description = "description" + i;
+
+            Map<String, String> srcConfig = new HashMap<>();
+            srcConfig.put("url", "http://github.com/aeng/zanata-helper");
+            srcConfig.put("username", username);
+            srcConfig.put("apiKey", apiKey);
+
+            Map<String, String> transConfig = new HashMap<>();
+            transConfig.put("url", "http://localhost:8080/zanata/project/zanata-helper/" + i);
+            transConfig.put("username", username);
+            transConfig.put("apiKey", apiKey);
+
+            JobConfig job =
+                new JobConfig(id, name, description,
+                    JobConfig.Type.SYNC_TO_SERVER,
+                    SyncType.TRANSLATIONS,
+                    srcConfig, "org.zanata.helper.plugin.git.Plugin",
+                    transConfig,
+                    "org.zanata.helper.plugin.zanata.Plugin",
+                    CronHelper.CronType.THRITY_SECONDS.getExpression());
+            configs.add(job);
+
+        }
         return configs;
     }
 
@@ -187,9 +190,13 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public void cancelInProgressSyncJob(JobConfig jobConfig)
-        throws UnableToInterruptJobException {
-        cronTrigger.cancelInProgressJob(jobConfig);
+    public void cancelRunningJob(Long id)
+        throws UnableToInterruptJobException, JobNotFoundException {
+        JobConfig jobConfig = jobConfigMap.get(id);
+        if(jobConfig == null) {
+            throw new JobNotFoundException(id.toString());
+        }
+        cronTrigger.cancelRunningJob(jobConfig);
     }
 
     private void scheduleJob(JobConfig jobConfig) throws SchedulerException {
@@ -215,7 +222,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     private JobSummary convertToJobSummary(JobDetail jobDetail) {
         if (jobDetail != null) {
             JobConfig jobConfig =
-                jobConfigMap.get(jobDetail.getKey().getName());
+                jobConfigMap.get(new Long(jobDetail.getKey().getName()));
             return convertToJobSummary(jobConfig);
         }
         return new JobSummary();

@@ -12,6 +12,7 @@ public abstract class APIController {
     public final static String API_ROOT = "/api";
 
     public final static String JOBS_ROOT = "/jobs";
+    public final static String JOB_ROOT = "/job";
 
     public static String getAPIUrl() {
         return getBaseUrl() + API_ROOT;

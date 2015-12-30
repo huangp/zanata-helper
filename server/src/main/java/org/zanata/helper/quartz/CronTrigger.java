@@ -147,7 +147,7 @@ public class CronTrigger {
             .collect(Collectors.toList());
     }
 
-    public void cancelInProgressJob(JobConfig sync)
+    public void cancelRunningJob(JobConfig sync)
         throws UnableToInterruptJobException {
         JobKey jobKey = new JobKey(sync.getId().toString());
         scheduler.interrupt(jobKey);
