@@ -199,6 +199,16 @@ public class SchedulerServiceImpl implements SchedulerService {
         cronTrigger.cancelRunningJob(jobConfig);
     }
 
+    @Override
+    public void deleteJob(Long id)
+        throws SchedulerException, JobNotFoundException {
+        JobConfig jobConfig = jobConfigMap.get(id);
+        if(jobConfig == null) {
+            throw new JobNotFoundException(id.toString());
+        }
+        cronTrigger.deleteJob(jobConfig);
+    }
+
     private void scheduleJob(JobConfig jobConfig) throws SchedulerException {
         TriggerKey key = cronTrigger.scheduleMonitor(jobConfig);
         if (key != null) {

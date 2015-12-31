@@ -1,9 +1,10 @@
 package org.zanata.helper.quartz;
 
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.Job;
+import org.quartz.InterruptableJob;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.UnableToInterruptJobException;
 import org.zanata.helper.component.ContextBeanProvider;
 import org.zanata.helper.events.EventPublisher;
 import org.zanata.helper.events.JobProgressEvent;
@@ -14,7 +15,7 @@ import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import java.io.File;
 
 @Slf4j
-public class SyncJob implements Job {
+public class SyncJob implements InterruptableJob {
 
     private String basedir;
 
@@ -24,10 +25,13 @@ public class SyncJob implements Job {
     private final int syncToRepoTotalSteps = 5;
     private final int syncToServerTotalSteps = 4;
 
+    private JobConfig jobConfig;
+
+    @Override
     public void execute(JobExecutionContext context)
         throws JobExecutionException {
 
-        JobConfig jobConfig =
+        jobConfig =
             (JobConfig) context.getJobDetail().getJobDataMap().get("value");
         basedir =
             (String) context.getJobDetail().getJobDataMap().get("basedir");
@@ -48,15 +52,20 @@ public class SyncJob implements Job {
         }
 
         if (jobConfig.getJobType().equals(JobConfig.Type.SYNC_TO_REPO)) {
-//            processSyncToRepo(jobConfig, srcExecutor, transServerExecutor);
+            processSyncToRepo(srcExecutor, transServerExecutor);
         } else if (jobConfig.getJobType()
             .equals(JobConfig.Type.SYNC_TO_SERVER)) {
-//            processSyncToServer(jobConfig, srcExecutor, transServerExecutor);
+            processSyncToServer(srcExecutor, transServerExecutor);
         }
     }
 
-    private void processSyncToRepo(JobConfig jobConfig,
-        RepoExecutor srcExecutor,
+    @Override
+    public void interrupt() throws UnableToInterruptJobException {
+        Thread.currentThread().interrupt();
+        updateProgress(jobConfig.getId(), 0, 0, "interrupted");
+    }
+
+    private void processSyncToRepo(RepoExecutor srcExecutor,
         TranslationServerExecutor transServerExecutor)
         throws JobExecutionException {
 
@@ -88,15 +97,7 @@ public class SyncJob implements Job {
         }
     }
 
-    private void updateProgress(Long id, int currentStep, int totalSteps,
-        String description) {
-        eventPublisher.fireEvent(
-            new JobProgressEvent(this, id, currentStep, totalSteps,
-                description));
-    }
-
-    private void processSyncToServer(JobConfig jobConfig,
-        RepoExecutor repoExecutor,
+    private void processSyncToServer(RepoExecutor repoExecutor,
         TranslationServerExecutor transServerExecutor)
         throws JobExecutionException {
 
@@ -104,7 +105,6 @@ public class SyncJob implements Job {
             log.info("No plugin in job. Skipping." + jobConfig.toString());
             return;
         }
-
         try {
             updateProgress(jobConfig.getId(), 1, syncToServerTotalSteps,
                 "Sync to server starts");
@@ -121,6 +121,13 @@ public class SyncJob implements Job {
         } catch (Exception e) {
             throw new JobExecutionException(e);
         }
+    }
+
+    private void updateProgress(Long id, int currentStep, int totalSteps,
+        String description) {
+        eventPublisher.fireEvent(
+            new JobProgressEvent(this, id, currentStep, totalSteps,
+                description));
     }
 
     private File getDestDirectory(String name) {

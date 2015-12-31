@@ -87,7 +87,7 @@
                   </c:choose>
 
                   <li class="l--pad-all-quarter">
-                    <a href="#">
+                    <a href="/job?id=${job.id}">
                       <div class="list__item__content">
                         <div class="list__item__info">
                           <h3 class="list__title">${job.name}</h3>

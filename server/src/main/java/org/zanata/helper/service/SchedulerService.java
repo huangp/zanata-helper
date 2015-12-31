@@ -24,4 +24,6 @@ public interface SchedulerService {
 
     void cancelRunningJob(Long id)
         throws UnableToInterruptJobException, JobNotFoundException;
+
+    void deleteJob(Long id) throws SchedulerException, JobNotFoundException;
 }

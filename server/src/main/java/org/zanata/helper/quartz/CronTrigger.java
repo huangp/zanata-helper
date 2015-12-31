@@ -153,6 +153,11 @@ public class CronTrigger {
         scheduler.interrupt(jobKey);
     }
 
+    public void deleteJob(JobConfig sync) throws SchedulerException {
+        JobKey jobKey = new JobKey(sync.getId().toString());
+        scheduler.deleteJob(jobKey);
+    }
+
     public void reschedule(TriggerKey key, JobConfig sync)
         throws SchedulerException {
         scheduler.rescheduleJob(key, buildTrigger(sync));

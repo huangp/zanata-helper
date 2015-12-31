@@ -24,9 +24,9 @@ function cancelRunningJob(id) {
     type: 'POST',
     cache : false,
     success : function(response) {
-      refreshRunningJobs();
+      console.debug('cancel job requested', id);
     },
-    error : function(XMLHttpRequest, textStatus, errorThrown) {
+    error : function(data, textStatus, errorThrown) {
       console.log(errorThrown);
     }
   });

@@ -53,16 +53,14 @@ public class JobController extends APIController {
     @RequestMapping(value = CANCEL_URL, method = RequestMethod.POST,
         produces = "application/json; charset=UTF-8")
     @ResponseBody
-    public ResponseEntity<JobStatus> cancelRunningJob(
+    public ResponseEntity<String> cancelRunningJob(
         @RequestParam(value = "id", defaultValue = "") String id) {
         try {
             if(StringUtils.isEmpty(id)) {
                 return new ResponseEntity(HttpStatus.NOT_FOUND);
             }
             schedulerServiceImpl.cancelRunningJob(new Long(id));
-            return new ResponseEntity<JobStatus>(
-                schedulerServiceImpl.getLastStatus(new Long(id)),
-                HttpStatus.OK);
+            return new ResponseEntity<String>(HttpStatus.OK);
         } catch (SchedulerException e) {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (JobNotFoundException e) {

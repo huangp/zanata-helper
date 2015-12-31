@@ -16,23 +16,25 @@
   <ul class="list--panel">
     <c:forEach var="job" items="${runningJobs}">
       <li class="l--pad-all-quarter">
-        <div class="list__item__content">
-          <div class="list__item__info">
-            <span>${job.name}</span>
-            <span class="list__item__meta">${job.description}</span>
+        <a href="/job?id=${job.id}">
+          <div class="list__item__content">
+            <div class="list__item__info">
+              <span>${job.name}</span>
+              <span class="list__item__meta">${job.description}</span>
+            </div>
+            <div class="list__item__actions">
+              <c:set var="cancelButtonTitle">
+                <spring:message code="jsf.job.cancel.button.title"/>
+              </c:set>
+              <button class="button--small button--danger loader" onclick="cancelRunningJob(${job.id})"
+                  title="${cancelButtonTitle}">
+                <span class="loader__label">
+                  <i class="i i--cancel"></i>
+                </span>
+              </button>
+            </div>
           </div>
-          <div class="list__item__actions">
-            <c:set var="cancelButtonTitle">
-              <spring:message code="jsf.job.cancel.button.title"/>
-            </c:set>
-            <button class="button--small button--danger loader" onclick="cancelRunningJob(${job.id})"
-                title="${cancelButtonTitle}">
-              <span class="loader__label">
-                <i class="i i--cancel"></i>
-              </span>
-            </button>
-          </div>
-        </div>
+        </a>
       </li>
     </c:forEach>
   </ul>
