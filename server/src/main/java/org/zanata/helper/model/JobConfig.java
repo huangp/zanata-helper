@@ -34,13 +34,6 @@ public class JobConfig implements Serializable {
     private String sourceRepoExecutorName;
     private String translationServerExecutorName;
 
-//    private String sourceUrl;
-//    private String sourceUsername;
-//    private String sourceApiKey;
-//    private String zanataUrl;
-//    private String zanataUsername;
-//    private String zanataApiKey;
-
     @Setter
     private JobStatus lastJobStatus;
 

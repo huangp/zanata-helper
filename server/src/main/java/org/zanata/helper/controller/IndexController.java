@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestTemplate;
 import org.zanata.helper.api.APIController;
-import org.zanata.helper.api.JobsController;
+import org.zanata.helper.api.JobsAPIController;
 import org.zanata.helper.model.JobSummary;
 import org.zanata.helper.util.DateUtil;
 
@@ -51,7 +51,7 @@ public class IndexController {
 
     private String getRunningJobsUrl() {
         return APIController.getBaseUrl() + APIController.API_ROOT
-                + APIController.JOBS_ROOT + JobsController.RUNNING_JOBS_URL;
+                + APIController.JOBS_ROOT + JobsAPIController.RUNNING_JOBS_URL;
     }
 
     private String getAllJobsUrl() {

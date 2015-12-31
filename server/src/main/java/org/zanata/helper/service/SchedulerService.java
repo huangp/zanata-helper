@@ -20,6 +20,8 @@ public interface SchedulerService {
 
     List<JobSummary> getAllJobs() throws SchedulerException;
 
+    JobConfig getJob(Long id);
+
     void persistAndScheduleJob(JobConfig sync) throws SchedulerException;
 
     void cancelRunningJob(Long id)

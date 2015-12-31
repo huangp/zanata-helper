@@ -8,11 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.zanata.helper.exception.JobNotFoundException;
-import org.zanata.helper.model.JobStatus;
 import org.zanata.helper.model.JobSummary;
 import org.zanata.helper.service.SchedulerService;
 
@@ -22,7 +19,7 @@ import org.zanata.helper.service.SchedulerService;
 
 @RestController
 @RequestMapping(value = APIController.API_ROOT + APIController.JOBS_ROOT)
-public class JobsController extends APIController {
+public class JobsAPIController extends APIController {
 
     public final static String RUNNING_JOBS_URL = "/running";
 

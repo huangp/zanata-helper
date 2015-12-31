@@ -63,7 +63,7 @@ public class CronTrigger {
                     JobDetail jobDetail =
                         JobBuilder
                             .newJob(org.zanata.helper.quartz.SyncJob.class)
-                            .withIdentity(jobConfig.getId().toString())
+                            .withIdentity(jobKey.getName())
                             .withDescription(jobConfig.toString())
                             .build();
 
@@ -99,18 +99,6 @@ public class CronTrigger {
             }
         }
         return null;
-    }
-
-    public void pauseJob(JobKey jobKey) throws SchedulerException {
-        scheduler.pauseJob(jobKey);
-    }
-
-    public void resumeJob(JobKey jobKey) throws SchedulerException {
-        scheduler.resumeJob(jobKey);
-    }
-
-    public void pauseAll() throws SchedulerException {
-        scheduler.pauseAll();
     }
 
     public JobStatus getTriggerStatus(TriggerKey key,

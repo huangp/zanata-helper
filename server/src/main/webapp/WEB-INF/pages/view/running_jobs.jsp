@@ -13,9 +13,9 @@
   <p class="txt--meta l--pad-all-half"><spring:message code="jsp.noRunningJobs"/></p>
 </c:if>
 <c:if test="${not empty runningJobs}">
-  <ul class="list--panel">
+  <ul class="list--panel" id="runningJobs">
     <c:forEach var="job" items="${runningJobs}">
-      <li class="l--pad-all-quarter">
+      <li class="l--pad-all-quarter" id="running-${job.id}">
         <a href="/job?id=${job.id}">
           <div class="list__item__content">
             <div class="list__item__info">

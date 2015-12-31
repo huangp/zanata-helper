@@ -12,10 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.zanata.helper.exception.JobNotFoundException;
 import org.zanata.helper.model.JobStatus;
-import org.zanata.helper.model.JobSummary;
 import org.zanata.helper.service.SchedulerService;
-
-import java.util.List;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
@@ -23,7 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = APIController.API_ROOT + APIController.JOB_ROOT)
-public class JobController extends APIController {
+public class JobAPIController extends APIController {
 
     public final static String STATUS_URL = "/status";
     public final static String CANCEL_URL = "/cancel";

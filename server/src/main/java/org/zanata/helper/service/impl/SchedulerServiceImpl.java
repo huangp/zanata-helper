@@ -183,6 +183,11 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
+    public JobConfig getJob(Long id) {
+        return jobConfigMap.get(id);
+    }
+
+    @Override
     public void persistAndScheduleJob(JobConfig jobConfig)
         throws SchedulerException {
         //TODO: persist jobConfig in db
