@@ -7,24 +7,13 @@
 <div class="form__item">
   <c:if test="${not empty selectedTransPlugin}">
     <c:forEach var="transPluginField" items="${selectedTransPlugin.fields.values()}">
-      <c:set var="key" value="${transSettingsPrefix}${transPluginField.key}" />
-
-      <c:choose>
-        <c:when test="${not empty errors && errors.containsKey(key)}">
-          <c:set var="errorClass" value="form__item--error" />
-        </c:when>
-        <c:otherwise>
-          <c:set var="errorClass" value="" />
-        </c:otherwise>
-      </c:choose>
-
-      <div class="form__item ${errorClass}" title="${transPluginField.tooltip}">
-        <label for="${transPluginField.key}">${transPluginField.label}</label>
-        <input id="${key}" name="${key}" type="text" placeholder="${transPluginField.placeholder}" class="l--push-bottom-quarter" value="${transPluginField.value}"/>
-        <c:if test="${not empty errors && errors.containsKey(key)}">
-          <span class="l--pad-all-quarter message--danger">${errors.get(key)}</span>
-        </c:if>
-      </div>
+      <jsp:include page="/WEB-INF/pages/includes/textField.jsp" >
+        <jsp:param name="key" value="${transSettingsPrefix}${transPluginField.key}" />
+        <jsp:param name="value" value="${transPluginField.value}" />
+        <jsp:param name="label" value="${transPluginField.label}" />
+        <jsp:param name="tooltip" value="${transPluginField.tooltip}" />
+        <jsp:param name="placeholder" value="${transPluginField.placeholder}" />
+      </jsp:include>
     </c:forEach>
   </c:if>
 </div>

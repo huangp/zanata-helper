@@ -78,6 +78,34 @@ public final class PluginsServiceImpl implements PluginsService {
     }
 
     @Override
+    public RepoExecutor getNewSourceRepoPlugin(String className) {
+        for (Class plugin : sourceRepoPluginMap.values()) {
+            if (plugin.getClass().getName().equals(className)) {
+                try {
+                    return getNewSourceRepoPlugin(plugin.getName(), null);
+                } catch (UnableLoadPluginException e) {
+                    log.warn("Unable to load plugin " + e.getMessage());
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public TranslationServerExecutor getNewTransServerPlugin(String className) {
+        for (Class plugin : transServerPluginMap.values()) {
+            if (plugin.getClass().getName().equals(className)) {
+                try {
+                    return getNewTransServerPlugin(plugin.getName(), null);
+                } catch (UnableLoadPluginException e) {
+                    log.warn("Unable to load plugin " + e.getMessage());
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
     public RepoExecutor getNewSourceRepoPlugin(String className,
         Map<String, String> fields) throws UnableLoadPluginException {
         Class<? extends RepoExecutor>

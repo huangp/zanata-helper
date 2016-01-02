@@ -18,7 +18,7 @@
         <div class="g__item w--1-m w--3-8-l w--1-4 l--push-bottom-half">
           <h1><spring:message code="Application.name"/></h1>
           <div class="l--push-top-quarter panel" id="runningJobsContent">
-            <jsp:include page="view/running_jobs.jsp" />
+            <jsp:include page="/WEB-INF/pages/view/running_jobs.jsp" />
           </div>
         </div>
 

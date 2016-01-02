@@ -16,6 +16,10 @@ public interface PluginsService {
 
     List<TranslationServerExecutor> getAvailableTransServerPlugins();
 
+    RepoExecutor getNewSourceRepoPlugin(String className);
+
+    TranslationServerExecutor getNewTransServerPlugin(String className);
+
     RepoExecutor getNewSourceRepoPlugin(String className,
         Map<String, String> fields) throws UnableLoadPluginException;
 

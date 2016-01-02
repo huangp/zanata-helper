@@ -5,13 +5,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobListener;
+import org.quartz.Trigger;
+import org.quartz.TriggerListener;
 import org.zanata.helper.events.EventPublisher;
 import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.events.JobRunStartsEvent;
 import org.zanata.helper.model.JobConfig;
 
 @Slf4j
-public class JobConfigListener implements JobListener {
+public class JobConfigListener implements TriggerListener {
     public static final String LISTENER_NAME = "JobConfigListener";
 
     private final EventPublisher eventPublisher;
@@ -24,32 +26,35 @@ public class JobConfigListener implements JobListener {
         return LISTENER_NAME;
     }
 
-    // Run this if job is about to be executed.
-    public void jobToBeExecuted(JobExecutionContext context) {
+    @Override
+    public void triggerFired(Trigger trigger, JobExecutionContext context) {
         JobConfig jobConfig = getJobConfigJob(context);
         eventPublisher.fireEvent(
             new JobRunStartsEvent(this, jobConfig.getId(),
                 context.getFireTime()));
     }
 
-    public void jobExecutionVetoed(JobExecutionContext context) {
+    @Override
+    public boolean vetoJobExecution(Trigger trigger,
+        JobExecutionContext context) {
         log.debug("jobExecutionVetoed: " + getJobConfigJob(context).getName());
+        return false;
     }
 
-    public void jobWasExecuted(JobExecutionContext context,
-        JobExecutionException jobException) {
-        JobConfig jobConfig = getJobConfigJob(context);
+    @Override
+    public void triggerMisfired(Trigger trigger) {
 
+    }
+
+    @Override
+    public void triggerComplete(Trigger trigger, JobExecutionContext context,
+        Trigger.CompletedExecutionInstruction triggerInstructionCode) {
+
+        JobConfig jobConfig = getJobConfigJob(context);
         eventPublisher.fireEvent(
             new JobRunCompletedEvent(this, jobConfig.getId(),
-                    context.getJobRunTime(),
-                    context.getFireTime()));
-
-        if (jobException != null &&
-                !StringUtils.isEmpty(jobException.getMessage())) {
-            log.error("Exception thrown by: " + getJobConfigJob(context).getName()
-                    + " Exception: " + jobException.getMessage());
-        }
+                context.getJobRunTime(),
+                context.getFireTime()));
     }
 
     private JobConfig getJobConfigJob(JobExecutionContext context) {

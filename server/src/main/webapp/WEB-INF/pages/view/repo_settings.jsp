@@ -8,24 +8,13 @@
 <div class="form__item">
   <c:if test="${not empty selectedSrcPlugin}">
     <c:forEach var="srcRepoField" items="${selectedSrcPlugin.fields.values()}">
-      <c:set var="key" value="${repoSettingsPrefix}${srcRepoField.key}" />
-
-      <c:choose>
-        <c:when test="${not empty errors && errors.containsKey(key)}">
-          <c:set var="errorClass" value="form__item--error" />
-        </c:when>
-        <c:otherwise>
-          <c:set var="errorClass" value="" />
-        </c:otherwise>
-      </c:choose>
-
-      <div class="form__item ${errorClass}" title="${srcRepoField.tooltip}">
-        <label for="${srcRepoField.key}">${srcRepoField.label}</label>
-        <input id="${key}" name="${key}" type="text" placeholder="${srcRepoField.placeholder}" class="l--push-bottom-quarter" value="${srcRepoField.value}"/>
-        <c:if test="${not empty errors && errors.containsKey(key)}">
-          <span class="l--pad-all-quarter message--danger">${errors.get(key)}</span>
-        </c:if>
-      </div>
+      <jsp:include page="/WEB-INF/pages/includes/textField.jsp" >
+        <jsp:param name="key" value="${repoSettingsPrefix}${srcRepoField.key}" />
+        <jsp:param name="value" value="${srcRepoField.value}" />
+        <jsp:param name="label" value="${srcRepoField.label}" />
+        <jsp:param name="tooltip" value="${srcRepoField.tooltip}" />
+        <jsp:param name="placeholder" value="${srcRepoField.placeholder}" />
+      </jsp:include>
     </c:forEach>
   </c:if>
 </div>

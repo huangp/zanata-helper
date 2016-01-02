@@ -88,7 +88,7 @@ public class CronTrigger {
                     if (scheduler.getListenerManager().getJobListeners()
                         .isEmpty()) {
                         scheduler.getListenerManager()
-                            .addJobListener(
+                            .addTriggerListener(
                                 new JobConfigListener(eventPublisher));
                     }
                     scheduler.scheduleJob(jobDetail, trigger);
@@ -135,30 +135,30 @@ public class CronTrigger {
             .collect(Collectors.toList());
     }
 
-    public void cancelRunningJob(JobConfig sync)
+    public void cancelRunningJob(JobConfig jobConfig)
         throws UnableToInterruptJobException {
-        JobKey jobKey = new JobKey(sync.getId().toString());
+        JobKey jobKey = new JobKey(jobConfig.getId().toString());
         scheduler.interrupt(jobKey);
     }
 
-    public void deleteJob(JobConfig sync) throws SchedulerException {
-        JobKey jobKey = new JobKey(sync.getId().toString());
+    public void deleteJob(JobConfig jobConfig) throws SchedulerException {
+        JobKey jobKey = new JobKey(jobConfig.getId().toString());
         scheduler.deleteJob(jobKey);
     }
 
-    public void reschedule(TriggerKey key, JobConfig sync)
+    public void reschedule(TriggerKey key, JobConfig jobConfig)
         throws SchedulerException {
-        scheduler.rescheduleJob(key, buildTrigger(sync));
+        scheduler.rescheduleJob(key, buildTrigger(jobConfig));
     }
 
-    private Trigger buildTrigger(JobConfig sync) {
+    private Trigger buildTrigger(JobConfig jobConfig) {
         TriggerBuilder builder = TriggerBuilder
             .newTrigger()
-            .withIdentity("Trigger:" + sync.getId());
+            .withIdentity(jobConfig.getId().toString());
 
-        if (!StringUtils.isEmpty(sync.getCron())) {
+        if (!StringUtils.isEmpty(jobConfig.getCron())) {
             builder.withSchedule(
-                CronScheduleBuilder.cronSchedule(sync.getCron()));
+                CronScheduleBuilder.cronSchedule(jobConfig.getCron()));
         }
         return builder.build();
     }

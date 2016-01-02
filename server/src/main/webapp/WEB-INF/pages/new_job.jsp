@@ -3,7 +3,7 @@
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
-<jsp:include page="includes/header.jsp"/>
+<jsp:include page="/WEB-INF/pages/includes/header.jsp"/>
 
 <body class="new-zanata new-zanata-base">
 <main role="main" class="l--pad-v-1">
@@ -16,18 +16,30 @@
 
         <form:form commandName="jobForm" action="/jobs/new" method="post">
           <div class="g__item l--push-top-1">
-            <div class="form__item">
-              <label for="name"><spring:message code="jsf.newJob.name"/></label>
-              <form:input path="name" id="name" maxlength="100" cssClass="l--push-bottom-quarter"/>
-              <form:errors path="name" cssClass="l--pad-all-quarter message--danger"/>
-            </div>
+            <c:set var="nameLabel">
+              <spring:message code="jsf.newJob.name"/>
+            </c:set>
+            <jsp:include page="/WEB-INF/pages/includes/textField.jsp" >
+              <jsp:param name="key" value="name" />
+              <jsp:param name="value" value="${jobForm.name}" />
+              <jsp:param name="label" value="${nameLabel}" />
+              <jsp:param name="tooltip" value="" />
+              <jsp:param name="placeholder" value="" />
+              <jsp:param name="maxlength" value="${jobForm.NAME_MAX}" />
+            </jsp:include>
 
-            <div class="form__item">
-              <label for="description"><spring:message code="jsf.newJob.description"/></label>
-              <form:textarea path="description" id="description" cssClass="l--push-bottom-quarter"/>
-              <form:errors path="description" cssClass="l--pad-all-quarter message--danger">
-              </form:errors>
-            </div>
+
+            <c:set var="descriptionLabel">
+              <spring:message code="jsf.newJob.description"/>
+            </c:set>
+            <jsp:include page="/WEB-INF/pages/includes/textField.jsp" >
+              <jsp:param name="key" value="description" />
+              <jsp:param name="value" value="${jobForm.description}" />
+              <jsp:param name="label" value="${descriptionLabel}" />
+              <jsp:param name="tooltip" value="" />
+              <jsp:param name="placeholder" value="" />
+              <jsp:param name="type" value="textArea" />
+            </jsp:include>
 
             <div class="form__item">
               <label for="jobType"><spring:message code="jsf.newJob.jobType"/></label>
@@ -48,6 +60,7 @@
             <div class="form__item">
               <input type="checkbox" name="repeatJob" onclick="toggleSection(this, 'cronConfigSection')"> Repeat job
             </div>
+
             <div class="form__item is-hidden" id="cronConfigSection">
               <spring:message code="jsf.newJob.cron.placeholder" var="cronPlaceholder"/>
               <label for="cron"><spring:message code="jsf.newJob.cron.label"/>
@@ -66,7 +79,7 @@
             </form:select>
 
             <div id="sourceRepoSettings">
-              <jsp:include page="view/repo_settings.jsp" />
+              <jsp:include page="/WEB-INF/pages/view/repo_settings.jsp" />
             </div>
 
             <h2 class="heading--secondary l--push-top-half">
@@ -79,11 +92,11 @@
             </form:select>
 
             <div id="transServerSettings" class="form__item">
-              <jsp:include page="view/trans_settings.jsp" />
+              <jsp:include page="/WEB-INF/pages/view/trans_settings.jsp" />
             </div>
 
             <div class="form__item l--push-top-1">
-              <button class="button button--primary button--full loader">
+              <button class="button button--primary button--full loader" onclick="$('#jobForm').submit()">
                 <span class="loader__label">
                   <spring:message code="jsf.newJob.createJob.button"/>
                 </span>

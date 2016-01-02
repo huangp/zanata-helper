@@ -84,32 +84,32 @@ public class SchedulerServiceImpl implements SchedulerService {
 
         List<JobConfig> configs = new ArrayList<JobConfig>();
 
-        for (int i = 0; i < 7; i++) {
-            Long id = new Long(i);
-            String name = "name" + i;
-            String description = "description" + i;
-
-            Map<String, String> srcConfig = new HashMap<>();
-            srcConfig.put("url", "http://github.com/aeng/zanata-helper");
-            srcConfig.put("username", username);
-            srcConfig.put("apiKey", apiKey);
-
-            Map<String, String> transConfig = new HashMap<>();
-            transConfig.put("url", "http://localhost:8080/zanata/project/zanata-helper/" + i);
-            transConfig.put("username", username);
-            transConfig.put("apiKey", apiKey);
-
-            JobConfig job =
-                new JobConfig(id, name, description,
-                    JobConfig.Type.SYNC_TO_SERVER,
-                    SyncType.TRANSLATIONS,
-                    srcConfig, "org.zanata.helper.plugin.git.Plugin",
-                    transConfig,
-                    "org.zanata.helper.plugin.zanata.Plugin",
-                    CronHelper.CronType.THRITY_SECONDS.getExpression());
-            configs.add(job);
-
-        }
+//        for (int i = 0; i < 7; i++) {
+//            Long id = new Long(i);
+//            String name = "name" + i;
+//            String description = "description" + i;
+//
+//            Map<String, String> srcConfig = new HashMap<>();
+//            srcConfig.put("url", "http://github.com/aeng/zanata-helper");
+//            srcConfig.put("username", username);
+//            srcConfig.put("apiKey", apiKey);
+//
+//            Map<String, String> transConfig = new HashMap<>();
+//            transConfig.put("url", "http://localhost:8080/zanata/project/zanata-helper/" + i);
+//            transConfig.put("username", username);
+//            transConfig.put("apiKey", apiKey);
+//
+//            JobConfig job =
+//                new JobConfig(id, name, description,
+//                    JobConfig.Type.SYNC_TO_SERVER,
+//                    SyncType.TRANSLATIONS,
+//                    srcConfig, "org.zanata.helper.plugin.git.Plugin",
+//                    transConfig,
+//                    "org.zanata.helper.plugin.zanata.Plugin",
+//                    CronHelper.CronType.THRITY_SECONDS.getExpression());
+//            configs.add(job);
+//
+//        }
         return configs;
     }
 
