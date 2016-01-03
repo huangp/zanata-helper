@@ -11,6 +11,7 @@ import java.util.Map;
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
  */
+@PluginExecutor
 public abstract class TranslationServerExecutor implements Plugin {
 
     @Getter

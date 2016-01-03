@@ -1,7 +1,13 @@
 package org.zanata.helper.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Service;
+import org.zanata.helper.common.plugin.PluginExecutor;
 import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.exception.UnableLoadPluginException;
@@ -37,6 +43,21 @@ public final class PluginsServiceImpl implements PluginsService {
          * TODO: scan classpath for plugins class, remove plugins dependency from server module
          * For now, load all known plugins
          */
+
+        //Not Working - not scanning jar
+
+//        final ClassLoader classLoader = this.getClass().getClassLoader();
+//
+//        ClassPathScanningCandidateComponentProvider scanner =
+//            new ClassPathScanningCandidateComponentProvider(false);
+//
+//        scanner.addIncludeFilter(new AnnotationTypeFilter(PluginExecutor.class));
+//        scanner.setResourceLoader(new PathMatchingResourcePatternResolver(classLoader));
+//
+//        System.out.println("alex: start");
+//        for (BeanDefinition bd : scanner.findCandidateComponents("")) {
+//            System.out.println(bd.getBeanClassName());
+//        }
 
         sourceRepoPluginMap
             .put(org.zanata.helper.plugin.git.Plugin.class.getName(),
