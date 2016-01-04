@@ -1,10 +1,9 @@
 package org.zanata.helper.service.impl;
 
+import org.apache.deltaspike.core.api.common.DeltaSpike;
 import org.scannotation.AnnotationDB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.zanata.helper.common.annotation.RepoPlugin;
 import org.zanata.helper.common.annotation.TranslationServerPlugin;
 import org.zanata.helper.common.plugin.RepoExecutor;
@@ -13,6 +12,8 @@ import org.zanata.helper.exception.UnableLoadPluginException;
 import org.zanata.helper.service.PluginsService;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -24,15 +25,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.google.common.base.Throwables;
+
 
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
  */
-@Service
-public final class PluginsServiceImpl implements PluginsService {
+@RequestScoped
+public class PluginsServiceImpl implements PluginsService {
     private static final Logger log =
             LoggerFactory.getLogger(PluginsServiceImpl.class);
-    @Autowired
+    @Inject @DeltaSpike
     private ServletContext servletContext;
 
     private final static Map<String, Class<? extends RepoExecutor>>
@@ -91,10 +94,8 @@ public final class PluginsServiceImpl implements PluginsService {
                 transServerPluginMap.put(entity.getName(), entity);
             }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (IOException | ClassNotFoundException e) {
+            throw Throwables.propagate(e);
         }
     }
 

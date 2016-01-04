@@ -7,8 +7,6 @@ import org.quartz.InterruptableJob;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.UnableToInterruptJobException;
-import org.zanata.helper.component.ContextBeanProvider;
-import org.zanata.helper.events.EventPublisher;
 import org.zanata.helper.events.JobProgressEvent;
 import org.zanata.helper.model.JobConfig;
 import org.zanata.helper.common.plugin.RepoExecutor;
@@ -16,19 +14,21 @@ import org.zanata.helper.common.plugin.TranslationServerExecutor;
 
 import java.io.File;
 import java.io.IOException;
+import javax.enterprise.event.Event;
+import javax.inject.Inject;
 
 @Slf4j
 public class SyncJob implements InterruptableJob {
 
     private String basedir;
 
-    private final EventPublisher eventPublisher =
-        ContextBeanProvider.getBean(EventPublisher.class);
-
     private final int syncToRepoTotalSteps = 5;
     private final int syncToServerTotalSteps = 4;
 
     private JobConfig jobConfig;
+
+    @Inject
+    private Event<JobProgressEvent> jobProgressEvent;
 
     @Override
     public void execute(JobExecutionContext context)
@@ -131,8 +131,8 @@ public class SyncJob implements InterruptableJob {
 
     private void updateProgress(Long id, int currentStep, int totalSteps,
         String description) {
-        eventPublisher.fireEvent(
-            new JobProgressEvent(this, id, currentStep, totalSteps,
+        jobProgressEvent.fire(
+            new JobProgressEvent(id, currentStep, totalSteps,
                 description));
     }
 

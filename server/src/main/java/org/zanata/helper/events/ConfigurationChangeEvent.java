@@ -1,18 +1,16 @@
 package org.zanata.helper.events;
 
 import lombok.Getter;
-import org.springframework.context.ApplicationEvent;
 import org.zanata.helper.model.JobConfig;
 
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
  */
-public class ConfigurationChangeEvent extends ApplicationEvent {
+public class ConfigurationChangeEvent {
     @Getter
-    private JobConfig sync;
+    private JobConfig jobConfig;
 
-    public ConfigurationChangeEvent(Object source, JobConfig sync) {
-        super(source);
-        this.sync = sync;
+    public ConfigurationChangeEvent(JobConfig jobConfig) {
+        this.jobConfig = jobConfig;
     }
 }

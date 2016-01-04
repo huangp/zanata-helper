@@ -1,5 +1,6 @@
 package org.zanata.helper.service.impl;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 
@@ -7,15 +8,11 @@ import org.quartz.JobDetail;
 import org.quartz.SchedulerException;
 import org.quartz.TriggerKey;
 import org.quartz.UnableToInterruptJobException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Service;
-import org.zanata.helper.common.model.SyncOption;
+
 import org.zanata.helper.events.ConfigurationChangeEvent;
 import org.zanata.helper.events.JobProgressEvent;
 import org.zanata.helper.events.JobRunStartsEvent;
 import org.zanata.helper.model.JobConfig;
-import org.zanata.helper.events.EventPublisher;
 import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.exception.JobNotFoundException;
 import org.zanata.helper.model.JobSummary;
@@ -24,12 +21,14 @@ import org.zanata.helper.quartz.CronTrigger;
 import org.zanata.helper.component.AppConfiguration;
 import org.zanata.helper.service.PluginsService;
 import org.zanata.helper.service.SchedulerService;
-import org.zanata.helper.util.CronHelper;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -37,43 +36,52 @@ import java.util.stream.Collectors;
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
-@Service
+@ApplicationScoped
 @Slf4j
 public class SchedulerServiceImpl implements SchedulerService {
-    @Autowired
+    @Inject
     private AppConfiguration appConfiguration;
 
-    @Autowired
-    private EventPublisher eventPublisher;
-
-    @Autowired
+    @Inject
     private PluginsService pluginsServiceImpl;
 
-    private Map<Long, JobConfig> jobConfigMap = Maps.newHashMap();
+    private Map<Long, JobConfig> jobConfigMap =
+            Collections.synchronizedMap(Maps.newHashMap());
 
-    private Map<Long, TriggerKey> jobConfigKeyMap = Maps.newHashMap();
+    private Map<Long, TriggerKey> jobConfigKeyMap =
+            Collections.synchronizedMap(Maps.newHashMap());
 
     private CronTrigger cronTrigger;
 
     // TODO: database connection, thread count, scheduler, queue, event
 
     @PostConstruct
-    public void onApplicationEvent() throws SchedulerException {
+    public void onApplicationEvent() {
         log.info("=====================================================");
         log.info("=====================================================");
         log.info("================Zanata helper starts=================");
-        log.info(appConfiguration.getBuildVersion() + ":" +
-            appConfiguration.getBuildInfo());
+        log.info("== build :            {}-{}",
+                appConfiguration.getBuildVersion(),
+                appConfiguration.getBuildInfo());
+        log.info("== repo directory:    {}",
+                appConfiguration.getRepoDirectory());
+        log.info("== config directory:  {}",
+                appConfiguration.getConfigDirectory());
         log.info("=====================================================");
         log.info("=====================================================");
         log.info("Initialising jobs...");
 
         List<JobConfig> jobConfigs = getJobs();
-        cronTrigger = new CronTrigger(eventPublisher, appConfiguration,
-            pluginsServiceImpl);
-        for (JobConfig jobConfig : jobConfigs) {
-            scheduleJob(jobConfig);
+        try {
+            cronTrigger = new CronTrigger(appConfiguration,
+                pluginsServiceImpl);
+            for (JobConfig jobConfig : jobConfigs) {
+                scheduleJob(jobConfig);
+            }
+        } catch (SchedulerException e) {
+            throw Throwables.propagate(e);
         }
+
         log.info("Initialised {} jobs.", jobConfigMap.size());
     }
 
@@ -113,14 +121,13 @@ public class SchedulerServiceImpl implements SchedulerService {
         return configs;
     }
 
-    @EventListener
-    public void onApplicationEvent(ConfigurationChangeEvent event) {
-        if (jobConfigMap.containsKey(event.getSync().getId())) {
-            jobConfigMap.put(event.getSync().getId(), event.getSync());
+    public void onApplicationEvent(@Observes  ConfigurationChangeEvent event) {
+        if (jobConfigMap.containsKey(event.getJobConfig().getId())) {
+            jobConfigMap.put(event.getJobConfig().getId(), event.getJobConfig());
             try {
                 cronTrigger.reschedule(
-                    jobConfigKeyMap.get(event.getSync().getId()),
-                    event.getSync());
+                    jobConfigKeyMap.get(event.getJobConfig().getId()),
+                    event.getJobConfig());
             }
             catch (SchedulerException e) {
                 log.error("Error rescheduling job:" + e.getMessage());
@@ -129,8 +136,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     // TODO: update job details
-    @EventListener
-    public void onJobProgressUpdate(JobProgressEvent event) {
+    public void onJobProgressUpdate(@Observes JobProgressEvent event) {
         JobConfig jobConfig = jobConfigMap.get(event.getId());
         if (jobConfig != null) {
             log.info(jobConfig.getName() + ":" + event.getDescription());
@@ -138,8 +144,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     // TODO: fire websocket event
-    @EventListener
-    public void onJobStarts(JobRunStartsEvent event) {
+    public void onJobStarts(@Observes JobRunStartsEvent event) {
         JobConfig jobConfig = jobConfigMap.get(event.getId());
         if (jobConfig != null) {
             log.debug(
@@ -148,8 +153,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     // TODO: update database record, create history
-    @EventListener
-    public void onJobCompleted(JobRunCompletedEvent event)
+    public void onJobCompleted(@Observes JobRunCompletedEvent event)
         throws JobNotFoundException, SchedulerException {
         JobConfig jobConfig = jobConfigMap.get(event.getId());
 

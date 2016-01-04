@@ -1,29 +1,46 @@
 package org.zanata.helper.component;
 
 import java.io.File;
-
-import lombok.Getter;
-import lombok.Setter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+import javax.enterprise.context.Dependent;
 
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import com.google.common.base.Throwables;
+import lombok.Getter;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
- *
  */
-@Component
+@Dependent
 public class AppConfiguration {
     private final static String CONFIG_DIR = "configuration";
     private final static String repoDirectory = "repository";
 
+    public AppConfiguration() {
+        ClassLoader contextClassLoader =
+                Thread.currentThread().getContextClassLoader();
+        try (InputStream config = contextClassLoader
+                .getResourceAsStream("config.properties");
+                InputStream info = contextClassLoader
+                        .getResourceAsStream("info.properties")) {
+            Properties properties = new Properties();
+            properties.load(info);
+            buildInfo = properties.getProperty("build.info");
+            buildVersion = properties.getProperty("build.version");
+            properties.load(config);
+            storageDirectory = properties.getProperty("store.directory");
+
+        } catch (IOException e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
     @Getter
-    @Value("${build.version}")
     private String buildVersion;
 
     @Getter
-    @Value("${build.info}")
     private String buildInfo;
 
     //TODO: make this configurable
@@ -31,8 +48,6 @@ public class AppConfiguration {
      * Must have read write access
      * i.e /tmp/zanataHelperRoot
      */
-    @Setter
-    @Value("${store.directory}")
     private String storageDirectory;
 
     public String getConfigDirectory() {

@@ -1,17 +1,9 @@
 package org.zanata.helper.api;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.quartz.SchedulerException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zanata.helper.common.model.Field;
 import org.zanata.helper.common.plugin.Plugin;
 import org.zanata.helper.common.plugin.RepoExecutor;
@@ -26,73 +18,87 @@ import org.zanata.helper.model.JobStatus;
 import org.zanata.helper.service.PluginsService;
 import org.zanata.helper.service.SchedulerService;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
 
-@RestController
-@RequestMapping(value = APIController.API_ROOT + APIController.JOB_ROOT)
-@Slf4j
-public class JobAPIController extends APIController {
-
+@RequestScoped
+@Path(APIController.JOB_ROOT)
+@Produces("application/json")
+public class JobAPIController {
+    private static final Logger log =
+            LoggerFactory.getLogger(JobAPIController.class);
     public final static String STATUS_URL = "/status";
     public final static String CANCEL_URL = "/cancel";
 
-    @Autowired
+    @Inject
     private SchedulerService schedulerServiceImpl;
 
-    @Autowired
+    @Inject
     private PluginsService pluginsServiceImpl;
 
-    @Autowired
+    @Inject
     private MessageResource messageResource;
 
-    @RequestMapping(value = STATUS_URL, method = RequestMethod.GET, produces = CHARSET_JSON_UTF8)
-    @ResponseBody
-    public ResponseEntity<JobStatus> getJobStatus(
-            @RequestParam(value = "id", defaultValue = "") String id) {
+    @Path(STATUS_URL)
+    @GET
+    public Response getJobStatus(
+            @QueryParam(value = "id") @DefaultValue("") String id) {
         try {
             if(StringUtils.isEmpty(id)) {
-                return new ResponseEntity(HttpStatus.NOT_FOUND);
+                return Response.status(
+                        Response.Status.NOT_FOUND).build();
             }
-            return new ResponseEntity<JobStatus>(
-                    schedulerServiceImpl.getLastStatus(new Long(id)),
-                    HttpStatus.OK);
+            return Response.ok(schedulerServiceImpl.getLastStatus(new Long(id))).build();
         } catch (SchedulerException e) {
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error("get job status error", e);
+            return Response.serverError().build();
         } catch (JobNotFoundException e) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+            log.warn("get job status not found", e);
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
     }
 
-    @RequestMapping(value = CANCEL_URL, method = RequestMethod.POST, produces = CHARSET_JSON_UTF8)
-    @ResponseBody
-    public ResponseEntity<String> cancelRunningJob(
-        @RequestParam(value = "id", defaultValue = "") String id) {
+    @Path(CANCEL_URL)
+    @POST
+    public Response cancelRunningJob(
+        @QueryParam(value = "id") @DefaultValue("") String id) {
         try {
             if(StringUtils.isEmpty(id)) {
-                return new ResponseEntity(HttpStatus.NOT_FOUND);
+                return Response.status(
+                        Response.Status.NOT_FOUND).build();
             }
             schedulerServiceImpl.cancelRunningJob(new Long(id));
-            return new ResponseEntity<String>(HttpStatus.OK);
+            return Response.ok().build();
         } catch (SchedulerException e) {
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error("cancel error", e);
+            return Response.serverError().build();
         } catch (JobNotFoundException e) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+            log.warn("cancel job not found", e);
+            return Response.status(
+                    Response.Status.NOT_FOUND).build();
         }
     }
 
-    @RequestMapping(method = RequestMethod.POST, produces = CHARSET_JSON_UTF8)
-    @ResponseBody
-    public ResponseEntity<Map<String, String>> createJob(
-        @RequestBody JobForm form) {
+    @POST
+    public Response createJob(
+        JobForm form) {
         Map<String, String> errors = validateJobForm(form);
         if (!errors.isEmpty()) {
-            return new ResponseEntity<Map<String, String>>(errors,
-                HttpStatus.BAD_REQUEST);
+            return Response.status(Response.Status.BAD_REQUEST).entity(errors).build();
         }
 
         JobConfig jobConfig = new JobConfigBuilder(form).build();
@@ -102,10 +108,10 @@ public class JobAPIController extends APIController {
         catch (SchedulerException e) {
             log.error("Error trying to schedule job", e.getMessage());
             errors.put("error", e.getMessage());
-            return new ResponseEntity<Map<String, String>>(
-                HttpStatus.INTERNAL_SERVER_ERROR);
+            return Response.serverError().build();
         }
-        return new ResponseEntity<Map<String, String>>(HttpStatus.CREATED);
+        // TODO create URI
+        return Response.created(URI.create("")).build();
     }
 
     private Map<String, String> validateJobForm(JobForm form) {

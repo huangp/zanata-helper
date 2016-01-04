@@ -1,53 +1,52 @@
 package org.zanata.helper.api;
 
-import java.util.List;
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
 
 import org.quartz.SchedulerException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.zanata.helper.model.JobSummary;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zanata.helper.service.SchedulerService;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
 
-@RestController
-@RequestMapping(value = APIController.API_ROOT + APIController.JOBS_ROOT)
-public class JobsAPIController extends APIController {
+@RequestScoped
+@Path(APIController.JOBS_ROOT)
+@Produces("application/json")
+public class JobsAPIController {
+    private static final Logger log =
+            LoggerFactory.getLogger(JobsAPIController.class);
 
     public final static String RUNNING_JOBS_URL = "/running";
 
-    @Autowired
+    @Inject
     private SchedulerService schedulerServiceImpl;
 
 
-    @RequestMapping(method = RequestMethod.GET,
-        produces = "application/json; charset=UTF-8")
-    @ResponseBody
-    public ResponseEntity<List<JobSummary>> getAllJobs() {
+    @GET
+    public Response getAllJobs() {
         try {
-            return new ResponseEntity<List<JobSummary>>(
-                schedulerServiceImpl.getAllJobs(), HttpStatus.OK);
+            return Response.ok(schedulerServiceImpl.getAllJobs()).build();
         } catch (SchedulerException e) {
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error("fail getting all jobs", e);
+            return Response.serverError().build();
         }
     }
 
-    @RequestMapping(value = RUNNING_JOBS_URL, method = RequestMethod.GET,
-            produces = "application/json; charset=UTF-8")
-    @ResponseBody
-    public ResponseEntity<List<JobSummary>> getRunningJobs() {
+    @Path(RUNNING_JOBS_URL)
+    @GET
+    public Response getRunningJobs() {
         try {
-            return new ResponseEntity<List<JobSummary>>(
-                    schedulerServiceImpl.getRunningJob(), HttpStatus.OK);
+            return Response.ok(schedulerServiceImpl.getRunningJob()).build();
         } catch (SchedulerException e) {
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error("fail getting running jobs", e);
+            return Response.serverError().build();
         }
     }
 }

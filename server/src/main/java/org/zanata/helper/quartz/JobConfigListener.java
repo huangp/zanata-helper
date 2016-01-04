@@ -1,13 +1,12 @@
 package org.zanata.helper.quartz;
 
+import javax.enterprise.event.Event;
+import javax.inject.Inject;
+
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-import org.quartz.JobListener;
 import org.quartz.Trigger;
 import org.quartz.TriggerListener;
-import org.zanata.helper.events.EventPublisher;
 import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.events.JobRunStartsEvent;
 import org.zanata.helper.model.JobConfig;
@@ -16,11 +15,12 @@ import org.zanata.helper.model.JobConfig;
 public class JobConfigListener implements TriggerListener {
     public static final String LISTENER_NAME = "JobConfigListener";
 
-    private final EventPublisher eventPublisher;
+    @Inject
+    private Event<JobRunCompletedEvent> jobRunCompletedEvent;
 
-    public JobConfigListener(EventPublisher eventPublisher) {
-        this.eventPublisher = eventPublisher;
-    }
+    @Inject
+    private Event<JobRunStartsEvent> jobRunStartsEvent;
+
 
     public String getName() {
         return LISTENER_NAME;
@@ -29,8 +29,8 @@ public class JobConfigListener implements TriggerListener {
     @Override
     public void triggerFired(Trigger trigger, JobExecutionContext context) {
         JobConfig jobConfig = getJobConfigJob(context);
-        eventPublisher.fireEvent(
-            new JobRunStartsEvent(this, jobConfig.getId(),
+        jobRunStartsEvent.fire(
+            new JobRunStartsEvent(jobConfig.getId(),
                 context.getFireTime()));
     }
 
@@ -51,8 +51,8 @@ public class JobConfigListener implements TriggerListener {
         Trigger.CompletedExecutionInstruction triggerInstructionCode) {
 
         JobConfig jobConfig = getJobConfigJob(context);
-        eventPublisher.fireEvent(
-            new JobRunCompletedEvent(this, jobConfig.getId(),
+        jobRunCompletedEvent.fire(
+            new JobRunCompletedEvent(jobConfig.getId(),
                 context.getJobRunTime(),
                 context.getFireTime()));
     }

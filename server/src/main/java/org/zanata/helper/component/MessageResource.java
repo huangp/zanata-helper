@@ -1,26 +1,27 @@
 package org.zanata.helper.component;
 
+import java.text.MessageFormat;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.stereotype.Component;
+import javax.enterprise.context.RequestScoped;
 
-@Component
-public class MessageResource
-{
-   @Autowired
-   private MessageSource messageSource;
-   
-   private final Locale locale = Locale.getDefault();
-   
-   public String getMessage(String messageKey, Object ...args)
-   {
-      return messageSource.getMessage(messageKey, args, locale);
-   }
-   
-   public String getMessage(String messageKey)
-   {
-      return messageSource.getMessage(messageKey, null, locale);
-   }
+@RequestScoped
+public class MessageResource {
+
+    private final ResourceBundle messageSource;
+
+    public MessageResource() {
+        Locale locale = Locale.getDefault();
+        messageSource = ResourceBundle.getBundle("messages", locale);
+    }
+
+    public String getMessage(String messageKey, Object... args) {
+        String template = messageSource.getString(messageKey);
+        return MessageFormat.format(template, args);
+    }
+
+    public String getMessage(String messageKey) {
+        return messageSource.getString(messageKey);
+    }
 }

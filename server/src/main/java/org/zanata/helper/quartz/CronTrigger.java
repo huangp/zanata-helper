@@ -19,7 +19,6 @@ import org.quartz.UnableToInterruptJobException;
 import org.quartz.impl.StdSchedulerFactory;
 import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
-import org.zanata.helper.events.EventPublisher;
 import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.exception.UnableLoadPluginException;
 import org.zanata.helper.model.JobStatus;
@@ -40,16 +39,13 @@ public class CronTrigger {
     private final Scheduler scheduler =
         StdSchedulerFactory.getDefaultScheduler();
 
-    private final EventPublisher eventPublisher;
-
     private final AppConfiguration appConfiguration;
 
     private final PluginsService pluginsService;
 
-    public CronTrigger(EventPublisher eventPublisher,
-        AppConfiguration appConfiguration, PluginsService pluginsService)
+    public CronTrigger(AppConfiguration appConfiguration,
+            PluginsService pluginsService)
         throws SchedulerException {
-        this.eventPublisher = eventPublisher;
         this.appConfiguration = appConfiguration;
         this.pluginsService = pluginsService;
         scheduler.start();
@@ -91,7 +87,7 @@ public class CronTrigger {
                         .isEmpty()) {
                         scheduler.getListenerManager()
                             .addTriggerListener(
-                                new JobConfigListener(eventPublisher));
+                                new JobConfigListener());
                     }
                     scheduler.scheduleJob(jobDetail, trigger);
                     return trigger.getKey();
