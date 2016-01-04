@@ -38,18 +38,11 @@ public class SyncJob implements InterruptableJob {
 
         RepoExecutor srcExecutor =
             (RepoExecutor) context.getJobDetail().getJobDataMap()
-                .get("sourceRepoExecutor");
+                .get(RepoExecutor.class.getSimpleName());
 
         TranslationServerExecutor transServerExecutor =
             (TranslationServerExecutor) context.getJobDetail().getJobDataMap()
-                .get("translationServerExecutor");
-
-        //TODO: remove this, this is for test only
-        try {
-            Thread.sleep(100000);
-        } catch(InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
+                .get(TranslationServerExecutor.class.getSimpleName());
 
         if (jobConfig.getJobType().equals(JobConfig.Type.SYNC_TO_REPO)) {
             processSyncToRepo(srcExecutor, transServerExecutor);

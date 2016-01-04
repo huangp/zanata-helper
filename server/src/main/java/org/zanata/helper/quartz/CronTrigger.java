@@ -17,6 +17,8 @@ import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.UnableToInterruptJobException;
 import org.quartz.impl.StdSchedulerFactory;
+import org.zanata.helper.common.plugin.RepoExecutor;
+import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.events.EventPublisher;
 import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.exception.UnableLoadPluginException;
@@ -72,13 +74,13 @@ public class CronTrigger {
                         .put("basedir", appConfiguration.getStorageDirectory());
 
                     jobDetail.getJobDataMap()
-                        .put("sourceRepoExecutor", pluginsService
+                        .put(RepoExecutor.class.getSimpleName(), pluginsService
                             .getNewSourceRepoPlugin(
                                 jobConfig.getSourceRepoExecutorName(),
                                 jobConfig.getSourceRepoConfig()));
 
                     jobDetail.getJobDataMap()
-                        .put("translationServerExecutor", pluginsService
+                        .put(TranslationServerExecutor.class.getSimpleName(), pluginsService
                             .getNewTransServerPlugin(
                                 jobConfig.getTranslationServerExecutorName(),
                                 jobConfig.getTransServerConfig()));

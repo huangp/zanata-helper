@@ -22,6 +22,8 @@ public class Plugin extends RepoExecutor {
     private final String description = Messages.getString("plugin.description");
     private final GitSyncService gitSyncService;
 
+    private final static String DEFAULT_BRANCH = "master";
+
     public Plugin(Map<String, String> fields) {
         super(fields);
 
@@ -65,15 +67,26 @@ public class Plugin extends RepoExecutor {
 
     @Override
     public void cloneRepo(File dir) throws RepoSyncException {
-        gitSyncService.cloneRepo(getFields().get("url").getValue(), dir);
+        gitSyncService.cloneRepo(getFields().get("url").getValue(),
+            getBranch(), dir);
     }
 
     @Override
     public void pushToRepo(File dir, SyncType syncType)
-        throws RepoSyncException {
+            throws RepoSyncException {
         gitSyncService
-            .syncTranslationToRepo(getFields().get("url").getValue(), dir);
+                .syncTranslationToRepo(getFields().get("url").getValue(),
+                        getBranch(), dir);
     }
 
-
+    /**
+     * Default to {@link DEFAULT_BRANCH} branch if it is not specify
+     */
+    private String getBranch() {
+        String branch = getFields().get("branch").getValue();
+        if (branch == null || branch.length() <= 0) {
+            return DEFAULT_BRANCH;
+        }
+        return branch;
+    }
 }

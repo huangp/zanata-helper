@@ -31,7 +31,7 @@ public class GitSyncServiceTest {
     public void canCloneGitRepo() throws IOException {
         Assertions.assertThat(dest.listFiles()).isNullOrEmpty();
 
-        syncService.cloneRepo("https://github.com/zanata/zanata-api.git",
+        syncService.cloneRepo("https://github.com/zanata/zanata-api.git", null,
                 dest);
 
         Assertions.assertThat(dest.listFiles()).isNotEmpty();

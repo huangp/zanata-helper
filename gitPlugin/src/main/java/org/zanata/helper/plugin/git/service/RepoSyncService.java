@@ -28,7 +28,9 @@ import org.zanata.helper.common.exception.RepoSyncException;
 public interface RepoSyncService<P> {
     Credentials<P> getCredentials();
 
-    void cloneRepo(String repoUrl, File destPath) throws RepoSyncException;
+    void cloneRepo(String repoUrl, String branch, File destPath)
+            throws RepoSyncException;
 
-    void syncTranslationToRepo(String repoUrl, File baseDir) throws RepoSyncException;
+    void syncTranslationToRepo(String repoUrl, String branch, File baseDir)
+            throws RepoSyncException;
 }

@@ -57,12 +57,12 @@ public class GitSyncService implements RepoSyncService<String> {
         return credentials;
     }
 
-    public void cloneRepo(String repoUrl, File destPath)
+    public void cloneRepo(String repoUrl, String branch, File destPath)
             throws RepoSyncException {
         CloneCommand clone = Git.cloneRepository();
         clone.setBare(false);
         clone.setCloneAllBranches(false);
-        clone.setDirectory(destPath).setURI(repoUrl);
+        clone.setDirectory(destPath).setURI(repoUrl).setBranch(branch);
         UsernamePasswordCredentialsProvider user =
                 new UsernamePasswordCredentialsProvider(
                         getCredentials().getUsername(),
@@ -76,7 +76,7 @@ public class GitSyncService implements RepoSyncService<String> {
     }
 
     @Override
-    public void syncTranslationToRepo(String repoUrl, File baseDir)
+    public void syncTranslationToRepo(String repoUrl, String branch, File baseDir)
             throws RepoSyncException {
         try {
             Git git = Git.open(baseDir);
