@@ -16,8 +16,8 @@ gretty {
 description = 'Zanata helper server'
 dependencies {
     compile project(':common')
-    compile project(':gitPlugin')
-    compile project(':zanataPlugin')
+    compile project(':git-plugin')
+    compile project(':zanata-cli-plugin')
     compile group: 'org.slf4j', name: 'jcl-over-slf4j', version:'1.7.13'
     compile group: 'javax.servlet', name: 'jstl', version:'1.2'
     compile group: 'taglibs', name: 'standard', version:'1.1.2'

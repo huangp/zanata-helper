@@ -1,10 +1,10 @@
 rootProject.name = 'Zanata Helper'
 include 'common'
-include ':zanataPlugin'
-include 'gitPlugin'
+include ':zanata-cli-plugin'
+include 'git-plugin'
 include ':server'
 
-project(':zanataPlugin').projectDir = "$rootDir/zanataPlugin" as File
-project(':server').projectDir = "$rootDir/server" as File
 project(':common').projectDir = "$rootDir/common" as File
-project(':gitPlugin').projectDir = "$rootDir/gitPlugin" as File
+project(':zanata-cli-plugin').projectDir = "$rootDir/zanata-cli-plugin" as File
+project(':git-plugin').projectDir = "$rootDir/git-plugin" as File
+project(':server').projectDir = "$rootDir/server" as File
