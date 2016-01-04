@@ -69,11 +69,10 @@ public final class PluginsServiceImpl implements PluginsService {
         try {
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             URL[] urls = pluginJars.toArray(new URL[]{});
-            log.debug("jar urls to scan", Arrays.toString(urls));
             db.scanArchives(urls);
             Set<String> repoPluginClasses =
                     db.getAnnotationIndex().get(RepoPlugin.class.getName());
-            log.info("loaded repo plugins ==== {}", repoPluginClasses);
+            log.info("available repo plugins - {}", repoPluginClasses);
 
             for (String cls : repoPluginClasses) {
                 Class<? extends RepoExecutor> entity =
@@ -84,7 +83,7 @@ public final class PluginsServiceImpl implements PluginsService {
             Set<String> transServerPluginClasses =
                     db.getAnnotationIndex()
                             .get(TranslationServerPlugin.class.getName());
-            log.info("loaded translation server plugins ==== {}",
+            log.info("available translation server plugins - {}",
                     transServerPluginClasses);
 
             for (String cls : transServerPluginClasses) {

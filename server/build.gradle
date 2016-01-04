@@ -8,7 +8,8 @@ apply plugin: 'war'
 gretty {
   // supported values:
   // 'jetty7', 'jetty8', 'jetty9', 'tomcat7', 'tomcat8'
-  servletContainer = 'tomcat8'
+  servletContainer = 'jetty9'
+  port= 8080
   contextPath = ''
 }
 
