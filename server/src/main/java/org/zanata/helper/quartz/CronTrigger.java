@@ -71,7 +71,7 @@ public class CronTrigger {
 
                     jobDetail.getJobDataMap().put("value", jobConfig);
                     jobDetail.getJobDataMap()
-                        .put("basedir", appConfiguration.getStorageDirectory());
+                        .put("basedir", appConfiguration.getRepoDirectory());
 
                     jobDetail.getJobDataMap()
                         .put(RepoExecutor.class.getSimpleName(), pluginsService
