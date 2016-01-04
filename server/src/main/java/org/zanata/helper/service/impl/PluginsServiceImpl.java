@@ -5,7 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.zanata.helper.common.plugin.PluginExecutor;
+import org.zanata.helper.common.annotation.RepoPlugin;
+import org.zanata.helper.common.annotation.TranslationServerPlugin;
 import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.exception.UnableLoadPluginException;
@@ -49,7 +50,6 @@ public final class PluginsServiceImpl implements PluginsService {
      */
     @PostConstruct
     public void initialise() {
-
         Set<String> libJars = servletContext.getResourcePaths("/WEB-INF/lib");
         Set<URL> pluginJars = libJars.stream()
                 .filter(jar -> jar.toLowerCase().contains("plugin") ||
@@ -65,27 +65,40 @@ public final class PluginsServiceImpl implements PluginsService {
                 .filter(url -> url != null)
                 .collect(Collectors.toSet());
 
-
         AnnotationDB db = new AnnotationDB();
         try {
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
             URL[] urls = pluginJars.toArray(new URL[]{});
             log.debug("jar urls to scan", Arrays.toString(urls));
             db.scanArchives(urls);
-            Set<String> pluginClasses =
-                    db.getAnnotationIndex().get(PluginExecutor.class.getName());
-            log.info("==== {}", pluginClasses);
+            Set<String> repoPluginClasses =
+                    db.getAnnotationIndex().get(RepoPlugin.class.getName());
+            log.info("loaded repo plugins ==== {}", repoPluginClasses);
+
+            for (String cls : repoPluginClasses) {
+                Class<? extends RepoExecutor> entity =
+                    (Class<? extends RepoExecutor>) cl.loadClass(cls);
+                sourceRepoPluginMap.put(entity.getName(), entity);
+            }
+
+            Set<String> transServerPluginClasses =
+                    db.getAnnotationIndex()
+                            .get(TranslationServerPlugin.class.getName());
+            log.info("loaded translation server plugins ==== {}",
+                    transServerPluginClasses);
+
+            for (String cls : transServerPluginClasses) {
+                Class<? extends TranslationServerExecutor> entity =
+                        (Class<? extends TranslationServerExecutor>) cl
+                                .loadClass(cls);
+                transServerPluginMap.put(entity.getName(), entity);
+            }
+
         } catch (IOException e) {
-            throw Throwables.propagate(e);
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
-
-
-        sourceRepoPluginMap
-            .put(org.zanata.helper.plugin.git.Plugin.class.getName(),
-                org.zanata.helper.plugin.git.Plugin.class);
-
-        transServerPluginMap
-            .put(org.zanata.helper.plugin.zanata.Plugin.class.getName(),
-                org.zanata.helper.plugin.zanata.Plugin.class);
     }
 
     @Override

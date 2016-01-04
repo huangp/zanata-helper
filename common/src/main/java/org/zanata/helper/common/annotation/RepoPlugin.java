@@ -1,4 +1,4 @@
-package org.zanata.helper.common.plugin;
+package org.zanata.helper.common.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,5 +10,5 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface PluginExecutor {
+public @interface RepoPlugin {
 }

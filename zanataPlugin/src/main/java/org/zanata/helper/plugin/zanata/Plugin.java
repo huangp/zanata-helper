@@ -2,8 +2,10 @@ package org.zanata.helper.plugin.zanata;
 
 import org.zanata.client.commands.pull.PullOptionsImpl;
 import org.zanata.client.commands.push.PushOptionsImpl;
+import org.zanata.helper.common.annotation.TranslationServerPlugin;
 import org.zanata.helper.common.model.SyncType;
 import org.zanata.helper.common.model.Field;
+import org.zanata.helper.common.annotation.RepoPlugin;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.common.validator.StringValidator;
 import org.zanata.helper.common.validator.UrlValidator;
@@ -15,9 +17,8 @@ import java.util.Map;
 
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
- *
- * TODO: internationalise this class
  */
+@TranslationServerPlugin
 public class Plugin extends TranslationServerExecutor {
 
     private final String name = "Zanata plugin";

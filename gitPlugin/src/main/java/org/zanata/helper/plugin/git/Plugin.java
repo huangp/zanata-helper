@@ -4,6 +4,7 @@ import org.zanata.helper.common.model.SyncType;
 import org.zanata.helper.common.model.UsernamePasswordCredential;
 import org.zanata.helper.common.exception.RepoSyncException;
 import org.zanata.helper.common.model.Field;
+import org.zanata.helper.common.annotation.RepoPlugin;
 import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.validator.StringValidator;
 import org.zanata.helper.plugin.git.service.impl.GitSyncService;
@@ -14,9 +15,8 @@ import java.util.Map;
 
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
- *
- * TODO: internationalise this class
  */
+@RepoPlugin
 public class Plugin extends RepoExecutor {
     private final String name = "Git plugin";
     private final String description = Messages.getString("plugin.description");

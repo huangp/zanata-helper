@@ -2,7 +2,7 @@
 - To run test: `gradle dist test`
 
 - To run war: 
-    - `gradle appRun`, `appRunDebug`
+    - `gradle appRunWar`, `appRunWarDebug`
     - [http://localhost:8080/](http://localhost:8080/)
     - For more info, see [http://akhikhl.github.io/gretty-doc/Gretty-configuration.html]
 
