@@ -1,11 +1,9 @@
 package org.zanata.helper.service.impl;
 
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.type.filter.AnnotationTypeFilter;
+import org.scannotation.AnnotationDB;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.zanata.helper.common.plugin.PluginExecutor;
 import org.zanata.helper.common.plugin.RepoExecutor;
@@ -14,17 +12,29 @@ import org.zanata.helper.exception.UnableLoadPluginException;
 import org.zanata.helper.service.PluginsService;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.ServletContext;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import com.google.common.base.Throwables;
 
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
  */
 @Service
-@Slf4j
 public final class PluginsServiceImpl implements PluginsService {
+    private static final Logger log =
+            LoggerFactory.getLogger(PluginsServiceImpl.class);
+    @Autowired
+    private ServletContext servletContext;
 
     private final static Map<String, Class<? extends RepoExecutor>>
         sourceRepoPluginMap =
@@ -39,25 +49,35 @@ public final class PluginsServiceImpl implements PluginsService {
      */
     @PostConstruct
     public void initialise() {
-        /**
-         * TODO: scan classpath for plugins class, remove plugins dependency from server module
-         * For now, load all known plugins
-         */
 
-        //Not Working - not scanning jar
+        Set<String> libJars = servletContext.getResourcePaths("/WEB-INF/lib");
+        Set<URL> pluginJars = libJars.stream()
+                .filter(jar -> jar.toLowerCase().contains("plugin") ||
+                        jar.toLowerCase().contains("common"))
+                .map(jar -> {
+                    try {
+                        return servletContext.getResource(jar);
+                    } catch (MalformedURLException e) {
+                        log.error("error getting resource", e);
+                        return null;
+                    }
+                })
+                .filter(url -> url != null)
+                .collect(Collectors.toSet());
 
-//        final ClassLoader classLoader = this.getClass().getClassLoader();
-//
-//        ClassPathScanningCandidateComponentProvider scanner =
-//            new ClassPathScanningCandidateComponentProvider(false);
-//
-//        scanner.addIncludeFilter(new AnnotationTypeFilter(PluginExecutor.class));
-//        scanner.setResourceLoader(new PathMatchingResourcePatternResolver(classLoader));
-//
-//        System.out.println("alex: start");
-//        for (BeanDefinition bd : scanner.findCandidateComponents("")) {
-//            System.out.println(bd.getBeanClassName());
-//        }
+
+        AnnotationDB db = new AnnotationDB();
+        try {
+            URL[] urls = pluginJars.toArray(new URL[]{});
+            log.debug("jar urls to scan", Arrays.toString(urls));
+            db.scanArchives(urls);
+            Set<String> pluginClasses =
+                    db.getAnnotationIndex().get(PluginExecutor.class.getName());
+            log.info("==== {}", pluginClasses);
+        } catch (IOException e) {
+            throw Throwables.propagate(e);
+        }
+
 
         sourceRepoPluginMap
             .put(org.zanata.helper.plugin.git.Plugin.class.getName(),
