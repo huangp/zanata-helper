@@ -1,6 +1,6 @@
 package org.zanata.helper.model;
 
-import java.io.Serializable;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,14 +8,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
  */
 @Getter
 @NoArgsConstructor
-public class JobConfig_test implements Serializable {
+public class JobConfig_test extends PersistModel {
 
     private Long id;
     private String name;
@@ -31,6 +30,9 @@ public class JobConfig_test implements Serializable {
 
     private String sourceRepoExecutorName;
     private String translationServerExecutorName;
+
+    @Setter(AccessLevel.PROTECTED)
+    private Date createdDate;
 
     public JobConfig_test(Long id, String name, String description,
         SyncConfig syncToServerConfig, SyncConfig syncToRepoConfig,
