@@ -3,7 +3,7 @@ package org.zanata.helper.plugin.zanata;
 import org.zanata.client.commands.pull.PullOptionsImpl;
 import org.zanata.client.commands.push.PushOptionsImpl;
 import org.zanata.helper.common.annotation.TranslationServerPlugin;
-import org.zanata.helper.common.model.SyncType;
+import org.zanata.helper.common.model.SyncOption;
 import org.zanata.helper.common.model.Field;
 import org.zanata.helper.common.annotation.RepoPlugin;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
@@ -72,11 +72,11 @@ public class Plugin extends TranslationServerExecutor {
     }
 
     @Override
-    public void pullFromServer(File dir, SyncType syncType) throws
+    public void pullFromServer(File dir, SyncOption syncOption) throws
         ZanataSyncException {
-        if (syncType.equals(SyncType.BOTH)) {
+        if (syncOption.equals(SyncOption.BOTH)) {
             pullOptions.setPullType("both");
-        } else if (syncType.equals(SyncType.SOURCE)) {
+        } else if (syncOption.equals(SyncOption.SOURCE)) {
             pullOptions.setPullType("source");
         } else {
             pullOptions.setPullType("trans");
@@ -86,11 +86,11 @@ public class Plugin extends TranslationServerExecutor {
     }
 
     @Override
-    public void pushToServer(File dir, SyncType syncType)
+    public void pushToServer(File dir, SyncOption syncOption)
         throws ZanataSyncException {
-        if (syncType.equals(SyncType.BOTH)) {
+        if (syncOption.equals(SyncOption.BOTH)) {
             pushOptions.setPushType("both");
-        } else if (syncType.equals(SyncType.SOURCE)) {
+        } else if (syncOption.equals(SyncOption.SOURCE)) {
             pushOptions.setPushType("source");
         } else {
             pushOptions.setPushType("trans");

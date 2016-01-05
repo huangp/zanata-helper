@@ -19,7 +19,7 @@ import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.zanata.helper.api.APIController;
-import org.zanata.helper.common.model.SyncType;
+import org.zanata.helper.common.model.SyncOption;
 import org.zanata.helper.common.model.Field;
 import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
@@ -178,15 +178,15 @@ public class NewJobController {
     private List<Field> getSyncTypes() {
         if (syncTypes == null) {
             syncTypes = new ArrayList<>();
-            syncTypes.add(new Field(SyncType.SOURCE.name(), messageResource
+            syncTypes.add(new Field(SyncOption.SOURCE.name(), messageResource
                 .getMessage("jsf.newJob.syncType.sourceOnly.explanation"), "",
                 ""));
             syncTypes
-                .add(new Field(SyncType.TRANSLATIONS.name(), messageResource
+                .add(new Field(SyncOption.TRANSLATIONS.name(), messageResource
                     .getMessage(
                         "jsf.newJob.syncType.translationsOnly.explanation"), "",
                     ""));
-            syncTypes.add(new Field(SyncType.BOTH.name(), messageResource
+            syncTypes.add(new Field(SyncOption.BOTH.name(), messageResource
                 .getMessage("jsf.newJob.syncType.both.explanation"), "",
                 ""));
         }

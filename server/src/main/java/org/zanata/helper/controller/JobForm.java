@@ -6,7 +6,7 @@ import java.util.Map;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.NotEmpty;
-import org.zanata.helper.common.model.SyncType;
+import org.zanata.helper.common.model.SyncOption;
 import org.zanata.helper.model.JobConfig;
 
 import lombok.Getter;
@@ -47,7 +47,7 @@ public class JobForm implements Serializable {
     private JobConfig.Type jobType = JobConfig.Type.SYNC_TO_SERVER;
 
     @Setter
-    private SyncType syncType = SyncType.SOURCE;
+    private SyncOption syncOption = SyncOption.SOURCE;
 
     @NotEmpty
     @Size(min = SOURCE_REPO_NAME_MIN, max = SOURCE_REPO_NAME_MAX)

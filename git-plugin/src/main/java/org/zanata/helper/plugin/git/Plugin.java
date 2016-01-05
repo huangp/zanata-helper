@@ -1,6 +1,6 @@
 package org.zanata.helper.plugin.git;
 
-import org.zanata.helper.common.model.SyncType;
+import org.zanata.helper.common.model.SyncOption;
 import org.zanata.helper.common.model.UsernamePasswordCredential;
 import org.zanata.helper.common.exception.RepoSyncException;
 import org.zanata.helper.common.model.Field;
@@ -72,7 +72,7 @@ public class Plugin extends RepoExecutor {
     }
 
     @Override
-    public void pushToRepo(File dir, SyncType syncType)
+    public void pushToRepo(File dir, SyncOption syncOption)
             throws RepoSyncException {
         gitSyncService
                 .syncTranslationToRepo(getFields().get("url").getValue(),

@@ -91,11 +91,11 @@ public class SyncJob implements InterruptableJob {
                 3, syncToRepoTotalSteps,
                 "Pulling files to server from " + destDir);
             transServerExecutor
-                .pullFromServer(destDir, jobConfig.getSyncType());
+                .pullFromServer(destDir, jobConfig.getSyncOption());
             updateProgress(jobConfig.getId(),
                 4, syncToRepoTotalSteps,
                 "Commits to repository from " + destDir);
-            srcExecutor.pushToRepo(destDir, jobConfig.getSyncType());
+            srcExecutor.pushToRepo(destDir, jobConfig.getSyncOption());
             updateProgress(jobConfig.getId(), 5, syncToRepoTotalSteps,
                 "Sync to repository completed");
         } catch (Exception e) {
@@ -121,7 +121,7 @@ public class SyncJob implements InterruptableJob {
             updateProgress(jobConfig.getId(),
                 3, syncToServerTotalSteps,
                 "Pushing files to server from " + destDir);
-            transServerExecutor.pushToServer(destDir, jobConfig.getSyncType());
+            transServerExecutor.pushToServer(destDir, jobConfig.getSyncOption());
             updateProgress(jobConfig.getId(), 4, syncToServerTotalSteps,
                 "Sync to server completed");
         } catch (Exception e) {

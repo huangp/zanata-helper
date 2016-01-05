@@ -2,7 +2,7 @@ package org.zanata.helper.common.plugin;
 
 import lombok.Getter;
 import org.zanata.helper.common.model.Field;
-import org.zanata.helper.common.model.SyncType;
+import org.zanata.helper.common.model.SyncOption;
 import org.zanata.helper.common.exception.RepoSyncException;
 
 import java.io.File;
@@ -41,9 +41,9 @@ public abstract class RepoExecutor implements Plugin {
      * Push changes to source repository
      *
      * @param dir - directory to push from
-     * @param syncType - source only, translations only, or both
+     * @param syncOption - source only, translations only, or both
      * @return push successful
      */
-    public abstract void pushToRepo(File dir, SyncType syncType) throws
+    public abstract void pushToRepo(File dir, SyncOption syncOption) throws
         RepoSyncException;
 }

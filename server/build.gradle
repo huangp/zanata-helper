@@ -19,6 +19,7 @@ dependencies {
     compile project(':git-plugin')
     compile project(':zanata-cli-plugin')
     compile group: 'org.slf4j', name: 'jcl-over-slf4j', version:'1.7.13'
+    compile group: 'org.yaml', name: 'snakeyaml', version:'1.16'
     compile group: 'javax.servlet', name: 'jstl', version:'1.2'
     compile group: 'taglibs', name: 'standard', version:'1.1.2'
     compile group: 'net.bull.javamelody', name: 'javamelody-core', version:'1.58.0'

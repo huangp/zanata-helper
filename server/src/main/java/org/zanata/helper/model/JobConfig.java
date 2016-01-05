@@ -8,7 +8,7 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.zanata.helper.common.model.SyncType;
+import org.zanata.helper.common.model.SyncOption;
 
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
@@ -25,7 +25,7 @@ public class JobConfig implements Serializable {
      */
     private String cron;
     private JobConfig.Type jobType;
-    private SyncType syncType;
+    private SyncOption syncOption;
     private Map<String, String> sourceRepoConfig =
         new HashMap<String, String>();
     private Map<String, String> transServerConfig =
@@ -39,16 +39,16 @@ public class JobConfig implements Serializable {
 
 
     public JobConfig(String name, String description, JobConfig.Type jobType,
-        SyncType syncType, Map<String, String> sourceRepoConfig,
+        SyncOption syncOption, Map<String, String> sourceRepoConfig,
         String sourceRepoExecutorName, Map<String, String> transServerConfig,
         String translationServerExecutorName, String cron) {
         this(new Date().getTime(), name, description, jobType,
-            syncType, sourceRepoConfig, sourceRepoExecutorName,
+            syncOption, sourceRepoConfig, sourceRepoExecutorName,
             transServerConfig, translationServerExecutorName, cron);
     }
 
     public JobConfig(Long id, String name, String description,
-        JobConfig.Type jobType, SyncType syncType,
+        JobConfig.Type jobType, SyncOption syncOption,
         Map<String, String> sourceRepoConfig, String sourceRepoExecutorName,
         Map<String, String> transServerConfig,
         String translationServerExecutorName, String cron) {
@@ -56,7 +56,7 @@ public class JobConfig implements Serializable {
         this.name = name;
         this.description = description;
         this.jobType = jobType;
-        this.syncType = syncType;
+        this.syncOption = syncOption;
         this.sourceRepoConfig = sourceRepoConfig;
         this.sourceRepoExecutorName = sourceRepoExecutorName;
         this.transServerConfig = transServerConfig;

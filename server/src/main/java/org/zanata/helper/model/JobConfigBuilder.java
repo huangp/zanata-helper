@@ -1,6 +1,6 @@
 package org.zanata.helper.model;
 
-import org.zanata.helper.common.model.SyncType;
+import org.zanata.helper.common.model.SyncOption;
 import org.zanata.helper.controller.JobForm;
 
 import lombok.NoArgsConstructor;
@@ -18,7 +18,7 @@ public class JobConfigBuilder {
     private String description;
     private String cron;
     private JobConfig.Type jobType;
-    private SyncType syncType;
+    private SyncOption syncOption;
     private String sourceRepoExecutorName;
     private Map<String, String> sourceRepoConfig =
         new HashMap<String, String>();
@@ -31,7 +31,7 @@ public class JobConfigBuilder {
         this.description = jobForm.getDescription();
         this.cron = jobForm.getCron();
         this.jobType = jobForm.getJobType();
-        this.syncType = jobForm.getSyncType();
+        this.syncOption = jobForm.getSyncOption();
         this.sourceRepoExecutorName = jobForm.getSourceRepoExecutorName();
         this.translationServerExecutorName =
             jobForm.getTranslationServerExecutorName();
@@ -59,8 +59,8 @@ public class JobConfigBuilder {
         return this;
     }
 
-    public JobConfigBuilder setSyncType(SyncType syncType) {
-        this.syncType = syncType;
+    public JobConfigBuilder setSyncType(SyncOption syncOption) {
+        this.syncOption = syncOption;
         return this;
     }
 
@@ -89,7 +89,7 @@ public class JobConfigBuilder {
     }
 
     public JobConfig build() {
-        return new JobConfig(name, description, jobType, syncType,
+        return new JobConfig(name, description, jobType, syncOption,
             sourceRepoConfig, sourceRepoExecutorName, transServerConfig,
             translationServerExecutorName, cron);
     }

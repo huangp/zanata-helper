@@ -2,7 +2,7 @@ package org.zanata.helper.common.plugin;
 
 import lombok.Getter;
 import org.zanata.helper.common.model.Field;
-import org.zanata.helper.common.model.SyncType;
+import org.zanata.helper.common.model.SyncOption;
 
 import java.io.File;
 import java.util.LinkedHashMap;
@@ -30,17 +30,17 @@ public abstract class TranslationServerExecutor implements Plugin {
      * Pull from server into given directory
      *
      * @param dir - directory to pull to
-     * @param syncType - source only, translations only, or both
+     * @param syncOption - source only, translations only, or both
      */
-    public abstract void pullFromServer(File dir, SyncType syncType)
+    public abstract void pullFromServer(File dir, SyncOption syncOption)
         throws Exception;
 
     /**
      * Push files to server from given directory
      *
      * @param dir - directory to push from
-     * @param syncType - source only, translations only, or both
+     * @param syncOption - source only, translations only, or both
      */
-    public abstract void pushToServer(File dir, SyncType syncType)
+    public abstract void pushToServer(File dir, SyncOption syncOption)
         throws Exception;
 }

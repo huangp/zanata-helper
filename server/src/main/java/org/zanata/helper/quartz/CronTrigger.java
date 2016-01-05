@@ -64,7 +64,7 @@ public class CronTrigger {
                 try {
                     JobDetail jobDetail =
                         JobBuilder
-                            .newJob(org.zanata.helper.quartz.SyncJob.class)
+                            .newJob(SyncJob.class)
                             .withIdentity(jobKey.getName())
                             .withDescription(jobConfig.toString())
                             .build();
