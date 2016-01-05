@@ -11,46 +11,44 @@ import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.exception.UnableLoadPluginException;
 import org.zanata.helper.service.PluginsService;
 
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableMap;
 
 
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
  */
-@RequestScoped
+@ApplicationScoped
 public class PluginsServiceImpl implements PluginsService {
     private static final Logger log =
             LoggerFactory.getLogger(PluginsServiceImpl.class);
     @Inject @DeltaSpike
     private ServletContext servletContext;
 
-    private final static Map<String, Class<? extends RepoExecutor>>
-        sourceRepoPluginMap =
-        new HashMap<String, Class<? extends RepoExecutor>>();
+    private static Map<String, Class<? extends RepoExecutor>>
+        sourceRepoPluginMap;
 
-    private final static Map<String, Class<? extends TranslationServerExecutor>>
-        transServerPluginMap =
-        new HashMap<String, Class<? extends TranslationServerExecutor>>();
+    private static Map<String, Class<? extends TranslationServerExecutor>>
+        transServerPluginMap;
 
     /**
      * Initiate all plugins available
      */
-    @PostConstruct
-    public void initialise() {
+    @Override
+    public void init() {
         Set<String> libJars = servletContext.getResourcePaths("/WEB-INF/lib");
         Set<URL> pluginJars = libJars.stream()
                 .filter(jar -> jar.toLowerCase().contains("plugin") ||
@@ -71,32 +69,31 @@ public class PluginsServiceImpl implements PluginsService {
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             URL[] urls = pluginJars.toArray(new URL[]{});
             db.scanArchives(urls);
-            Set<String> repoPluginClasses =
-                    db.getAnnotationIndex().get(RepoPlugin.class.getName());
-            log.info("available repo plugins - {}", repoPluginClasses);
 
-            for (String cls : repoPluginClasses) {
-                Class<? extends RepoExecutor> entity =
-                    (Class<? extends RepoExecutor>) cl.loadClass(cls);
-                sourceRepoPluginMap.put(entity.getName(), entity);
-            }
-
-            Set<String> transServerPluginClasses =
-                    db.getAnnotationIndex()
-                            .get(TranslationServerPlugin.class.getName());
-            log.info("available translation server plugins - {}",
-                    transServerPluginClasses);
-
-            for (String cls : transServerPluginClasses) {
-                Class<? extends TranslationServerExecutor> entity =
-                        (Class<? extends TranslationServerExecutor>) cl
-                                .loadClass(cls);
-                transServerPluginMap.put(entity.getName(), entity);
-            }
-
+            sourceRepoPluginMap = buildPluginMap(db, cl, RepoPlugin.class);
+            transServerPluginMap =
+                    buildPluginMap(db, cl, TranslationServerPlugin.class);
         } catch (IOException | ClassNotFoundException e) {
             throw Throwables.propagate(e);
         }
+    }
+
+    private static <P> Map<String, Class<? extends P>> buildPluginMap(
+            AnnotationDB db, ClassLoader cl, Class<? extends Annotation> pluginAnnotation)
+            throws ClassNotFoundException {
+        ImmutableMap.Builder<String, Class<? extends P>>
+                pluginBuilder = ImmutableMap.builder();
+        Set<String> repoPluginClasses =
+                db.getAnnotationIndex().get(pluginAnnotation.getName());
+        log.info("available plugins for {} - {}", pluginAnnotation,
+                repoPluginClasses);
+
+        for (String cls : repoPluginClasses) {
+            Class<? extends P> entity =
+                    (Class<? extends P>) cl.loadClass(cls);
+            pluginBuilder.put(entity.getName(), entity);
+        }
+        return pluginBuilder.build();
     }
 
     @Override
@@ -185,11 +182,4 @@ public class PluginsServiceImpl implements PluginsService {
             throw new UnableLoadPluginException(className);
         }
     }
-
-//    public static void main(String args[]) {
-//        System.out.println(org.zanata.helper.plugin.git.Plugin.class.getName());
-////        sourceRepoPluginMap.put("gitPlugin",
-////            org.zanata.helper.plugin.git.Plugin.class);
-////        SourceRepoExecutor executor = getNewSourceRepoPlugin("gitPlugin", null);
-//    }
 }

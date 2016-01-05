@@ -59,7 +59,7 @@ public class SyncJob implements InterruptableJob {
                 processSyncToServer(srcExecutor, transServerExecutor);
             }
         } catch (JobExecutionException e) {
-            log.error("Error running sync job. {}", e.getStackTrace());
+            log.error("Error running sync job.", e);
         } finally {
             cleanupDirectory();
         }

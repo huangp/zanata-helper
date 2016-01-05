@@ -4,6 +4,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.deltaspike.core.api.lifecycle.Initialized;
 import org.quartz.JobDetail;
 import org.quartz.SchedulerException;
 import org.quartz.TriggerKey;
@@ -22,10 +23,10 @@ import org.zanata.helper.component.AppConfiguration;
 import org.zanata.helper.service.PluginsService;
 import org.zanata.helper.service.SchedulerService;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import javax.servlet.ServletContext;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -54,9 +55,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     private CronTrigger cronTrigger;
 
     // TODO: database connection, thread count, scheduler, queue, event
-
-    @PostConstruct
-    public void onApplicationEvent() {
+    public void onStartUp(@Observes @Initialized ServletContext servletContext) {
         log.info("=====================================================");
         log.info("=====================================================");
         log.info("================Zanata helper starts=================");
@@ -83,6 +82,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         }
 
         log.info("Initialised {} jobs.", jobConfigMap.size());
+        pluginsServiceImpl.init();
     }
 
     // TODO: read from database

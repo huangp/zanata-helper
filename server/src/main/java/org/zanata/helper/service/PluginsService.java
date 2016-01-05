@@ -26,4 +26,6 @@ public interface PluginsService {
     TranslationServerExecutor getNewTransServerPlugin(
         String className,
         Map<String, String> fields) throws UnableLoadPluginException;
+
+    void init();
 }
