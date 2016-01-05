@@ -4,14 +4,17 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
  */
 @Getter
-@ToString
+@NoArgsConstructor
 public class JobConfig_test implements Serializable {
 
     private Long id;

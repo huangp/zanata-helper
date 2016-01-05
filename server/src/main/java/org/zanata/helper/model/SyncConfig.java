@@ -6,6 +6,7 @@ import java.util.Date;
 import org.zanata.helper.common.model.SyncOption;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
@@ -13,6 +14,7 @@ import lombok.ToString;
  */
 @Getter
 @ToString
+@NoArgsConstructor
 public class SyncConfig implements Serializable {
 
     private Type type;
