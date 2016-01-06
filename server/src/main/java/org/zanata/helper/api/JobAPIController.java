@@ -94,8 +94,7 @@ public class JobAPIController {
     }
 
     @POST
-    public Response createJob(
-        JobForm form) {
+    public Response createJob(JobForm form) {
         Map<String, String> errors = validateJobForm(form);
         if (!errors.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(errors).build();
@@ -114,6 +113,7 @@ public class JobAPIController {
         return Response.created(URI.create("")).build();
     }
 
+    // TODO use bean validation
     private Map<String, String> validateJobForm(JobForm form) {
         Map<String, String> errors = new HashMap<>();
 

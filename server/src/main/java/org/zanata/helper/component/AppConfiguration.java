@@ -3,10 +3,13 @@ package org.zanata.helper.component;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.Properties;
 import javax.enterprise.context.Dependent;
 
 import org.apache.commons.lang.StringUtils;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import lombok.Getter;
 
@@ -17,6 +20,8 @@ import lombok.Getter;
 public class AppConfiguration {
     private final static String CONFIG_DIR = "configuration";
     private final static String repoDirectory = "repository";
+    private final File configDir;
+    private final File repoDir;
 
     public AppConfiguration() {
         ClassLoader contextClassLoader =
@@ -32,9 +37,33 @@ public class AppConfiguration {
             properties.load(config);
             storageDirectory = properties.getProperty("store.directory");
 
+            configDir = Paths.get(buildConfigDirectory()).toFile();
+            checkDirectory("configuration", configDir);
+
+            repoDir = Paths.get(buildRepoDirectory()).toFile();
+            checkDirectory("repo", repoDir);
+
         } catch (IOException e) {
             throw Throwables.propagate(e);
         }
+    }
+
+    @VisibleForTesting
+    public AppConfiguration(File configDir, File repoDir) {
+        this.configDir = configDir;
+        this.repoDir = repoDir;
+    }
+
+    private static void checkDirectory(String nameOfDirectory, File directory) {
+        Preconditions.checkState(directory.isDirectory(),
+                "%s directory %s must be a directory",
+                nameOfDirectory, directory);
+        Preconditions.checkState(directory.canRead(),
+                "%s directory %s must be readable", nameOfDirectory,
+                directory);
+        Preconditions.checkState(directory.canWrite(),
+                "%s directory %s must be writable", nameOfDirectory,
+                directory);
     }
 
     @Getter
@@ -50,17 +79,25 @@ public class AppConfiguration {
      */
     private String storageDirectory;
 
-    public String getConfigDirectory() {
+    private String buildConfigDirectory() {
         return removeTrailingSlash(storageDirectory) + File.separatorChar
                 + CONFIG_DIR;
     }
 
-    public String getRepoDirectory() {
+    private String buildRepoDirectory() {
         return removeTrailingSlash(storageDirectory) + File.separatorChar
                 + repoDirectory;
     }
 
-   private static String removeTrailingSlash(String string) {
-      return StringUtils.chomp(string, "" + File.separatorChar);
-   }
+    public File getConfigDirectory() {
+        return configDir;
+    }
+
+    public File getRepoDirectory() {
+        return repoDir;
+    }
+
+    private static String removeTrailingSlash(String string) {
+        return StringUtils.chomp(string, "" + File.separatorChar);
+    }
 }
