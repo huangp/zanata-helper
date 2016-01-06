@@ -15,20 +15,21 @@ import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import java.io.File;
 import java.io.IOException;
 import javax.enterprise.event.Event;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.CDI;
 import javax.inject.Inject;
 
 @Slf4j
 public class SyncJob implements InterruptableJob {
 
-    private String basedir;
+    private File basedir;
 
     private final int syncToRepoTotalSteps = 5;
     private final int syncToServerTotalSteps = 4;
 
     private JobConfig jobConfig;
 
-    @Inject
-    private Event<JobProgressEvent> jobProgressEvent;
+    private final BeanManager beanManager = CDI.current().getBeanManager();
 
     @Override
     public void execute(JobExecutionContext context)
@@ -39,7 +40,7 @@ public class SyncJob implements InterruptableJob {
                     (JobConfig) context.getJobDetail().getJobDataMap()
                             .get("value");
             basedir =
-                    (String) context.getJobDetail().getJobDataMap()
+                    (File) context.getJobDetail().getJobDataMap()
                             .get("basedir");
 
             RepoExecutor srcExecutor =
@@ -61,7 +62,7 @@ public class SyncJob implements InterruptableJob {
         } catch (JobExecutionException e) {
             log.error("Error running sync job.", e);
         } finally {
-            cleanupDirectory();
+            cleanupDirectory(new File(basedir, jobConfig.getId().toString()));
         }
     }
 
@@ -131,27 +132,30 @@ public class SyncJob implements InterruptableJob {
 
     private void updateProgress(Long id, int currentStep, int totalSteps,
         String description) {
-        jobProgressEvent.fire(
+        fireEvent(
             new JobProgressEvent(id, currentStep, totalSteps,
                 description));
     }
 
     private File getDestDirectory(String name) {
         File dest = new File(basedir, name);
-        if (dest.exists()) {
-            cleanupDirectory();
-        }
+        cleanupDirectory(dest);
         dest.mkdir();
         return dest;
     }
 
-    private void cleanupDirectory() {
-        File destDir = getDestDirectory(jobConfig.getId().toString());
+    private void cleanupDirectory(File destDir) {
         try {
-            FileUtils.deleteDirectory(destDir);
+            if (destDir.exists()) {
+                FileUtils.deleteDirectory(destDir);
+            }
         } catch (IOException e) {
             log.error("Unable to remove directory {}. {}", destDir,
                 e.getStackTrace());
         }
+    }
+
+    private void fireEvent(Object event) {
+        beanManager.fireEvent(event);
     }
 }

@@ -3,7 +3,7 @@ package org.zanata.helper.api;
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
-public interface APIController {
+public interface APIResources {
     String API_ROOT = "/api";
 
     String JOBS_ROOT = "/jobs";

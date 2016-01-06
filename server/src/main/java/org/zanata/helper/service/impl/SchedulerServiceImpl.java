@@ -4,6 +4,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.deltaspike.core.api.lifecycle.Initialized;
 import org.quartz.JobDetail;
 import org.quartz.SchedulerException;
@@ -63,15 +64,16 @@ public class SchedulerServiceImpl implements SchedulerService {
         log.info("=====================================================");
         log.info("================Zanata helper starts=================");
         log.info("== build :            {}-{}",
-                appConfiguration.getBuildVersion(),
-                appConfiguration.getBuildInfo());
+            appConfiguration.getBuildVersion(),
+            appConfiguration.getBuildInfo());
         log.info("== repo directory:    {}",
-                appConfiguration.getRepoDirectory());
+            appConfiguration.getRepoDirectory());
         log.info("== config directory:  {}",
-                appConfiguration.getConfigDirectory());
+            appConfiguration.getConfigDirectory());
         log.info("=====================================================");
         log.info("=====================================================");
 
+        log.info("Loading available plugins...");
         pluginsServiceImpl.init();
 
         log.info("Initialising jobs...");
@@ -86,7 +88,6 @@ public class SchedulerServiceImpl implements SchedulerService {
         } catch (SchedulerException e) {
             throw Throwables.propagate(e);
         }
-
         log.info("Initialised {} jobs.", jobConfigMap.size());
     }
 
@@ -119,22 +120,24 @@ public class SchedulerServiceImpl implements SchedulerService {
                     srcConfig, "org.zanata.helper.plugin.git.Plugin",
                     transConfig,
                     "org.zanata.helper.plugin.zanata.Plugin",
-                    CronHelper.CronType.THRITY_SECONDS.getExpression());
+                    null);
             configs.add(job);
 
         }
         return configs;
     }
 
-    public void onApplicationEvent(@Observes  ConfigurationChangeEvent event) {
+    public void onApplicationEvent(@Observes ConfigurationChangeEvent event) {
         if (jobConfigMap.containsKey(event.getJobConfig().getId())) {
-            jobConfigMap.put(event.getJobConfig().getId(), event.getJobConfig());
+            jobConfigMap
+                .put(event.getJobConfig().getId(), event.getJobConfig());
+        }
+        if (jobConfigKeyMap.containsKey(event.getJobConfig().getId())) {
             try {
                 cronTrigger.reschedule(
                     jobConfigKeyMap.get(event.getJobConfig().getId()),
                     event.getJobConfig());
-            }
-            catch (SchedulerException e) {
+            } catch (SchedulerException e) {
                 log.error("Error rescheduling job:" + e.getMessage());
             }
         }
@@ -224,23 +227,36 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     private void scheduleJob(JobConfig jobConfig) throws SchedulerException {
-        TriggerKey key = cronTrigger.scheduleMonitor(jobConfig);
-        if (key != null) {
-            jobConfigMap.put(jobConfig.getId(), jobConfig);
-            jobConfigKeyMap.put(jobConfig.getId(), key);
+        jobConfigMap.put(jobConfig.getId(), jobConfig);
+
+        if (isRepeatedJob(jobConfig)) {
+            TriggerKey key = cronTrigger.schedule(jobConfig);
+            if (key != null) {
+                jobConfigKeyMap.put(jobConfig.getId(), key);
+            }
         }
+    }
+
+    private boolean isRepeatedJob(JobConfig jobConfig) {
+        return !StringUtils.isEmpty(jobConfig.getCron());
     }
 
     private JobStatus getStatus(Long id, JobRunCompletedEvent event)
         throws SchedulerException, JobNotFoundException {
-        if (id == null) {
-            throw new JobNotFoundException("");
+        if (id == null || !jobConfigMap.containsKey(id)) {
+            String stringId = id == null ? "" : id.toString();
+            throw new JobNotFoundException(stringId);
         }
+
+
         TriggerKey triggerKey = jobConfigKeyMap.get(id);
-        if (triggerKey == null) {
-            throw new JobNotFoundException(id.toString());
+        if (triggerKey != null) {
+            return cronTrigger.getTriggerStatus(triggerKey, event);
+        } else {
+            //TODO: alex how to get trigger status of job on demand only.
+            //TODO: trigger job on demand
+            return cronTrigger.getTriggerStatus(triggerKey, event);
         }
-        return cronTrigger.getTriggerStatus(triggerKey, event);
     }
 
     private JobSummary convertToJobSummary(JobDetail jobDetail) {

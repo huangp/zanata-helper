@@ -55,6 +55,9 @@ public class AppConfiguration {
     }
 
     private static void checkDirectory(String nameOfDirectory, File directory) {
+        if (!directory.exists()) {
+            directory.mkdir();
+        }
         Preconditions.checkState(directory.isDirectory(),
                 "%s directory %s must be a directory",
                 nameOfDirectory, directory);

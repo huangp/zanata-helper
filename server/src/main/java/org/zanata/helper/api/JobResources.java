@@ -14,7 +14,6 @@ import org.zanata.helper.controller.JobForm;
 import org.zanata.helper.exception.JobNotFoundException;
 import org.zanata.helper.model.JobConfig;
 import org.zanata.helper.model.JobConfigBuilder;
-import org.zanata.helper.model.JobStatus;
 import org.zanata.helper.service.PluginsService;
 import org.zanata.helper.service.SchedulerService;
 
@@ -36,11 +35,11 @@ import javax.ws.rs.core.Response;
  */
 
 @RequestScoped
-@Path(APIController.JOB_ROOT)
+@Path(APIResources.JOB_ROOT)
 @Produces("application/json")
-public class JobAPIController {
+public class JobResources {
     private static final Logger log =
-            LoggerFactory.getLogger(JobAPIController.class);
+            LoggerFactory.getLogger(JobResources.class);
     public final static String STATUS_URL = "/status";
     public final static String CANCEL_URL = "/cancel";
 

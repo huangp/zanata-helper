@@ -8,7 +8,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.core.Response;
 
-import org.zanata.helper.api.JobsAPIController;
+import org.zanata.helper.api.JobsResource;
 import org.zanata.helper.model.JobSummary;
 
 import lombok.extern.slf4j.Slf4j;
@@ -22,16 +22,16 @@ import lombok.extern.slf4j.Slf4j;
 public class IndexController {
 
     @Inject
-    private JobsAPIController jobsAPIController;
+    private JobsResource jobsResource;
 
     public List<JobSummary> getAllJobs() {
-        Response response = jobsAPIController.getAllJobs();
+        Response response = jobsResource.getAllJobs();
         JobSummary[] allJobs = (JobSummary[])response.getEntity();
         return Arrays.asList(allJobs);
     }
 
     private List<JobSummary> getRunningJobs() {
-        Response response = jobsAPIController.getRunningJobs();
+        Response response = jobsResource.getRunningJobs();
         JobSummary[] runningJobs = (JobSummary[])response.getEntity();
         return Arrays.asList(runningJobs);
     }

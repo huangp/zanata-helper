@@ -1,7 +1,7 @@
 package org.zanata.helper.quartz;
 
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.CDI;
 
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
@@ -15,12 +15,7 @@ import org.zanata.helper.model.JobConfig;
 public class JobConfigListener implements TriggerListener {
     public static final String LISTENER_NAME = "JobConfigListener";
 
-    @Inject
-    private Event<JobRunCompletedEvent> jobRunCompletedEvent;
-
-    @Inject
-    private Event<JobRunStartsEvent> jobRunStartsEvent;
-
+    private final BeanManager beanManager = CDI.current().getBeanManager();
 
     public String getName() {
         return LISTENER_NAME;
@@ -29,9 +24,8 @@ public class JobConfigListener implements TriggerListener {
     @Override
     public void triggerFired(Trigger trigger, JobExecutionContext context) {
         JobConfig jobConfig = getJobConfigJob(context);
-        jobRunStartsEvent.fire(
-            new JobRunStartsEvent(jobConfig.getId(),
-                context.getFireTime()));
+        fireEvent(new JobRunStartsEvent(jobConfig.getId(),
+            context.getFireTime()));
     }
 
     @Override
@@ -43,7 +37,6 @@ public class JobConfigListener implements TriggerListener {
 
     @Override
     public void triggerMisfired(Trigger trigger) {
-
     }
 
     @Override
@@ -51,13 +44,15 @@ public class JobConfigListener implements TriggerListener {
         Trigger.CompletedExecutionInstruction triggerInstructionCode) {
 
         JobConfig jobConfig = getJobConfigJob(context);
-        jobRunCompletedEvent.fire(
-            new JobRunCompletedEvent(jobConfig.getId(),
-                context.getJobRunTime(),
-                context.getFireTime()));
+        fireEvent(new JobRunCompletedEvent(jobConfig.getId(),
+            context.getJobRunTime(), context.getFireTime()));
     }
 
     private JobConfig getJobConfigJob(JobExecutionContext context) {
         return (JobConfig) context.getJobDetail().getJobDataMap().get("value");
+    }
+
+    private void fireEvent(Object event) {
+        beanManager.fireEvent(event);
     }
 }

@@ -12,6 +12,8 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.SimpleScheduleBuilder;
+import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
@@ -43,6 +45,8 @@ public class CronTrigger {
 
     private final PluginsService pluginsService;
 
+    private final JobConfigListener listener = new JobConfigListener();
+
     public CronTrigger(AppConfiguration appConfiguration,
             PluginsService pluginsService)
         throws SchedulerException {
@@ -51,19 +55,13 @@ public class CronTrigger {
         scheduler.start();
     }
 
-    public TriggerKey scheduleMonitor(JobConfig jobConfig)
+    public TriggerKey schedule(JobConfig jobConfig)
         throws SchedulerException {
         if (jobConfig != null) {
             JobKey jobKey = new JobKey(jobConfig.getId().toString());
-
             if (!scheduler.checkExists(jobKey)) {
                 try {
-                    JobDetail jobDetail =
-                        JobBuilder
-                            .newJob(SyncJob.class)
-                            .withIdentity(jobKey.getName())
-                            .withDescription(jobConfig.toString())
-                            .build();
+                    JobDetail jobDetail = buildJobDetails(jobConfig, jobKey);
 
                     jobDetail.getJobDataMap().put("value", jobConfig);
                     jobDetail.getJobDataMap()
@@ -82,12 +80,10 @@ public class CronTrigger {
                                 jobConfig.getTransServerConfig()));
 
                     Trigger trigger = buildTrigger(jobConfig);
-
                     if (scheduler.getListenerManager().getJobListeners()
                         .isEmpty()) {
                         scheduler.getListenerManager()
-                            .addTriggerListener(
-                                new JobConfigListener());
+                            .addTriggerListener(listener);
                     }
                     scheduler.scheduleJob(jobDetail, trigger);
                     return trigger.getKey();
@@ -150,14 +146,22 @@ public class CronTrigger {
     }
 
     private Trigger buildTrigger(JobConfig jobConfig) {
-        TriggerBuilder builder = TriggerBuilder
-            .newTrigger()
+        TriggerBuilder builder = TriggerBuilder.newTrigger()
             .withIdentity(jobConfig.getId().toString());
-
         if (!StringUtils.isEmpty(jobConfig.getCron())) {
             builder.withSchedule(
                 CronScheduleBuilder.cronSchedule(jobConfig.getCron()));
+        } else {
+            builder.withSchedule(
+                SimpleScheduleBuilder.simpleSchedule().withRepeatCount(0));
         }
         return builder.build();
+    }
+
+    private JobDetail buildJobDetails(JobConfig jobConfig, JobKey jobKey) {
+        return JobBuilder
+            .newJob(SyncJob.class)
+            .withIdentity(jobKey.getName())
+            .withDescription(jobConfig.toString()).build();
     }
 }

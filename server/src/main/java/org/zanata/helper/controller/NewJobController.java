@@ -3,10 +3,8 @@ package org.zanata.helper.controller;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 
 import org.apache.deltaspike.core.api.common.DeltaSpike;
-import org.zanata.helper.api.APIController;
 import org.zanata.helper.common.model.SyncOption;
 import org.zanata.helper.common.model.Field;
 import org.zanata.helper.common.plugin.RepoExecutor;
@@ -14,12 +12,10 @@ import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.component.MessageResource;
 import org.zanata.helper.model.JobConfig;
 import org.zanata.helper.service.PluginsService;
-import org.zanata.helper.service.SchedulerService;
 
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

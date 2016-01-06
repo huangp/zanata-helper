@@ -17,11 +17,11 @@ import org.zanata.helper.service.SchedulerService;
  */
 
 @RequestScoped
-@Path(APIController.JOBS_ROOT)
+@Path(APIResources.JOBS_ROOT)
 @Produces("application/json")
-public class JobsAPIController {
+public class JobsResource {
     private static final Logger log =
-            LoggerFactory.getLogger(JobsAPIController.class);
+            LoggerFactory.getLogger(JobsResource.class);
 
     public final static String RUNNING_JOBS_URL = "/running";
 
