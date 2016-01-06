@@ -22,9 +22,6 @@ dependencies {
     compile project(':git-plugin')
     compile project(':zanata-cli-plugin')
     compile group: 'org.slf4j', name: 'jcl-over-slf4j', version:'1.7.13'
-    compile group: 'org.yaml', name: 'snakeyaml', version:'1.16'
-    compile group: 'javax.servlet', name: 'jstl', version:'1.2'
-    compile group: 'taglibs', name: 'standard', version:'1.1.2'
     compile group: 'net.bull.javamelody', name: 'javamelody-core', version:'1.58.0'
 
     // CDI
@@ -43,6 +40,10 @@ dependencies {
     compile 'com.sun.jersey:jersey-servlet:1.19'
     compile 'com.sun.jersey:jersey-json:1.19'
 
+    //jsf
+    runtime group: 'com.sun.faces', name: 'jsf-api', version: '2.2.12'
+    runtime group: 'com.sun.faces', name: 'jsf-impl', version: '2.2.12'
+
     // utilities
     compile group: 'com.google.guava', name: 'guava', version:'19.0'
     compile group: 'org.scannotation', name: 'scannotation', version:'1.0.3'
@@ -51,6 +52,7 @@ dependencies {
     compile group: 'org.apache.commons', name: 'commons-lang3', version:'3.4'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version:'2.6.4'
     compile group: 'org.quartz-scheduler', name: 'quartz', version:'2.2.2'
+    compile group: 'org.yaml', name: 'snakeyaml', version:'1.16'
     providedCompile group: 'org.projectlombok', name: 'lombok', version:'1.16.6'
     providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version:'3.1.0'
 }
