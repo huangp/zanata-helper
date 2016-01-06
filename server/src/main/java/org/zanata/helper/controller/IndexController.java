@@ -3,54 +3,36 @@ package org.zanata.helper.controller;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.enterprise.context.RequestScoped;
+import javax.faces.bean.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.ws.rs.core.Response;
 
-import org.zanata.helper.api.APIController;
 import org.zanata.helper.api.JobsAPIController;
 import org.zanata.helper.model.JobSummary;
-import org.zanata.helper.util.DateUtil;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
-@RequestScoped
+@Named("indexController")
+@ViewScoped
+@Slf4j
 public class IndexController {
 
-    private final DateUtil dateUtil = new DateUtil();
+    @Inject
+    private JobsAPIController jobsAPIController;
 
-//    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public String getIndexPage() {
-//        model.addAttribute("dateUtil", dateUtil);
-//        model.addAttribute("allJobs", getAllJobs());
-//        model.addAttribute("runningJobs", getRunningJobs());
-        return "index";
-    }
-
-//    @RequestMapping(value = "/runningJobs", method = RequestMethod.GET)
-    public String getRunningJobs() {
-//        model.addAttribute("runningJobs", _getRunningJobs());
-        return "view/running_jobs";
-    }
-
-    private List<JobSummary> _getRunningJobs() {
-        JobSummary[] runningJobs = new JobSummary[] {};
-//                restTemplate.getForObject(getRunningJobsUrl(), JobSummary[].class);
-        return Arrays.asList(runningJobs);
-    }
-
-    private List<JobSummary> getAllJobs() {
-        JobSummary[] allJobs = new JobSummary[] {};
-//                restTemplate.getForObject(getAllJobsUrl(), JobSummary[].class);
+    public List<JobSummary> getAllJobs() {
+        Response response = jobsAPIController.getAllJobs();
+        JobSummary[] allJobs = (JobSummary[])response.getEntity();
         return Arrays.asList(allJobs);
     }
 
-    private String getRunningJobsUrl() {
-        return APIController.API_ROOT
-                + APIController.JOBS_ROOT + JobsAPIController.RUNNING_JOBS_URL;
-    }
-
-    private String getAllJobsUrl() {
-        return APIController.API_ROOT
-                + APIController.JOBS_ROOT;
+    private List<JobSummary> getRunningJobs() {
+        Response response = jobsAPIController.getRunningJobs();
+        JobSummary[] runningJobs = (JobSummary[])response.getEntity();
+        return Arrays.asList(runningJobs);
     }
 }

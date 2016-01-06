@@ -10,6 +10,7 @@ import org.quartz.SchedulerException;
 import org.quartz.TriggerKey;
 import org.quartz.UnableToInterruptJobException;
 
+import org.zanata.helper.common.model.SyncOption;
 import org.zanata.helper.events.ConfigurationChangeEvent;
 import org.zanata.helper.events.JobProgressEvent;
 import org.zanata.helper.events.JobRunStartsEvent;
@@ -22,6 +23,7 @@ import org.zanata.helper.quartz.CronTrigger;
 import org.zanata.helper.component.AppConfiguration;
 import org.zanata.helper.service.PluginsService;
 import org.zanata.helper.service.SchedulerService;
+import org.zanata.helper.util.CronHelper;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
@@ -30,6 +32,7 @@ import javax.servlet.ServletContext;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -68,6 +71,9 @@ public class SchedulerServiceImpl implements SchedulerService {
                 appConfiguration.getConfigDirectory());
         log.info("=====================================================");
         log.info("=====================================================");
+
+        pluginsServiceImpl.init();
+
         log.info("Initialising jobs...");
 
         List<JobConfig> jobConfigs = getJobs();
@@ -82,7 +88,6 @@ public class SchedulerServiceImpl implements SchedulerService {
         }
 
         log.info("Initialised {} jobs.", jobConfigMap.size());
-        pluginsServiceImpl.init();
     }
 
     // TODO: read from database
@@ -92,32 +97,32 @@ public class SchedulerServiceImpl implements SchedulerService {
 
         List<JobConfig> configs = new ArrayList<JobConfig>();
 
-//        for (int i = 0; i < 7; i++) {
-//            Long id = new Long(i);
-//            String name = "name" + i;
-//            String description = "description" + i;
-//
-//            Map<String, String> srcConfig = new HashMap<>();
-//            srcConfig.put("url", "http://github.com/aeng/zanata-helper");
-//            srcConfig.put("username", username);
-//            srcConfig.put("apiKey", apiKey);
-//
-//            Map<String, String> transConfig = new HashMap<>();
-//            transConfig.put("url", "http://localhost:8080/zanata/project/zanata-helper/" + i);
-//            transConfig.put("username", username);
-//            transConfig.put("apiKey", apiKey);
-//
-//            JobConfig job =
-//                new JobConfig(id, name, description,
-//                    JobConfig.Type.SYNC_TO_SERVER,
-//                    SyncType.TRANSLATIONS,
-//                    srcConfig, "org.zanata.helper.plugin.git.Plugin",
-//                    transConfig,
-//                    "org.zanata.helper.plugin.zanata.Plugin",
-//                    CronHelper.CronType.THRITY_SECONDS.getExpression());
-//            configs.add(job);
-//
-//        }
+        for (int i = 0; i < 1; i++) {
+            Long id = new Long(i);
+            String name = "name" + i;
+            String description = "description" + i;
+
+            Map<String, String> srcConfig = new HashMap<>();
+            srcConfig.put("url", "http://github.com/aeng/zanata-helper");
+            srcConfig.put("username", username);
+            srcConfig.put("apiKey", apiKey);
+
+            Map<String, String> transConfig = new HashMap<>();
+            transConfig.put("url", "http://localhost:8080/zanata/project/zanata-helper/" + i);
+            transConfig.put("username", username);
+            transConfig.put("apiKey", apiKey);
+
+            JobConfig job =
+                new JobConfig(id, name, description,
+                    JobConfig.Type.SYNC_TO_SERVER,
+                    SyncOption.TRANSLATIONS,
+                    srcConfig, "org.zanata.helper.plugin.git.Plugin",
+                    transConfig,
+                    "org.zanata.helper.plugin.zanata.Plugin",
+                    CronHelper.CronType.THRITY_SECONDS.getExpression());
+            configs.add(job);
+
+        }
         return configs;
     }
 

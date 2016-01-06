@@ -41,8 +41,8 @@ dependencies {
     compile 'com.sun.jersey:jersey-json:1.19'
 
     //jsf
-    runtime group: 'com.sun.faces', name: 'jsf-api', version: '2.2.12'
-    runtime group: 'com.sun.faces', name: 'jsf-impl', version: '2.2.12'
+    compile group: 'com.sun.faces', name: 'jsf-api', version: '2.2.12'
+    compile group: 'com.sun.faces', name: 'jsf-impl', version: '2.2.12'
 
     // utilities
     compile group: 'com.google.guava', name: 'guava', version:'19.0'

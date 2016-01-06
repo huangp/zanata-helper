@@ -1,0 +1,38 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:f="http://java.sun.com/jsf/core">
+
+  <div class="l--pad-all-quarter d--bottom">
+    <button class="button button--small button--primary loader" onclick="refreshRunningJobs()">
+    <span class="loader__label">#{msg['jsf.newJob.refresh.button']}</span>
+    </button>
+  </div>
+  <ui:fragment rendered="${empty indexController.runningJobs}">
+    <p class="txt--meta l--pad-all-half">#{msg['jsp.noRunningJobs']}</p>
+  </ui:fragment>
+  <ui:fragment rendered="${not empty indexController.runningJobs}">
+    <ul class="list--panel" id="runningJobs">
+      <ui:repeat value="${indexController.runningJobs}" var="job">
+        <li class="l--pad-all-quarter" id="running-${job.id}">
+          <a href="/job?id=${job.id}">
+            <div class="list__item__content">
+              <div class="list__item__info">
+                <span>${job.name}</span>
+                <span class="list__item__meta">${job.description}</span>
+              </div>
+              <div class="list__item__actions">
+                <button class="button--small button--danger loader" onclick="cancelRunningJob(${job.id})"
+                  title="#{msg['jsf.job.cancel.button.title']}">
+                <span class="loader__label">
+                  <i class="i i--cancel"></i>
+                </span>
+                </button>
+              </div>
+            </div>
+          </a>
+        </li>
+      </ui:repeat>
+    </ul>
+  </ui:fragment>
+</ui:composition>
