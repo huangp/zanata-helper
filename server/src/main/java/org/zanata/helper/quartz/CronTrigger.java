@@ -55,10 +55,9 @@ public class CronTrigger {
         scheduler.start();
     }
 
-    public TriggerKey schedule(JobConfig jobConfig)
-        throws SchedulerException {
+    public TriggerKey schedule(JobConfig jobConfig) throws SchedulerException {
         if (jobConfig != null) {
-            JobKey jobKey = new JobKey(jobConfig.getId().toString());
+            JobKey jobKey = getJobKey(jobConfig);
             if (!scheduler.checkExists(jobKey)) {
                 try {
                     JobDetail jobDetail = buildJobDetails(jobConfig, jobKey);
@@ -79,20 +78,29 @@ public class CronTrigger {
                                 jobConfig.getTranslationServerExecutorName(),
                                 jobConfig.getTransServerConfig()));
 
-                    Trigger trigger = buildTrigger(jobConfig);
-                    if (scheduler.getListenerManager().getJobListeners()
-                        .isEmpty()) {
-                        scheduler.getListenerManager()
-                            .addTriggerListener(listener);
+                    if(isRepeatedJob(jobConfig)) {
+                        Trigger trigger = buildTrigger(jobConfig);
+                        if (scheduler.getListenerManager().getJobListeners()
+                            .isEmpty()) {
+                            scheduler.getListenerManager()
+                                .addTriggerListener(listener);
+                        }
+                        scheduler.scheduleJob(jobDetail, trigger);
+                        return trigger.getKey();
+                    } else {
+                        scheduler.addJob(jobDetail, false);
                     }
-                    scheduler.scheduleJob(jobDetail, trigger);
-                    return trigger.getKey();
                 } catch (UnableLoadPluginException e) {
                     log.error("Unable to load plugin", e.getMessage());
                 }
             }
         }
         return null;
+    }
+
+    public void triggerJob(JobConfig jobConfig) throws SchedulerException {
+        JobKey key = getJobKey(jobConfig);
+        scheduler.triggerJob(key);
     }
 
     public JobStatus getTriggerStatus(TriggerKey key,
@@ -107,6 +115,32 @@ public class CronTrigger {
                 JobStatusType.getType(state, isJobRunning(key)),
                 trigger.getPreviousFireTime(), endTime,
                 trigger.getNextFireTime());
+        }
+        return null;
+    }
+
+    public JobStatus getTriggerStatus(JobConfig jobConfig,
+        JobRunCompletedEvent event) throws SchedulerException {
+        JobKey key = getJobKey(jobConfig);
+
+        if (scheduler.checkExists(key)) {
+            List<? extends Trigger> triggers =
+                scheduler.getTriggersOfJob(key);
+
+            if(!triggers.isEmpty()) {
+                Trigger trigger = triggers.get(0);
+                Date endTime =
+                    event != null ? event.getCompletedTime() : null;
+
+                Trigger.TriggerState state =
+                        scheduler.getTriggerState(trigger.getKey());
+
+                return new JobStatus(
+                        JobStatusType.getType(state,
+                                isJobRunning(trigger.getKey())),
+                        trigger.getPreviousFireTime(), endTime,
+                        trigger.getNextFireTime());
+            }
         }
         return null;
     }
@@ -131,12 +165,12 @@ public class CronTrigger {
 
     public void cancelRunningJob(JobConfig jobConfig)
         throws UnableToInterruptJobException {
-        JobKey jobKey = new JobKey(jobConfig.getId().toString());
+        JobKey jobKey = getJobKey(jobConfig);
         scheduler.interrupt(jobKey);
     }
 
     public void deleteJob(JobConfig jobConfig) throws SchedulerException {
-        JobKey jobKey = new JobKey(jobConfig.getId().toString());
+        JobKey jobKey = getJobKey(jobConfig);
         scheduler.deleteJob(jobKey);
     }
 
@@ -148,20 +182,30 @@ public class CronTrigger {
     private Trigger buildTrigger(JobConfig jobConfig) {
         TriggerBuilder builder = TriggerBuilder.newTrigger()
             .withIdentity(jobConfig.getId().toString());
-        if (!StringUtils.isEmpty(jobConfig.getCron())) {
+        if (isRepeatedJob(jobConfig)) {
             builder.withSchedule(
-                CronScheduleBuilder.cronSchedule(jobConfig.getCron()));
-        } else {
-            builder.withSchedule(
-                SimpleScheduleBuilder.simpleSchedule().withRepeatCount(0));
+                    CronScheduleBuilder.cronSchedule(jobConfig.getCron()));
         }
         return builder.build();
     }
 
     private JobDetail buildJobDetails(JobConfig jobConfig, JobKey jobKey) {
-        return JobBuilder
-            .newJob(SyncJob.class)
-            .withIdentity(jobKey.getName())
-            .withDescription(jobConfig.toString()).build();
+        JobBuilder builder = JobBuilder
+                .newJob(SyncJob.class)
+                .withIdentity(jobKey.getName())
+                .withDescription(jobConfig.toString());
+
+        if (!isRepeatedJob(jobConfig)) {
+            builder.storeDurably();
+        }
+        return builder.build();
+    }
+
+    private boolean isRepeatedJob(JobConfig jobConfig) {
+        return !StringUtils.isEmpty(jobConfig.getCron());
+    }
+
+    private JobKey getJobKey(JobConfig jobConfig) {
+        return new JobKey(jobConfig.getId().toString());
     }
 }

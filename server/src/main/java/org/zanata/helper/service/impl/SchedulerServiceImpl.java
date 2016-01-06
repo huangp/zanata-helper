@@ -226,19 +226,22 @@ public class SchedulerServiceImpl implements SchedulerService {
         cronTrigger.deleteJob(jobConfig);
     }
 
-    private void scheduleJob(JobConfig jobConfig) throws SchedulerException {
-        jobConfigMap.put(jobConfig.getId(), jobConfig);
-
-        if (isRepeatedJob(jobConfig)) {
-            TriggerKey key = cronTrigger.schedule(jobConfig);
-            if (key != null) {
-                jobConfigKeyMap.put(jobConfig.getId(), key);
-            }
+    @Override
+    public void startJob(Long id)
+        throws JobNotFoundException, SchedulerException {
+        JobConfig jobConfig = jobConfigMap.get(id);
+        if(jobConfig == null) {
+            throw new JobNotFoundException(id.toString());
         }
+        cronTrigger.triggerJob(jobConfig);
     }
 
-    private boolean isRepeatedJob(JobConfig jobConfig) {
-        return !StringUtils.isEmpty(jobConfig.getCron());
+    private void scheduleJob(JobConfig jobConfig) throws SchedulerException {
+        jobConfigMap.put(jobConfig.getId(), jobConfig);
+        TriggerKey key = cronTrigger.schedule(jobConfig);
+        if (key != null) {
+            jobConfigKeyMap.put(jobConfig.getId(), key);
+        }
     }
 
     private JobStatus getStatus(Long id, JobRunCompletedEvent event)
@@ -247,15 +250,11 @@ public class SchedulerServiceImpl implements SchedulerService {
             String stringId = id == null ? "" : id.toString();
             throw new JobNotFoundException(stringId);
         }
-
-
         TriggerKey triggerKey = jobConfigKeyMap.get(id);
         if (triggerKey != null) {
             return cronTrigger.getTriggerStatus(triggerKey, event);
         } else {
-            //TODO: alex how to get trigger status of job on demand only.
-            //TODO: trigger job on demand
-            return cronTrigger.getTriggerStatus(triggerKey, event);
+            return cronTrigger.getTriggerStatus(jobConfigMap.get(id), event);
         }
     }
 
