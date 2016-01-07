@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import org.junit.Test;
 import org.zanata.helper.common.model.SyncOption;
-import org.zanata.helper.model.JobConfig_test;
+import org.zanata.helper.model.JobConfig;
 import org.zanata.helper.model.SyncConfig;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,7 +16,7 @@ public class YamlUtilTest {
 
     @Test
     public void testRoundTrip() {
-        JobConfig_test jobConfig = new JobConfig_test(1L, "name", "description",
+        JobConfig jobConfig = new JobConfig(1L, "name", "description",
                 new SyncConfig(SyncConfig.Type.SYNC_TO_SERVER, "",
                         SyncOption.SOURCE),
                 new SyncConfig(SyncConfig.Type.SYNC_TO_REPO, "",
@@ -26,7 +26,7 @@ public class YamlUtilTest {
                 "translationServerExecutorName");
 
         String yamlString = YamlUtil.generateYaml(jobConfig);
-        JobConfig_test config = YamlUtil.generateJobConfig(yamlString);
+        JobConfig config = YamlUtil.generateJobConfig(yamlString);
         assertThat(yamlString).isEqualTo(YamlUtil.generateYaml(config));
     }
 }

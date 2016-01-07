@@ -32,7 +32,7 @@ public class JobsResource {
     @GET
     public Response getAllJobs() {
         try {
-            return Response.ok(schedulerServiceImpl.getAllJobs()).build();
+            return Response.ok(schedulerServiceImpl.getAllWork()).build();
         } catch (SchedulerException e) {
             log.error("fail getting all jobs", e);
             return Response.serverError().build();

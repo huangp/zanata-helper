@@ -14,6 +14,7 @@ import org.zanata.helper.exception.JobNotFoundException;
 import org.zanata.helper.i18n.Messages;
 import org.zanata.helper.model.JobConfig;
 import org.zanata.helper.model.JobConfigBuilder;
+import org.zanata.helper.model.SyncConfig;
 import org.zanata.helper.service.PluginsService;
 import org.zanata.helper.service.SchedulerService;
 
@@ -61,7 +62,7 @@ public class JobResource {
                 return Response.status(
                         Response.Status.NOT_FOUND).build();
             }
-            return Response.ok(schedulerServiceImpl.getLastStatus(new Long(id))).build();
+            return Response.ok(schedulerServiceImpl.getSyncToRepoJobLastStatus(new Long(id))).build();
         } catch (SchedulerException e) {
             log.error("get job status error", e);
             return Response.serverError().build();
@@ -74,13 +75,15 @@ public class JobResource {
     @Path(CANCEL_URL)
     @POST
     public Response cancelRunningJob(
-        @QueryParam(value = "id") @DefaultValue("") String id) {
+        @QueryParam(value = "id") @DefaultValue("") String id,
+        @QueryParam(value = "type") @DefaultValue("") String type) {
         try {
             if(StringUtils.isEmpty(id)) {
                 return Response.status(
                         Response.Status.NOT_FOUND).build();
             }
-            schedulerServiceImpl.cancelRunningJob(new Long(id));
+            schedulerServiceImpl.cancelRunningJob(new Long(id),
+                    SyncConfig.Type.valueOf(type));
             return Response.ok().build();
         } catch (SchedulerException e) {
             log.error("cancel error", e);

@@ -1,21 +1,30 @@
 package org.zanata.helper.quartz;
 
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.CDI;
+import javax.enterprise.context.Dependent;
+import javax.enterprise.event.Event;
+import javax.inject.Inject;
 
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.Trigger;
 import org.quartz.TriggerListener;
+import org.zanata.helper.common.model.SyncOption;
 import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.events.JobRunStartsEvent;
 import org.zanata.helper.model.JobConfig;
+import org.zanata.helper.model.SyncConfig;
 
 @Slf4j
+@Dependent
 public class JobConfigListener implements TriggerListener {
     public static final String LISTENER_NAME = "JobConfigListener";
 
-    private final BeanManager beanManager = CDI.current().getBeanManager();
+    @Inject
+    private Event<JobRunCompletedEvent> jobRunCompletedEvent;
+
+    @Inject
+    private Event<JobRunStartsEvent> jobRunStartsEvent;
+
 
     public String getName() {
         return LISTENER_NAME;
@@ -24,8 +33,9 @@ public class JobConfigListener implements TriggerListener {
     @Override
     public void triggerFired(Trigger trigger, JobExecutionContext context) {
         JobConfig jobConfig = getJobConfigJob(context);
-        fireEvent(new JobRunStartsEvent(jobConfig.getId(),
-            context.getFireTime()));
+        jobRunStartsEvent.fire(
+            new JobRunStartsEvent(jobConfig.getId(),
+                context.getFireTime()));
     }
 
     @Override
@@ -37,6 +47,7 @@ public class JobConfigListener implements TriggerListener {
 
     @Override
     public void triggerMisfired(Trigger trigger) {
+
     }
 
     @Override
@@ -44,15 +55,18 @@ public class JobConfigListener implements TriggerListener {
         Trigger.CompletedExecutionInstruction triggerInstructionCode) {
 
         JobConfig jobConfig = getJobConfigJob(context);
-        fireEvent(new JobRunCompletedEvent(jobConfig.getId(),
-            context.getJobRunTime(), context.getFireTime()));
+        jobRunCompletedEvent.fire(
+                new JobRunCompletedEvent(jobConfig.getId(), getType(context),
+                        trigger.getKey(),
+                        context.getJobRunTime(),
+                        context.getFireTime()));
     }
 
     private JobConfig getJobConfigJob(JobExecutionContext context) {
         return (JobConfig) context.getJobDetail().getJobDataMap().get("value");
     }
 
-    private void fireEvent(Object event) {
-        beanManager.fireEvent(event);
+    private SyncConfig.Type getType(JobExecutionContext context) {
+        return (SyncConfig.Type) context.getJobDetail().getJobDataMap().get("type");
     }
 }

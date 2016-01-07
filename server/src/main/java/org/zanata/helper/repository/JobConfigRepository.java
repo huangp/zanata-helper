@@ -22,7 +22,6 @@ package org.zanata.helper.repository;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -30,16 +29,16 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 
-import org.apache.commons.io.Charsets;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zanata.helper.component.AppConfiguration;
-import org.zanata.helper.model.JobConfig_test;
+import org.zanata.helper.model.JobConfig;
 import org.zanata.helper.util.YamlUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
@@ -72,7 +71,7 @@ public class JobConfigRepository {
         configDirectory = appConfiguration.getConfigDirectory();
     }
 
-    public Optional<JobConfig_test> load(long id) {
+    public Optional<JobConfig> load(long id) {
         File latestJobConfig = latestJobConfig(id);
         if (latestJobConfig.exists()) {
             try (InputStream inputStream = new FileInputStream(
@@ -86,7 +85,7 @@ public class JobConfigRepository {
     }
 
     // TODO we may have concurrent issue here
-    public void persist(JobConfig_test jobConfig) {
+    public void persist(JobConfig jobConfig) {
         File jobConfigFolder = jobConfigFolder(jobConfig.getId());
         File latestConfigFile = latestJobConfig(jobConfig.getId());
 
@@ -134,8 +133,12 @@ public class JobConfigRepository {
         return new File(jobConfigFolder(id), "current.yaml");
     }
 
+    private static File latestJobConfig(File jobConfigFolder) {
+        return new File(jobConfigFolder, "current.yaml");
+    }
 
-    public List<JobConfig_test> getHistory(long id) {
+
+    public List<JobConfig> getHistory(long id) {
         throw new UnsupportedOperationException("implement me");
     }
 
@@ -157,5 +160,13 @@ public class JobConfigRepository {
             return Long.parseLong(largestJob.get());
         }
         return 0;
+    }
+
+    public List<JobConfig> getAllJobs() {
+        return Arrays.stream(configDirectory.listFiles(File::isDirectory))
+                .map(JobConfigRepository::latestJobConfig)
+                .filter(file -> file.exists() && file.canRead())
+                .map(YamlUtil::generateJobConfig)
+                .collect(Collectors.toList());
     }
 }

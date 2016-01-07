@@ -39,7 +39,12 @@ public class IndexAction {
         return runningJobs;
     }
 
-    public void cancelRunningJob(String id) {
-        jobResource.cancelRunningJob(id);
+    /**
+     * Cancel running job
+     * @param id
+     * @param type - SyncConfig.Type
+     */
+    public void cancelRunningJob(String id, String type) {
+        jobResource.cancelRunningJob(id, type);
     }
 }

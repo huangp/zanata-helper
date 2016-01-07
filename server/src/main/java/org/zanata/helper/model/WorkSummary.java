@@ -1,7 +1,6 @@
 package org.zanata.helper.model;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,10 +12,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class JobSummary implements Serializable {
-    private String key;
+public class WorkSummary implements Serializable {
+    private Long id;
     private String name;
     private String description;
-    private SyncConfig.Type type;
-    private JobStatus jobStatus;
+    private JobSummary syncToRepoJob;
+    private JobSummary syncToTransServerJob;
 }

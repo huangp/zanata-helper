@@ -4,7 +4,8 @@
 package org.zanata.helper.quartz;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+
+import org.apache.commons.lang.StringUtils;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
@@ -12,8 +13,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SimpleScheduleBuilder;
-import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
@@ -23,14 +22,16 @@ import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.exception.UnableLoadPluginException;
+import org.zanata.helper.model.JobConfig;
 import org.zanata.helper.model.JobStatus;
 import org.zanata.helper.model.JobStatusType;
-import org.zanata.helper.model.JobConfig;
 import org.zanata.helper.component.AppConfiguration;
+import org.zanata.helper.model.SyncConfig;
 import org.zanata.helper.service.PluginsService;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -38,69 +39,98 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class CronTrigger {
+    public static final String REPO_SYNC_KEY_SUFFIX = "-repoSync";
+    public static final String SERVER_SYNC_KEY_SUFFIX = "-serverSync";
     private final Scheduler scheduler =
         StdSchedulerFactory.getDefaultScheduler();
 
     private final AppConfiguration appConfiguration;
 
     private final PluginsService pluginsService;
-
-    private final JobConfigListener listener = new JobConfigListener();
+    private final JobConfigListener triggerListener;
 
     public CronTrigger(AppConfiguration appConfiguration,
-            PluginsService pluginsService)
+            PluginsService pluginsService, JobConfigListener triggerListener)
         throws SchedulerException {
         this.appConfiguration = appConfiguration;
         this.pluginsService = pluginsService;
+        this.triggerListener = triggerListener;
         scheduler.start();
     }
 
-    public TriggerKey schedule(JobConfig jobConfig) throws SchedulerException {
-        if (jobConfig != null) {
-            JobKey jobKey = getJobKey(jobConfig);
-            if (!scheduler.checkExists(jobKey)) {
-                try {
-                    JobDetail jobDetail = buildJobDetails(jobConfig, jobKey);
-
-                    jobDetail.getJobDataMap().put("value", jobConfig);
-                    jobDetail.getJobDataMap()
-                        .put("basedir", appConfiguration.getRepoDirectory());
-
-                    jobDetail.getJobDataMap()
-                        .put(RepoExecutor.class.getSimpleName(), pluginsService
-                            .getNewSourceRepoPlugin(
-                                jobConfig.getSourceRepoExecutorName(),
-                                jobConfig.getSourceRepoConfig()));
-
-                    jobDetail.getJobDataMap()
-                        .put(TranslationServerExecutor.class.getSimpleName(), pluginsService
-                            .getNewTransServerPlugin(
-                                jobConfig.getTranslationServerExecutorName(),
-                                jobConfig.getTransServerConfig()));
-
-                    if(isRepeatedJob(jobConfig)) {
-                        Trigger trigger = buildTrigger(jobConfig);
-                        if (scheduler.getListenerManager().getJobListeners()
-                            .isEmpty()) {
-                            scheduler.getListenerManager()
-                                .addTriggerListener(listener);
-                        }
-                        scheduler.scheduleJob(jobDetail, trigger);
-                        return trigger.getKey();
-                    } else {
-                        scheduler.addJob(jobDetail, false);
-                    }
-                } catch (UnableLoadPluginException e) {
-                    log.error("Unable to load plugin", e.getMessage());
-                }
-            }
-        }
-        return null;
+    public Optional<TriggerKey> scheduleMonitorForRepoSync(JobConfig jobConfig)
+            throws SchedulerException {
+        return scheduleMonitor(jobConfig, RepoSyncJob.class,
+            SyncConfig.Type.SYNC_TO_REPO);
     }
 
-    public void triggerJob(JobConfig jobConfig) throws SchedulerException {
-        JobKey key = getJobKey(jobConfig);
-        scheduler.triggerJob(key);
+    public Optional<TriggerKey> scheduleMonitorForServerSync(JobConfig jobConfig)
+            throws SchedulerException {
+        return scheduleMonitor(jobConfig, TransServerSyncJob.class,
+            SyncConfig.Type.SYNC_TO_SERVER);
+    }
+
+    private  <J extends SyncJob> Optional<TriggerKey> scheduleMonitor(
+            JobConfig jobConfig, Class<J> jobClass, SyncConfig.Type type)
+            throws SchedulerException {
+        JobKey jobKey = getJobKey(jobConfig, getKeySuffix(type));
+
+        if (scheduler.checkExists(jobKey)) {
+            return Optional.empty();
+        }
+        try {
+            JobDetail jobDetail =
+                    JobBuilder
+                            .newJob(jobClass)
+                            .withIdentity(jobKey.getName())
+                            .withDescription(jobConfig.toString())
+                            .build();
+
+            jobDetail.getJobDataMap().put("value", jobConfig);
+            jobDetail.getJobDataMap().put("type", getKeySuffix(type));
+            jobDetail.getJobDataMap()
+                    .put("basedir", appConfiguration.getRepoDirectory());
+
+            jobDetail.getJobDataMap()
+                    .put(RepoExecutor.class.getSimpleName(), pluginsService
+                            .getNewSourceRepoPlugin(
+                                    jobConfig.getSourceRepoExecutorName(),
+                                    jobConfig.getSourceRepoConfig()));
+
+            jobDetail.getJobDataMap()
+                    .put(TranslationServerExecutor.class.getSimpleName(),
+                            pluginsService
+                                    .getNewTransServerPlugin(
+                                            jobConfig
+                                                    .getTranslationServerExecutorName(),
+                                            jobConfig.getTransServerConfig()));
+
+            String cronExp;
+            if (jobClass.equals(RepoSyncJob.class)) {
+                cronExp = jobConfig.getSyncToRepoConfig().getCron();
+            } else if (jobClass.equals(TransServerSyncJob.class)) {
+                cronExp = jobConfig.getSyncToServerConfig().getCron();
+            } else {
+                throw new IllegalStateException(
+                        "can not determine what job to run for " + jobClass);
+            }
+
+            if (scheduler.getListenerManager().getJobListeners().isEmpty()) {
+                scheduler.getListenerManager()
+                        .addTriggerListener(triggerListener);
+            }
+
+            if(!StringUtils.isEmpty(cronExp)) {
+                Trigger trigger = buildTrigger(cronExp, jobKey.getName());
+                scheduler.scheduleJob(jobDetail, trigger);
+                return Optional.of(trigger.getKey());
+            }
+            scheduler.addJob(jobDetail, false);
+            return Optional.empty();
+        } catch (UnableLoadPluginException e) {
+            log.error("Unable to load plugin", e.getMessage());
+        }
+        return Optional.empty();
     }
 
     public JobStatus getTriggerStatus(TriggerKey key,
@@ -118,19 +148,17 @@ public class CronTrigger {
         }
         return JobStatus.EMPTY;
     }
-
+    
     public JobStatus getTriggerStatus(JobConfig jobConfig,
-        JobRunCompletedEvent event) throws SchedulerException {
-        JobKey key = getJobKey(jobConfig);
+            JobRunCompletedEvent event) throws SchedulerException {
+        JobKey key = getJobKey(jobConfig, getKeySuffix(event.getType()));
 
         if (scheduler.checkExists(key)) {
-            List<? extends Trigger> triggers =
-                scheduler.getTriggersOfJob(key);
+            List<? extends Trigger> triggers = scheduler.getTriggersOfJob(key);
 
-            if(!triggers.isEmpty()) {
+            if (!triggers.isEmpty()) {
                 Trigger trigger = triggers.get(0);
-                Date endTime =
-                    event != null ? event.getCompletedTime() : null;
+                Date endTime = event != null ? event.getCompletedTime() : null;
 
                 Trigger.TriggerState state =
                         scheduler.getTriggerState(trigger.getKey());
@@ -163,49 +191,49 @@ public class CronTrigger {
             .collect(Collectors.toList());
     }
 
-    public void cancelRunningJob(JobConfig jobConfig)
+    public void cancelRunningJob(JobConfig jobConfig, SyncConfig.Type type)
         throws UnableToInterruptJobException {
-        JobKey jobKey = getJobKey(jobConfig);
+        JobKey jobKey = getJobKey(jobConfig, getKeySuffix(type));
         scheduler.interrupt(jobKey);
     }
 
-    public void deleteJob(JobConfig jobConfig) throws SchedulerException {
-        JobKey jobKey = getJobKey(jobConfig);
+    public void deleteJob(JobConfig jobConfig, SyncConfig.Type type)
+            throws SchedulerException {
+        JobKey jobKey = getJobKey(jobConfig, getKeySuffix(type));
         scheduler.deleteJob(jobKey);
     }
 
-    public void reschedule(TriggerKey key, JobConfig jobConfig)
+    public void reschedule(TriggerKey key, String cron, String triggerKey)
         throws SchedulerException {
-        scheduler.rescheduleJob(key, buildTrigger(jobConfig));
+        scheduler.rescheduleJob(key, buildTrigger(cron, triggerKey));
     }
 
-    private Trigger buildTrigger(JobConfig jobConfig) {
-        TriggerBuilder builder = TriggerBuilder.newTrigger()
-            .withIdentity(jobConfig.getId().toString());
-        if (isRepeatedJob(jobConfig)) {
+    public void triggerJob(JobConfig jobConfig, SyncConfig.Type type)
+            throws SchedulerException {
+        JobKey key = getJobKey(jobConfig, getKeySuffix(type));
+        scheduler.triggerJob(key);
+    }
+
+    private <J extends SyncJob> Trigger buildTrigger(String cronExp,
+            String triggerKey) {
+        TriggerBuilder builder = TriggerBuilder
+                .newTrigger()
+                .withIdentity(triggerKey);
+        if (!StringUtils.isEmpty(cronExp)) {
             builder.withSchedule(
-                    CronScheduleBuilder.cronSchedule(jobConfig.getCron()));
+                    CronScheduleBuilder.cronSchedule(cronExp));
         }
         return builder.build();
     }
 
-    private JobDetail buildJobDetails(JobConfig jobConfig, JobKey jobKey) {
-        JobBuilder builder = JobBuilder
-                .newJob(SyncJob.class)
-                .withIdentity(jobKey.getName())
-                .withDescription(jobConfig.toString());
-
-        if (!isRepeatedJob(jobConfig)) {
-            builder.storeDurably();
+    private String getKeySuffix(SyncConfig.Type type) {
+        if(type.equals(SyncConfig.Type.SYNC_TO_REPO)) {
+            return REPO_SYNC_KEY_SUFFIX;
         }
-        return builder.build();
+        return SERVER_SYNC_KEY_SUFFIX;
     }
 
-    private boolean isRepeatedJob(JobConfig jobConfig) {
-        return !StringUtils.isEmpty(jobConfig.getCron());
-    }
-
-    private JobKey getJobKey(JobConfig jobConfig) {
-        return new JobKey(jobConfig.getId().toString());
+    private JobKey getJobKey(JobConfig jobConfig, String suffix) {
+        return new JobKey(jobConfig.getId().toString() + suffix);
     }
 }
