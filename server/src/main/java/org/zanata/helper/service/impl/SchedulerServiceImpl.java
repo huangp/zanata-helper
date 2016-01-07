@@ -56,9 +56,6 @@ public class SchedulerServiceImpl implements SchedulerService {
     private JobConfigRepository jobConfigRepository;
 
     @Inject
-    private ContextControl contextControl;
-
-    @Inject
     private JobConfigListener triggerListener;
 
     private Map<Long, JobConfig> jobConfigMap =
@@ -102,10 +99,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     private List<JobConfig> getJobs() {
-        contextControl.startContext(RequestScoped.class);
-        List<JobConfig> allJobs = jobConfigRepository.getAllJobs();
-        contextControl.stopContext(RequestScoped.class);
-        return allJobs;
+        return jobConfigRepository.getAllJobs();
     }
 
     public void onApplicationEvent(@Observes  ConfigurationChangeEvent event) {

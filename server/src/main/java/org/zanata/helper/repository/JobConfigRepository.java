@@ -29,9 +29,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.apache.commons.io.FileUtils;
@@ -48,12 +50,14 @@ import static org.apache.commons.io.Charsets.UTF_8;
 /**
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
  */
-@RequestScoped
+@ApplicationScoped
 public class JobConfigRepository {
     private static final Logger log =
             LoggerFactory.getLogger(JobConfigRepository.class);
 
     private File configDirectory;
+
+    private ReentrantLock lock = new ReentrantLock();
 
     @Inject
     protected AppConfiguration appConfiguration;
@@ -84,15 +88,16 @@ public class JobConfigRepository {
         return Optional.empty();
     }
 
-    // TODO we may have concurrent issue here
     public void persist(JobConfig jobConfig) {
-        File jobConfigFolder = jobConfigFolder(jobConfig.getId());
-        File latestConfigFile = latestJobConfig(jobConfig.getId());
-
-        String incomingYaml = YamlUtil.generateYaml(jobConfig);
-
-        boolean made = jobConfigFolder.mkdirs();
         try {
+            lock.tryLock(5, TimeUnit.SECONDS);
+
+            File jobConfigFolder = jobConfigFolder(jobConfig.getId());
+            File latestConfigFile = latestJobConfig(jobConfig.getId());
+
+            String incomingYaml = YamlUtil.generateYaml(jobConfig);
+
+            boolean made = jobConfigFolder.mkdirs();
             if (!made && latestConfigFile.exists()) {
                 String current =
                         FileUtils.readFileToString(latestConfigFile, UTF_8);
@@ -107,10 +112,12 @@ public class JobConfigRepository {
 
             // write new job config
             FileUtils.write(latestConfigFile, incomingYaml, UTF_8);
-        } catch (IOException e) {
-            throw Throwables.propagate(e);
-        }
 
+        } catch (InterruptedException | IOException e) {
+            throw Throwables.propagate(e);
+        } finally {
+            lock.unlock();
+        }
     }
 
     public boolean delete(long id) {
