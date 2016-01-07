@@ -116,7 +116,7 @@ public class CronTrigger {
                 trigger.getPreviousFireTime(), endTime,
                 trigger.getNextFireTime());
         }
-        return null;
+        return JobStatus.EMPTY;
     }
 
     public JobStatus getTriggerStatus(JobConfig jobConfig,
@@ -142,7 +142,7 @@ public class CronTrigger {
                         trigger.getNextFireTime());
             }
         }
-        return null;
+        return JobStatus.EMPTY;
     }
 
     public boolean isJobRunning(TriggerKey key) throws SchedulerException {

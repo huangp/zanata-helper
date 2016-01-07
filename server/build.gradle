@@ -43,6 +43,7 @@ dependencies {
     //jsf
     compile group: 'com.sun.faces', name: 'jsf-api', version: '2.2.12'
     compile group: 'com.sun.faces', name: 'jsf-impl', version: '2.2.12'
+    compile 'org.richfaces:richfaces:4.5.12.Final'
 
     // utilities
     compile group: 'com.google.guava', name: 'guava', version:'19.0'

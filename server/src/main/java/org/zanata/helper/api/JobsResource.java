@@ -17,7 +17,7 @@ import org.zanata.helper.service.SchedulerService;
  */
 
 @RequestScoped
-@Path(APIResources.JOBS_ROOT)
+@Path(APIResource.JOBS_ROOT)
 @Produces("application/json")
 public class JobsResource {
     private static final Logger log =

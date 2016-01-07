@@ -16,6 +16,8 @@ import java.util.Date;
 @Getter
 @NoArgsConstructor
 public class JobStatus implements Serializable {
+    public static JobStatus EMPTY = new JobStatus();
+
     private JobStatusType status = JobStatusType.NONE;
 
     @JsonSerialize(using = DateSerializer.class)

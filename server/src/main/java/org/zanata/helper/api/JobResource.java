@@ -35,11 +35,11 @@ import javax.ws.rs.core.Response;
  */
 
 @RequestScoped
-@Path(APIResources.JOB_ROOT)
+@Path(APIResource.JOB_ROOT)
 @Produces("application/json")
-public class JobResources {
+public class JobResource {
     private static final Logger log =
-            LoggerFactory.getLogger(JobResources.class);
+            LoggerFactory.getLogger(JobResource.class);
     public final static String STATUS_URL = "/status";
     public final static String CANCEL_URL = "/cancel";
 

@@ -4,17 +4,58 @@
   xmlns:ui="http://java.sun.com/jsf/facelets"
   xmlns:f="http://java.sun.com/jsf/core"
   xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:a4j="http://richfaces.org/a4j"
   template="/WEB-INF/includes/template.xhtml">
 
-
   <ui:define name="content">
+    <h:form>
+      <a4j:jsFunction name="cancelJob"
+        action="#{indexController.cancelRunningJob(id)}" limitRender="true"
+        render="running-jobs-content">
+        <a4j:param name="val1" assignTo="#{id}"/>
+      </a4j:jsFunction>
+
+      <a4j:jsFunction name="refreshRunningJobs" limitRender="true" render="running-jobs-content"/>
+    </h:form>
+
     <div class="l__wrapper">
       <div class="g">
         <div class="g__item w--1-m w--3-8-l w--1-4 l--push-bottom-half">
           <h1>#{msg['Application.name']}</h1>
-          <div class="l--push-top-quarter panel" id="runningJobsContent">
-            <ui:include src="/WEB-INF/pages/view/running_jobs.xhtml"/>
-          </div>
+          <h:panelGroup layout="block" styleClass="l--push-top-quarter panel" id="running-jobs-content">
+            <div class="l--pad-all-quarter d--bottom">
+              <button class="button button--small button--primary loader" onclick="refreshRunningJobs()">
+                <span class="loader__label">#{msg['jsf.newJob.refresh.button']}</span>
+              </button>
+            </div>
+            <ui:fragment rendered="${empty indexController.runningJobs}">
+              <p class="txt--meta l--pad-all-half">#{msg['jsp.noRunningJobs']}</p>
+            </ui:fragment>
+            <ui:fragment rendered="${not empty indexController.runningJobs}">
+              <ul class="list--panel" id="runningJobs">
+                <ui:repeat value="${indexController.runningJobs}" var="job">
+                  <li class="l--pad-all-quarter" id="running-${job.id}">
+                    <a href="/job?id=${job.id}">
+                      <div class="list__item__content">
+                        <div class="list__item__info">
+                          <span>${job.name}</span>
+                          <span class="list__item__meta">${job.description}</span>
+                        </div>
+                        <div class="list__item__actions">
+                          <button class="button--small button--danger loader" onclick="cancelJob('#{job.id}')"
+                            title="#{msg['jsf.job.cancel.button.title']}">
+                            <span class="loader__label">
+                              <i class="i i--cancel"></i>
+                            </span>
+                          </button>
+                        </div>
+                      </div>
+                    </a>
+                  </li>
+                </ui:repeat>
+              </ul>
+            </ui:fragment>
+          </h:panelGroup>
         </div>
 
         <div class="g__item w--1-m w--5-8-l w--3-4">
