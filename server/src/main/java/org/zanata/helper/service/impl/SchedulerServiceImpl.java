@@ -21,6 +21,7 @@ import org.zanata.helper.model.JobSummary;
 import org.zanata.helper.model.JobStatus;
 import org.zanata.helper.quartz.CronTrigger;
 import org.zanata.helper.component.AppConfiguration;
+import org.zanata.helper.quartz.JobConfigListener;
 import org.zanata.helper.repository.JobConfigRepository;
 import org.zanata.helper.service.PluginsService;
 import org.zanata.helper.service.SchedulerService;
@@ -55,12 +56,14 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Inject
     private ContextControl contextControl;
 
+    @Inject
+    private JobConfigListener triggerListener;
+
     private Map<Long, JobConfig_test> jobConfigMap =
             Collections.synchronizedMap(Maps.newHashMap());
 
     private Map<Long, JobKeys> jobConfigKeyMap =
             Collections.synchronizedMap(Maps.newHashMap());
-
     private CronTrigger cronTrigger;
 
     // TODO: database connection, thread count, scheduler, queue, event
@@ -85,7 +88,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         List<JobConfig_test> jobConfigs = getJobs();
         try {
             cronTrigger = new CronTrigger(appConfiguration,
-                pluginsServiceImpl);
+                pluginsServiceImpl, triggerListener);
             for (JobConfig_test jobConfig : jobConfigs) {
                 scheduleJob(jobConfig);
             }

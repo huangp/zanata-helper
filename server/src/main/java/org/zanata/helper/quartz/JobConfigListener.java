@@ -1,5 +1,6 @@
 package org.zanata.helper.quartz;
 
+import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
@@ -12,6 +13,7 @@ import org.zanata.helper.events.JobRunStartsEvent;
 import org.zanata.helper.model.JobConfig_test;
 
 @Slf4j
+@Dependent
 public class JobConfigListener implements TriggerListener {
     public static final String LISTENER_NAME = "JobConfigListener";
 

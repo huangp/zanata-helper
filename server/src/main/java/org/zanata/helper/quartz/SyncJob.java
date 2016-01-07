@@ -3,6 +3,7 @@ package org.zanata.helper.quartz;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.deltaspike.core.api.provider.BeanManagerProvider;
 import org.quartz.InterruptableJob;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -14,17 +15,12 @@ import org.zanata.helper.model.JobConfig_test;
 
 import java.io.File;
 import java.io.IOException;
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
 
 @Slf4j
 public abstract class SyncJob implements InterruptableJob {
 
     protected String basedir;
     protected JobConfig_test jobConfig;
-
-    @Inject
-    private Event<JobProgressEvent> jobProgressEvent;
 
     @Override
     public final void execute(JobExecutionContext context)
@@ -67,10 +63,12 @@ public abstract class SyncJob implements InterruptableJob {
     }
 
     protected final void updateProgress(Long id, int currentStep, int totalSteps,
-        String description) {
-        jobProgressEvent.fire(
-            new JobProgressEvent(id, currentStep, totalSteps,
-                description));
+            String description) {
+        BeanManagerProvider.getInstance().getBeanManager()
+                .fireEvent(
+                        new JobProgressEvent(id, currentStep, totalSteps,
+                                description)
+                );
     }
 
     protected final File getDestDirectory(String name) {

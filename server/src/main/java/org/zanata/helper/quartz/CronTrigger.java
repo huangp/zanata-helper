@@ -44,12 +44,14 @@ public class CronTrigger {
     private final AppConfiguration appConfiguration;
 
     private final PluginsService pluginsService;
+    private final JobConfigListener triggerListener;
 
     public CronTrigger(AppConfiguration appConfiguration,
-            PluginsService pluginsService)
+            PluginsService pluginsService, JobConfigListener triggerListener)
         throws SchedulerException {
         this.appConfiguration = appConfiguration;
         this.pluginsService = pluginsService;
+        this.triggerListener = triggerListener;
         scheduler.start();
     }
 
@@ -114,7 +116,7 @@ public class CronTrigger {
                     .isEmpty()) {
                 scheduler.getListenerManager()
                         .addTriggerListener(
-                                new JobConfigListener());
+                                triggerListener);
             }
             scheduler.scheduleJob(jobDetail, trigger);
             return Optional.of(trigger.getKey());
