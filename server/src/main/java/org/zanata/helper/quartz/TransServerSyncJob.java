@@ -42,23 +42,23 @@ public class TransServerSyncJob extends SyncJob {
             TranslationServerExecutor transServerExecutor)
             throws JobExecutionException {
         if (repoExecutor == null || transServerExecutor == null) {
-            log.info("No plugin in job. Skipping." + jobConfig.toString());
+            log.info("No plugin in job. Skipping." + syncWorkConfig.toString());
             return;
         }
         try {
-            updateProgress(jobConfig.getId(), 1, syncToServerTotalSteps,
+            updateProgress(syncWorkConfig.getId(), 1, syncToServerTotalSteps,
                     "Sync to server starts");
-            File destDir = getDestDirectory(jobConfig.getId().toString());
-            updateProgress(jobConfig.getId(),
+            File destDir = getDestDirectory(syncWorkConfig.getId().toString());
+            updateProgress(syncWorkConfig.getId(),
                     2, syncToServerTotalSteps,
                     "Cloning repository to " + destDir);
             repoExecutor.cloneRepo(destDir);
-            updateProgress(jobConfig.getId(),
+            updateProgress(syncWorkConfig.getId(),
                     3, syncToServerTotalSteps,
                     "Pushing files to server from " + destDir);
             transServerExecutor.pushToServer(destDir,
-                    jobConfig.getSyncToServerConfig().getOption());
-            updateProgress(jobConfig.getId(), 4, syncToServerTotalSteps,
+                    syncWorkConfig.getSyncToServerConfig().getOption());
+            updateProgress(syncWorkConfig.getId(), 4, syncToServerTotalSteps,
                     "Sync to server completed");
         } catch (Exception e) {
             throw new JobExecutionException(e);

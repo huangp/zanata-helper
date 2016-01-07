@@ -42,25 +42,25 @@ public class RepoSyncJob extends SyncJob {
             TranslationServerExecutor transServerExecutor)
             throws JobExecutionException {
         if (srcExecutor == null || transServerExecutor == null) {
-            log.info("No plugin in job. Skipping. {}", jobConfig.toString());
+            log.info("No plugin in job. Skipping. {}", syncWorkConfig.toString());
             return;
         }
 
         try {
-            updateProgress(jobConfig.getId(), 1, syncToRepoTotalSteps,
+            updateProgress(syncWorkConfig.getId(), 1, syncToRepoTotalSteps,
                     "Sync to repository starts");
-            File destDir = getDestDirectory(jobConfig.getId().toString());
-            updateProgress(jobConfig.getId(),
+            File destDir = getDestDirectory(syncWorkConfig.getId().toString());
+            updateProgress(syncWorkConfig.getId(),
                     2, syncToRepoTotalSteps, "Cloning repository to " + destDir);
             srcExecutor.cloneRepo(destDir);
-            updateProgress(jobConfig.getId(), 3, syncToRepoTotalSteps,
+            updateProgress(syncWorkConfig.getId(), 3, syncToRepoTotalSteps,
                     "Pulling files to server from " + destDir);
             transServerExecutor
-                    .pullFromServer(destDir, jobConfig.getSyncToServerConfig().getOption());
-            updateProgress(jobConfig.getId(), 4, syncToRepoTotalSteps,
+                    .pullFromServer(destDir, syncWorkConfig.getSyncToServerConfig().getOption());
+            updateProgress(syncWorkConfig.getId(), 4, syncToRepoTotalSteps,
                     "Commits to repository from " + destDir);
-            srcExecutor.pushToRepo(destDir, jobConfig.getSyncToRepoConfig().getOption());
-            updateProgress(jobConfig.getId(), 5, syncToRepoTotalSteps,
+            srcExecutor.pushToRepo(destDir, syncWorkConfig.getSyncToRepoConfig().getOption());
+            updateProgress(syncWorkConfig.getId(), 5, syncToRepoTotalSteps,
                     "Sync to repository completed");
         } catch (Exception e) {
             throw new JobExecutionException(e);

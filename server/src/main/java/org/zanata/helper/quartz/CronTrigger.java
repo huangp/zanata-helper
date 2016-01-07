@@ -22,11 +22,11 @@ import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.exception.UnableLoadPluginException;
-import org.zanata.helper.model.JobConfig;
+import org.zanata.helper.model.SyncWorkConfig;
 import org.zanata.helper.model.JobStatus;
 import org.zanata.helper.model.JobStatusType;
 import org.zanata.helper.component.AppConfiguration;
-import org.zanata.helper.model.SyncConfig;
+import org.zanata.helper.model.JobConfig;
 import org.zanata.helper.service.PluginsService;
 
 import java.util.Date;
@@ -58,22 +58,22 @@ public class CronTrigger {
         scheduler.start();
     }
 
-    public Optional<TriggerKey> scheduleMonitorForRepoSync(JobConfig jobConfig)
+    public Optional<TriggerKey> scheduleMonitorForRepoSync(SyncWorkConfig syncWorkConfig)
             throws SchedulerException {
-        return scheduleMonitor(jobConfig, RepoSyncJob.class,
-            SyncConfig.Type.SYNC_TO_REPO);
+        return scheduleMonitor(syncWorkConfig, RepoSyncJob.class,
+            JobConfig.Type.SYNC_TO_REPO);
     }
 
-    public Optional<TriggerKey> scheduleMonitorForServerSync(JobConfig jobConfig)
+    public Optional<TriggerKey> scheduleMonitorForServerSync(SyncWorkConfig syncWorkConfig)
             throws SchedulerException {
-        return scheduleMonitor(jobConfig, TransServerSyncJob.class,
-            SyncConfig.Type.SYNC_TO_SERVER);
+        return scheduleMonitor(syncWorkConfig, TransServerSyncJob.class,
+            JobConfig.Type.SYNC_TO_SERVER);
     }
 
     private  <J extends SyncJob> Optional<TriggerKey> scheduleMonitor(
-            JobConfig jobConfig, Class<J> jobClass, SyncConfig.Type type)
+            SyncWorkConfig syncWorkConfig, Class<J> jobClass, JobConfig.Type type)
             throws SchedulerException {
-        JobKey jobKey = getJobKey(jobConfig, getKeySuffix(type));
+        JobKey jobKey = getJobKey(syncWorkConfig, getKeySuffix(type));
 
         if (scheduler.checkExists(jobKey)) {
             return Optional.empty();
@@ -83,10 +83,10 @@ public class CronTrigger {
                     JobBuilder
                             .newJob(jobClass)
                             .withIdentity(jobKey.getName())
-                            .withDescription(jobConfig.toString())
+                            .withDescription(syncWorkConfig.toString())
                             .build();
 
-            jobDetail.getJobDataMap().put("value", jobConfig);
+            jobDetail.getJobDataMap().put("value", syncWorkConfig);
             jobDetail.getJobDataMap().put("type", getKeySuffix(type));
             jobDetail.getJobDataMap()
                     .put("basedir", appConfiguration.getRepoDirectory());
@@ -94,22 +94,22 @@ public class CronTrigger {
             jobDetail.getJobDataMap()
                     .put(RepoExecutor.class.getSimpleName(), pluginsService
                             .getNewSourceRepoPlugin(
-                                    jobConfig.getSourceRepoExecutorName(),
-                                    jobConfig.getSourceRepoConfig()));
+                                    syncWorkConfig.getSourceRepoExecutorName(),
+                                    syncWorkConfig.getSourceRepoConfig()));
 
             jobDetail.getJobDataMap()
                     .put(TranslationServerExecutor.class.getSimpleName(),
                             pluginsService
                                     .getNewTransServerPlugin(
-                                            jobConfig
+                                            syncWorkConfig
                                                     .getTranslationServerExecutorName(),
-                                            jobConfig.getTransServerConfig()));
+                                            syncWorkConfig.getTransServerConfig()));
 
             String cronExp;
             if (jobClass.equals(RepoSyncJob.class)) {
-                cronExp = jobConfig.getSyncToRepoConfig().getCron();
+                cronExp = syncWorkConfig.getSyncToRepoConfig().getCron();
             } else if (jobClass.equals(TransServerSyncJob.class)) {
-                cronExp = jobConfig.getSyncToServerConfig().getCron();
+                cronExp = syncWorkConfig.getSyncToServerConfig().getCron();
             } else {
                 throw new IllegalStateException(
                         "can not determine what job to run for " + jobClass);
@@ -148,10 +148,10 @@ public class CronTrigger {
         }
         return JobStatus.EMPTY;
     }
-    
-    public JobStatus getTriggerStatus(JobConfig jobConfig,
+
+    public JobStatus getTriggerStatus(SyncWorkConfig syncWorkConfig,
             JobRunCompletedEvent event) throws SchedulerException {
-        JobKey key = getJobKey(jobConfig, getKeySuffix(event.getType()));
+        JobKey key = getJobKey(syncWorkConfig, getKeySuffix(event.getType()));
 
         if (scheduler.checkExists(key)) {
             List<? extends Trigger> triggers = scheduler.getTriggersOfJob(key);
@@ -191,15 +191,15 @@ public class CronTrigger {
             .collect(Collectors.toList());
     }
 
-    public void cancelRunningJob(JobConfig jobConfig, SyncConfig.Type type)
+    public void cancelRunningJob(SyncWorkConfig syncWorkConfig, JobConfig.Type type)
         throws UnableToInterruptJobException {
-        JobKey jobKey = getJobKey(jobConfig, getKeySuffix(type));
+        JobKey jobKey = getJobKey(syncWorkConfig, getKeySuffix(type));
         scheduler.interrupt(jobKey);
     }
 
-    public void deleteJob(JobConfig jobConfig, SyncConfig.Type type)
+    public void deleteJob(SyncWorkConfig syncWorkConfig, JobConfig.Type type)
             throws SchedulerException {
-        JobKey jobKey = getJobKey(jobConfig, getKeySuffix(type));
+        JobKey jobKey = getJobKey(syncWorkConfig, getKeySuffix(type));
         scheduler.deleteJob(jobKey);
     }
 
@@ -208,9 +208,9 @@ public class CronTrigger {
         scheduler.rescheduleJob(key, buildTrigger(cron, triggerKey));
     }
 
-    public void triggerJob(JobConfig jobConfig, SyncConfig.Type type)
+    public void triggerJob(SyncWorkConfig syncWorkConfig, JobConfig.Type type)
             throws SchedulerException {
-        JobKey key = getJobKey(jobConfig, getKeySuffix(type));
+        JobKey key = getJobKey(syncWorkConfig, getKeySuffix(type));
         scheduler.triggerJob(key);
     }
 
@@ -226,14 +226,14 @@ public class CronTrigger {
         return builder.build();
     }
 
-    private String getKeySuffix(SyncConfig.Type type) {
-        if(type.equals(SyncConfig.Type.SYNC_TO_REPO)) {
+    private String getKeySuffix(JobConfig.Type type) {
+        if(type.equals(JobConfig.Type.SYNC_TO_REPO)) {
             return REPO_SYNC_KEY_SUFFIX;
         }
         return SERVER_SYNC_KEY_SUFFIX;
     }
 
-    private JobKey getJobKey(JobConfig jobConfig, String suffix) {
-        return new JobKey(jobConfig.getId().toString() + suffix);
+    private JobKey getJobKey(SyncWorkConfig syncWorkConfig, String suffix) {
+        return new JobKey(syncWorkConfig.getId().toString() + suffix);
     }
 }

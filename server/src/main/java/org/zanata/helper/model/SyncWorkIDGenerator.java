@@ -24,17 +24,17 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.zanata.helper.repository.JobConfigRepository;
+import org.zanata.helper.repository.SyncWorkConfigRepository;
 
 /**
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
  */
 @ApplicationScoped
-public class JobIDGenerator {
+public class SyncWorkIDGenerator {
     private static long latestId;
 
     @Inject
-    private JobConfigRepository jobConfigRepository;
+    private SyncWorkConfigRepository syncWorkConfigRepository;
 
     public synchronized static Long nextID() {
         return ++latestId;
@@ -42,6 +42,6 @@ public class JobIDGenerator {
 
     @PostConstruct
     public void postConstruct() {
-        latestId = jobConfigRepository.largestStoredJobId();
+        latestId = syncWorkConfigRepository.largestStoredJobId();
     }
 }

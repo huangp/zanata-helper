@@ -1,7 +1,6 @@
 package org.zanata.helper.model;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,6 +16,6 @@ public class JobSummary implements Serializable {
     private String key;
     private String name;
     private String description;
-    private SyncConfig.Type type;
+    private JobConfig.Type type;
     private JobStatus jobStatus;
 }

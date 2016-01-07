@@ -12,9 +12,9 @@ import org.zanata.helper.common.plugin.Validator;
 import org.zanata.helper.action.JobForm;
 import org.zanata.helper.exception.JobNotFoundException;
 import org.zanata.helper.i18n.Messages;
+import org.zanata.helper.model.SyncWorkConfig;
+import org.zanata.helper.model.SyncWorkConfigBuilder;
 import org.zanata.helper.model.JobConfig;
-import org.zanata.helper.model.JobConfigBuilder;
-import org.zanata.helper.model.SyncConfig;
 import org.zanata.helper.service.PluginsService;
 import org.zanata.helper.service.SchedulerService;
 
@@ -83,7 +83,7 @@ public class JobResource {
                         Response.Status.NOT_FOUND).build();
             }
             schedulerServiceImpl.cancelRunningJob(new Long(id),
-                    SyncConfig.Type.valueOf(type));
+                    JobConfig.Type.valueOf(type));
             return Response.ok().build();
         } catch (SchedulerException e) {
             log.error("cancel error", e);
@@ -102,9 +102,9 @@ public class JobResource {
             return Response.status(Response.Status.BAD_REQUEST).entity(errors).build();
         }
 
-        JobConfig jobConfig = new JobConfigBuilder(form).build();
+        SyncWorkConfig syncWorkConfig = new SyncWorkConfigBuilder(form).build();
         try {
-            schedulerServiceImpl.persistAndScheduleJob(jobConfig);
+            schedulerServiceImpl.persistAndScheduleJob(syncWorkConfig);
         }
         catch (SchedulerException e) {
             log.error("Error trying to schedule job", e.getMessage());

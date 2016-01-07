@@ -40,7 +40,8 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zanata.helper.component.AppConfiguration;
-import org.zanata.helper.model.JobConfig;
+import org.zanata.helper.model.SyncWorkConfig;
+import org.zanata.helper.model.SyncWorkIDGenerator;
 import org.zanata.helper.util.YamlUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
@@ -51,9 +52,9 @@ import static org.apache.commons.io.Charsets.UTF_8;
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
  */
 @ApplicationScoped
-public class JobConfigRepository {
+public class SyncWorkConfigRepository {
     private static final Logger log =
-            LoggerFactory.getLogger(JobConfigRepository.class);
+            LoggerFactory.getLogger(SyncWorkConfigRepository.class);
 
     private File configDirectory;
 
@@ -63,11 +64,11 @@ public class JobConfigRepository {
     protected AppConfiguration appConfiguration;
 
     @VisibleForTesting
-    protected JobConfigRepository(File configDirectory) {
+    protected SyncWorkConfigRepository(File configDirectory) {
         this.configDirectory = configDirectory;
     }
 
-    public JobConfigRepository() {
+    public SyncWorkConfigRepository() {
     }
 
     @PostConstruct
@@ -75,7 +76,7 @@ public class JobConfigRepository {
         configDirectory = appConfiguration.getConfigDirectory();
     }
 
-    public Optional<JobConfig> load(long id) {
+    public Optional<SyncWorkConfig> load(long id) {
         File latestJobConfig = latestJobConfig(id);
         if (latestJobConfig.exists()) {
             try (InputStream inputStream = new FileInputStream(
@@ -88,14 +89,14 @@ public class JobConfigRepository {
         return Optional.empty();
     }
 
-    public void persist(JobConfig jobConfig) {
+    public void persist(SyncWorkConfig syncWorkConfig) {
         try {
             lock.tryLock(5, TimeUnit.SECONDS);
 
-            File jobConfigFolder = jobConfigFolder(jobConfig.getId());
-            File latestConfigFile = latestJobConfig(jobConfig.getId());
+            File jobConfigFolder = jobConfigFolder(syncWorkConfig.getId());
+            File latestConfigFile = latestJobConfig(syncWorkConfig.getId());
 
-            String incomingYaml = YamlUtil.generateYaml(jobConfig);
+            String incomingYaml = YamlUtil.generateYaml(syncWorkConfig);
 
             boolean made = jobConfigFolder.mkdirs();
             if (!made && latestConfigFile.exists()) {
@@ -145,7 +146,7 @@ public class JobConfigRepository {
     }
 
 
-    public List<JobConfig> getHistory(long id) {
+    public List<SyncWorkConfig> getHistory(long id) {
         throw new UnsupportedOperationException("implement me");
     }
 
@@ -154,7 +155,7 @@ public class JobConfigRepository {
      * will be the largest job id.
      *
      * @return largest job id or 0 if there is no job yet
-     * @see org.zanata.helper.model.JobIDGenerator
+     * @see SyncWorkIDGenerator
      */
     public long largestStoredJobId() {
         File[] jobConfigFolders = configDirectory.listFiles(File::isDirectory);
@@ -169,9 +170,9 @@ public class JobConfigRepository {
         return 0;
     }
 
-    public List<JobConfig> getAllJobs() {
+    public List<SyncWorkConfig> getAllJobs() {
         return Arrays.stream(configDirectory.listFiles(File::isDirectory))
-                .map(JobConfigRepository::latestJobConfig)
+                .map(SyncWorkConfigRepository::latestJobConfig)
                 .filter(file -> file.exists() && file.canRead())
                 .map(YamlUtil::generateJobConfig)
                 .collect(Collectors.toList());

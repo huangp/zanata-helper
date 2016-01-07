@@ -8,11 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.Trigger;
 import org.quartz.TriggerListener;
-import org.zanata.helper.common.model.SyncOption;
 import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.events.JobRunStartsEvent;
+import org.zanata.helper.model.SyncWorkConfig;
 import org.zanata.helper.model.JobConfig;
-import org.zanata.helper.model.SyncConfig;
 
 @Slf4j
 @Dependent
@@ -32,9 +31,9 @@ public class JobConfigListener implements TriggerListener {
 
     @Override
     public void triggerFired(Trigger trigger, JobExecutionContext context) {
-        JobConfig jobConfig = getJobConfigJob(context);
+        SyncWorkConfig syncWorkConfig = getJobConfigJob(context);
         jobRunStartsEvent.fire(
-            new JobRunStartsEvent(jobConfig.getId(),
+            new JobRunStartsEvent(syncWorkConfig.getId(),
                 context.getFireTime()));
     }
 
@@ -54,19 +53,19 @@ public class JobConfigListener implements TriggerListener {
     public void triggerComplete(Trigger trigger, JobExecutionContext context,
         Trigger.CompletedExecutionInstruction triggerInstructionCode) {
 
-        JobConfig jobConfig = getJobConfigJob(context);
+        SyncWorkConfig syncWorkConfig = getJobConfigJob(context);
         jobRunCompletedEvent.fire(
-                new JobRunCompletedEvent(jobConfig.getId(), getType(context),
+                new JobRunCompletedEvent(syncWorkConfig.getId(), getType(context),
                         trigger.getKey(),
                         context.getJobRunTime(),
                         context.getFireTime()));
     }
 
-    private JobConfig getJobConfigJob(JobExecutionContext context) {
-        return (JobConfig) context.getJobDetail().getJobDataMap().get("value");
+    private SyncWorkConfig getJobConfigJob(JobExecutionContext context) {
+        return (SyncWorkConfig) context.getJobDetail().getJobDataMap().get("value");
     }
 
-    private SyncConfig.Type getType(JobExecutionContext context) {
-        return (SyncConfig.Type) context.getJobDetail().getJobDataMap().get("type");
+    private JobConfig.Type getType(JobExecutionContext context) {
+        return (JobConfig.Type) context.getJobDetail().getJobDataMap().get("type");
     }
 }

@@ -13,31 +13,31 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.zanata.helper.common.model.SyncOption;
+import org.zanata.helper.model.SyncWorkConfig;
 import org.zanata.helper.model.JobConfig;
-import org.zanata.helper.model.SyncConfig;
 import org.zanata.helper.util.YamlUtil;
 import com.google.common.base.Throwables;
 
-public class JobConfigRepositoryTest {
+public class SyncWorkConfigRepositoryTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    private JobConfigRepository jobConfigRepository;
+    private SyncWorkConfigRepository syncWorkConfigRepository;
     private File configDir;
 
     @Before
     public void setUp() throws Exception {
         File storeDir = temporaryFolder.newFolder();
         configDir = new File(storeDir, "config");
-        jobConfigRepository = new JobConfigRepository(configDir);
+        syncWorkConfigRepository = new SyncWorkConfigRepository(configDir);
 
     }
 
-    private static JobConfig makeJobConfig(long id, String name) {
-        return new JobConfig(id, name, "description",
-                new SyncConfig(SyncConfig.Type.SYNC_TO_SERVER, "",
+    private static SyncWorkConfig makeJobConfig(long id, String name) {
+        return new SyncWorkConfig(id, name, "description",
+                new JobConfig(JobConfig.Type.SYNC_TO_SERVER, "",
                         SyncOption.SOURCE),
-                new SyncConfig(SyncConfig.Type.SYNC_TO_REPO, "",
+                new JobConfig(JobConfig.Type.SYNC_TO_REPO, "",
                         SyncOption.TRANSLATIONS),
                 new HashMap<>(), "sourceRepoPluginName",
                 new HashMap<>(),
@@ -46,21 +46,21 @@ public class JobConfigRepositoryTest {
 
     @Test
     public void testLoad() throws Exception {
-        jobConfigRepository.persist(makeJobConfig(1L, "name"));
+        syncWorkConfigRepository.persist(makeJobConfig(1L, "name"));
 
-        Optional<JobConfig> configOpt = jobConfigRepository.load(1L);
+        Optional<SyncWorkConfig> configOpt = syncWorkConfigRepository.load(1L);
 
         Assertions.assertThat(configOpt.isPresent()).isTrue();
 
-        JobConfig config = configOpt.get();
+        SyncWorkConfig config = configOpt.get();
         Assertions.assertThat(config).isEqualTo(config);
     }
 
     @Test
     public void canPersistForTheFirstTime() throws Exception {
-        JobConfig jobConfig = makeJobConfig(1L, "name");
+        SyncWorkConfig syncWorkConfig = makeJobConfig(1L, "name");
 
-        jobConfigRepository.persist(jobConfig);
+        syncWorkConfigRepository.persist(syncWorkConfig);
 
         File jobConfigFolder = asSubFile(configDir, "1");
         Assertions.assertThat(configDir.listFiles(File::isDirectory))
@@ -78,11 +78,11 @@ public class JobConfigRepositoryTest {
 
     @Test
     public void canPersistSameFileMultipleTimes() {
-        JobConfig jobConfig = makeJobConfig(1L, "name");
+        SyncWorkConfig syncWorkConfig = makeJobConfig(1L, "name");
 
-        jobConfigRepository.persist(jobConfig);
-        jobConfigRepository.persist(jobConfig);
-        jobConfigRepository.persist(jobConfig);
+        syncWorkConfigRepository.persist(syncWorkConfig);
+        syncWorkConfigRepository.persist(syncWorkConfig);
+        syncWorkConfigRepository.persist(syncWorkConfig);
 
         File jobConfigFolder = asSubFile(configDir, "1");
         File yamlFile = asSubFile(jobConfigFolder, "current.yaml");
@@ -95,13 +95,13 @@ public class JobConfigRepositoryTest {
     @Test
     public void canPersistDifferentConfigMultipleTimesAndKeepHistory() {
         // same id but different name
-        JobConfig jobConfig1 = makeJobConfig(1L, "name1");
-        JobConfig jobConfig2 = makeJobConfig(1L, "name2");
-        JobConfig jobConfig3 = makeJobConfig(1L, "name3");
+        SyncWorkConfig syncWorkConfig1 = makeJobConfig(1L, "name1");
+        SyncWorkConfig syncWorkConfig2 = makeJobConfig(1L, "name2");
+        SyncWorkConfig syncWorkConfig3 = makeJobConfig(1L, "name3");
 
-        jobConfigRepository.persist(jobConfig1);
-        jobConfigRepository.persist(jobConfig2);
-        jobConfigRepository.persist(jobConfig3);
+        syncWorkConfigRepository.persist(syncWorkConfig1);
+        syncWorkConfigRepository.persist(syncWorkConfig2);
+        syncWorkConfigRepository.persist(syncWorkConfig3);
 
         File jobConfigFolder = asSubFile(configDir, "1");
         File latestFile = asSubFile(jobConfigFolder, "current.yaml");

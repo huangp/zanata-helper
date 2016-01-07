@@ -5,10 +5,10 @@ import java.util.List;
 import org.quartz.SchedulerException;
 import org.quartz.UnableToInterruptJobException;
 import org.zanata.helper.exception.JobNotFoundException;
-import org.zanata.helper.model.JobConfig;
+import org.zanata.helper.model.SyncWorkConfig;
 import org.zanata.helper.model.JobSummary;
 import org.zanata.helper.model.JobStatus;
-import org.zanata.helper.model.SyncConfig;
+import org.zanata.helper.model.JobConfig;
 import org.zanata.helper.model.WorkSummary;
 
 /**
@@ -22,16 +22,16 @@ public interface SchedulerService {
 
     List<WorkSummary> getAllWork() throws SchedulerException;
 
-    JobConfig getJob(Long id);
+    SyncWorkConfig getJob(Long id);
 
-    void persistAndScheduleJob(JobConfig jobConfig) throws SchedulerException;
+    void persistAndScheduleJob(SyncWorkConfig syncWorkConfig) throws SchedulerException;
 
-    void cancelRunningJob(Long id, SyncConfig.Type type)
+    void cancelRunningJob(Long id, JobConfig.Type type)
         throws UnableToInterruptJobException, JobNotFoundException;
 
-    void deleteJob(Long id, SyncConfig.Type type)
+    void deleteJob(Long id, JobConfig.Type type)
         throws SchedulerException, JobNotFoundException;
 
-    void startJob(Long id, SyncConfig.Type type)
+    void startJob(Long id, JobConfig.Type type)
         throws JobNotFoundException, SchedulerException;
 }

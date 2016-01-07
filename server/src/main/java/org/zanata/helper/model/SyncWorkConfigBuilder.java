@@ -12,7 +12,7 @@ import java.util.Map;
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
 @NoArgsConstructor
-public class JobConfigBuilder {
+public class SyncWorkConfigBuilder {
 
     private String name;
     private String description;
@@ -25,7 +25,7 @@ public class JobConfigBuilder {
     private Map<String, String> transServerConfig =
             new HashMap<String, String>();
 
-    public JobConfigBuilder(JobForm jobForm) {
+    public SyncWorkConfigBuilder(JobForm jobForm) {
         this.name = jobForm.getName();
         this.description = jobForm.getDescription();
 //        this.cron = jobForm.getCron();
@@ -37,58 +37,58 @@ public class JobConfigBuilder {
         this.transServerConfig = jobForm.getTransServerConfig();
     }
 
-    public JobConfigBuilder setName(String name) {
+    public SyncWorkConfigBuilder setName(String name) {
         this.name = name;
         return this;
     }
 
-    public JobConfigBuilder setDescription(String description) {
+    public SyncWorkConfigBuilder setDescription(String description) {
         this.description = description;
         return this;
     }
 
-    public JobConfigBuilder setCron(String cron) {
+    public SyncWorkConfigBuilder setCron(String cron) {
         this.cron = cron;
         return this;
     }
 
-    public JobConfigBuilder setSyncType(SyncOption syncOption) {
+    public SyncWorkConfigBuilder setSyncType(SyncOption syncOption) {
         this.syncOption = syncOption;
         return this;
     }
 
-    public JobConfigBuilder setSourceRepoConfig(
+    public SyncWorkConfigBuilder setSourceRepoConfig(
             Map<String, String> sourceRepoConfig) {
         this.sourceRepoConfig = sourceRepoConfig;
         return this;
     }
 
-    public JobConfigBuilder setTransServerConfig(
+    public SyncWorkConfigBuilder setTransServerConfig(
             Map<String, String> transServerConfig) {
         this.transServerConfig = transServerConfig;
         return this;
     }
 
-    public JobConfigBuilder setSourceRepoExecutorName(
+    public SyncWorkConfigBuilder setSourceRepoExecutorName(
             String sourceRepoExecutorName) {
         this.sourceRepoExecutorName = sourceRepoExecutorName;
         return this;
     }
 
-    public JobConfigBuilder setTranslationServerExecutorName(
+    public SyncWorkConfigBuilder setTranslationServerExecutorName(
             String translationServerExecutorName) {
         this.translationServerExecutorName = translationServerExecutorName;
         return this;
     }
 
-    public JobConfig build() {
+    public SyncWorkConfig build() {
         // TODO the two cron and options should be separated
-        SyncConfig syncToServerConfig =
-                new SyncConfig(SyncConfig.Type.SYNC_TO_SERVER, cron,
+        JobConfig syncToServerConfig =
+                new JobConfig(JobConfig.Type.SYNC_TO_SERVER, cron,
                         syncOption);
-        SyncConfig syncToRepoConfig = new SyncConfig(
-                SyncConfig.Type.SYNC_TO_REPO, cron, syncOption);
-        return new JobConfig(name, description,
+        JobConfig syncToRepoConfig = new JobConfig(
+                JobConfig.Type.SYNC_TO_REPO, cron, syncOption);
+        return new SyncWorkConfig(name, description,
                 syncToServerConfig, syncToRepoConfig, sourceRepoConfig,
                 sourceRepoExecutorName, transServerConfig,
                 translationServerExecutorName);

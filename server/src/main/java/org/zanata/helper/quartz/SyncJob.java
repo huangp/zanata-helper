@@ -11,7 +11,7 @@ import org.quartz.UnableToInterruptJobException;
 import org.zanata.helper.events.JobProgressEvent;
 import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
-import org.zanata.helper.model.JobConfig;
+import org.zanata.helper.model.SyncWorkConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,15 +20,15 @@ import java.io.IOException;
 public abstract class SyncJob implements InterruptableJob {
 
     protected String basedir;
-    protected JobConfig jobConfig;
+    protected SyncWorkConfig syncWorkConfig;
 
     @Override
     public final void execute(JobExecutionContext context)
         throws JobExecutionException {
 
         try {
-            jobConfig =
-                    (JobConfig) context.getJobDetail().getJobDataMap()
+            syncWorkConfig =
+                    (SyncWorkConfig) context.getJobDetail().getJobDataMap()
                             .get("value");
             basedir =
                     (String) context.getJobDetail().getJobDataMap()
@@ -48,7 +48,7 @@ public abstract class SyncJob implements InterruptableJob {
         } catch (JobExecutionException e) {
             log.error("Error running sync job.", e);
         } finally {
-            cleanupDirectory(new File(basedir, jobConfig.getId().toString()));
+            cleanupDirectory(new File(basedir, syncWorkConfig.getId().toString()));
         }
     }
 
@@ -59,7 +59,7 @@ public abstract class SyncJob implements InterruptableJob {
     @Override
     public final void interrupt() throws UnableToInterruptJobException {
         Thread.currentThread().interrupt();
-        updateProgress(jobConfig.getId(), 0, 0, "interrupted");
+        updateProgress(syncWorkConfig.getId(), 0, 0, "interrupted");
     }
 
     protected final void updateProgress(Long id, int currentStep, int totalSteps,
