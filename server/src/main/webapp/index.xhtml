@@ -8,9 +8,9 @@
   template="/WEB-INF/includes/template.xhtml">
 
   <ui:define name="content">
-    <h:form>
+    <h:form styleClass="l--push-buttom-0">
       <a4j:jsFunction name="cancelJob"
-        action="#{indexController.cancelRunningJob(id)}" limitRender="true"
+        action="#{indexAction.cancelRunningJob(id)}" limitRender="true"
         render="running-jobs-content">
         <a4j:param name="val1" assignTo="#{id}"/>
       </a4j:jsFunction>
@@ -28,12 +28,12 @@
                 <span class="loader__label">#{msg['jsf.newJob.refresh.button']}</span>
               </button>
             </div>
-            <ui:fragment rendered="${empty indexController.runningJobs}">
+            <ui:fragment rendered="${empty indexAction.runningJobs}">
               <p class="txt--meta l--pad-all-half">#{msg['jsp.noRunningJobs']}</p>
             </ui:fragment>
-            <ui:fragment rendered="${not empty indexController.runningJobs}">
+            <ui:fragment rendered="${not empty indexAction.runningJobs}">
               <ul class="list--panel" id="runningJobs">
-                <ui:repeat value="${indexController.runningJobs}" var="job">
+                <ui:repeat value="${indexAction.runningJobs}" var="job">
                   <li class="l--pad-all-quarter" id="running-${job.id}">
                     <a href="/job?id=${job.id}">
                       <div class="list__item__content">
@@ -69,7 +69,7 @@
                   </a>
                   <ul class="dropdown__content js-dropdown__content" role="content" aria-labelledby="dropdownContent">
                     <li>
-                      <a class="i__item--right">
+                      <a href="/job/new" class="i__item--right" >
                         #{msg['jsf.newJob']} <i class="i i--plus i__item__icon"></i>
                       </a>
                     </li>
@@ -81,46 +81,46 @@
               </h2>
             </div>
 
-            <ui:fragment rendered="${empty indexController.allJobs}">
+            <ui:fragment rendered="#{empty indexAction.allJobs}">
               <div class="l--pad-all-half">
                 <p class="txt--meta">#{msg['jsp.noJobs']}</p>
-                <a href="jobs/new" class="button button--primary">#{msg['jsf.newJob']}</a>
+                <a href="/job/new" class="button button--primary">#{msg['jsf.newJob']}</a>
               </div>
             </ui:fragment>
-            <ui:fragment rendered="${not empty indexController.allJobs}">
+            <ui:fragment rendered="#{not empty indexAction.allJobs}">
               <ul class="list--panel">
-                <ui:repeat value="${indexController.allJobs}" var="job">
+                <ui:repeat value="#{indexAction.allJobs}" var="job">
                   <ui:param name="title" value="#{msg.format('jsf.job.status.title', job.lastJobStatus.status)}"/>
                   <ui:param name="statusClass" value="txt--neutral"/>
 
-                  <ui:fragment rendered="${job.lastJobStatus.status.name() eq 'RUNNING'}">
+                  <ui:fragment rendered="#{job.lastJobStatus.status.name() eq 'RUNNING'}">
                     <ui:param name="statusClass" value="txt--unsure"/>
                   </ui:fragment>
-                  <ui:fragment rendered="${job.lastJobStatus.status.name() eq 'ERROR'}">
+                  <ui:fragment rendered="#{job.lastJobStatus.status.name() eq 'ERROR'}">
                     <ui:param name="statusClass" value="txt--danger"/>
                   </ui:fragment>
-                  <ui:fragment rendered="${job.lastJobStatus.status.name() eq 'COMPLETE'}">
+                  <ui:fragment rendered="#{job.lastJobStatus.status.name() eq 'COMPLETE'}">
                     <ui:param name="statusClass" value="txt--success"/>
                   </ui:fragment>
-                  <ui:fragment rendered="${job.lastJobStatus.status.name() eq 'PAUSE'}">
+                  <ui:fragment rendered="#{job.lastJobStatus.status.name() eq 'PAUSE'}">
                     <ui:param name="statusClass" value="txt--neutral"/>
                   </ui:fragment>
-                  <ui:fragment rendered="${job.lastJobStatus.status.name() eq 'NORMAL'}">
+                  <ui:fragment rendered="#{job.lastJobStatus.status.name() eq 'NORMAL'}">
                     <ui:param name="statusClass" value=""/>
                   </ui:fragment>
 
                   <li class="l--pad-all-quarter">
-                    <a href="/job?id=${job.id}">
+                    <a href="/job?id=#{job.id}">
                       <div class="list__item__content">
                         <div class="list__item__info">
-                          <h3 class="list__title">${job.name}</h3>
-                          <span class="list__item__meta">${job.description}</span>
+                          <h3 class="list__title">#{job.name}</h3>
+                          <span class="list__item__meta">#{job.description}</span>
                         </div>
-                        <div class="list__item__actions txt--meta" title="${title}">
-                          <span class="l--push-right-quarter ${statusClass}">
+                        <div class="list__item__actions txt--meta" title="#{title}">
+                          <span class="l--push-right-quarter #{statusClass}">
                             <i class="i i--clock"></i>
                           </span>
-                          <span>${job.lastJobStatus.lastEndTime}</span>
+                          <span>#{job.lastJobStatus.lastEndTime}</span>
                         </div>
                       </div>
                     </a>

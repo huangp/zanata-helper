@@ -9,9 +9,9 @@ import org.zanata.helper.common.plugin.Plugin;
 import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.common.plugin.Validator;
-import org.zanata.helper.component.MessageResource;
-import org.zanata.helper.controller.JobForm;
+import org.zanata.helper.action.JobForm;
 import org.zanata.helper.exception.JobNotFoundException;
+import org.zanata.helper.i18n.Messages;
 import org.zanata.helper.model.JobConfig;
 import org.zanata.helper.model.JobConfigBuilder;
 import org.zanata.helper.service.PluginsService;
@@ -50,7 +50,7 @@ public class JobResource {
     private PluginsService pluginsServiceImpl;
 
     @Inject
-    private MessageResource messageResource;
+    private Messages msg;
 
     @Path(STATUS_URL)
     @GET
@@ -117,50 +117,59 @@ public class JobResource {
         Map<String, String> errors = new HashMap<>();
 
         if (StringUtils.length(form.getName()) < form.getNAME_MIN() ||
-            StringUtils.length(form.getName()) > form.getNAME_MAX()) {
-            errors.put("name", messageResource
-                .getMessage("jsf.validation.constraints.Size.message",
-                    form.getNAME_MIN(),
-                    form.getNAME_MAX()));
+                StringUtils.length(form.getName()) > form.getNAME_MAX()) {
+            errors.put("name", msg
+                    .format("jsf.validation.constraints.Size.message",
+                            form.getNAME_MIN(),
+                            form.getNAME_MAX()));
         }
-        if (StringUtils.length(form.getDescription()) >
-            form.getDESCRIPTION_MAX()) {
-            errors.put("description", messageResource
-                .getMessage("jsf.validation.constraints.Size.max",
-                    form.getDESCRIPTION_MAX()));
+        if (StringUtils.length(form.getDescription()) > form
+                .getDESCRIPTION_MAX()) {
+            errors.put("description", msg
+                    .format("jsf.validation.constraints.Size.max",
+                            form.getDESCRIPTION_MAX()));
         }
-        if (!StringUtils.isEmpty(form.getCron()) &&
-            StringUtils.length(form.getCron()) >
+
+        if (!StringUtils.isEmpty(form.getSyncToRepoCron()) &&
+            StringUtils.length(form.getSyncToRepoCron()) >
                 form.getCRON_MAX()) {
-            errors.put("cron", messageResource
-                .getMessage("jsf.validation.constraints.Size.max",
+            errors.put("syncToRepoCron", msg
+                .format("jsf.validation.constraints.Size.max",
                     form.getCRON_MAX()));
         }
 
-        if (StringUtils.length(form.getSourceRepoExecutorName()) <
+        if (!StringUtils.isEmpty(form.getSyncToServerCron()) &&
+            StringUtils.length(form.getSyncToServerCron()) >
+                form.getCRON_MAX()) {
+            errors.put("syncToServerCron", msg
+                .format("jsf.validation.constraints.Size.max",
+                    form.getCRON_MAX()));
+        }
+
+        if (StringUtils.length(form.getSrcRepoPluginName()) <
             form.getSOURCE_REPO_NAME_MIN() ||
-            StringUtils.length(form.getSourceRepoExecutorName()) >
+            StringUtils.length(form.getSrcRepoPluginName()) >
                 form.getSOURCE_REPO_NAME_MAX()) {
-            errors.put("sourceRepoExecutorName", messageResource
-                .getMessage("jsf.validation.constraints.Size.message",
+            errors.put("sourceRepoExecutorName", msg
+                .format("jsf.validation.constraints.Size.message",
                     form.getSOURCE_REPO_NAME_MIN(),
                     form.getSOURCE_REPO_NAME_MAX()));
         }
 
-        if (StringUtils.length(form.getTranslationServerExecutorName()) <
+        if (StringUtils.length(form.getTransServerPluginName()) <
             form.getTRAN_SERVER_NAME_MIN() ||
-            StringUtils.length(form.getTranslationServerExecutorName()) >
+            StringUtils.length(form.getTransServerPluginName()) >
                 form.getTRAN_SERVER_NAME_MAX()) {
-            errors.put("translationServerExecutorName", messageResource
-                .getMessage("jsf.validation.constraints.Size.message",
+            errors.put("translationServerExecutorName", msg
+                .format("jsf.validation.constraints.Size.message",
                     form.getTRAN_SERVER_NAME_MIN(),
                     form.getTRAN_SERVER_NAME_MAX()));
         }
 
-        errors.putAll(validateRepoFields(form.getSourceRepoConfig(),
-            form.getSourceRepoExecutorName()));
+        errors.putAll(validateRepoFields(form.getSrcRepoConfig(),
+            form.getSrcRepoPluginName()));
         errors.putAll(validateTransFields(form.getTransServerConfig(),
-            form.getTranslationServerExecutorName()));
+            form.getTransServerPluginName()));
 
         return errors;
     }

@@ -30,7 +30,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.enterprise.context.RequestScoped;
-import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Alternative;
 import javax.enterprise.inject.Default;
 import javax.inject.Named;
@@ -60,8 +59,7 @@ public class Messages extends AbstractMap<String, String> {
     private static ResourceBundle getResourceBundle(Locale locale) {
         // Generic ResourceBundle without built-in interpolation:
         try {
-            return ResourceBundle.getBundle(
-                    "org.zanata-helper.messages", locale);
+            return ResourceBundle.getBundle("messages", locale);
         } catch (MissingResourceException e) {
             return new ResourceBundle() {
                 @Override

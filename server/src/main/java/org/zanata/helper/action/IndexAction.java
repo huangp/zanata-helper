@@ -1,6 +1,5 @@
-package org.zanata.helper.controller;
+package org.zanata.helper.action;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
@@ -17,10 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
-@Named("indexController")
+@Named("indexAction")
 @RequestScoped
 @Slf4j
-public class IndexController {
+public class IndexAction {
 
     @Inject
     private JobsResource jobsResource;

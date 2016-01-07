@@ -1,4 +1,4 @@
-package org.zanata.helper.controller;
+package org.zanata.helper.action;
 
 import javax.inject.Inject;
 

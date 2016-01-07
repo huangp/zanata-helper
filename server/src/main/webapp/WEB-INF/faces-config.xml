@@ -11,6 +11,6 @@
       <supported-locale>en</supported-locale>
     </locale-config>
 
-    <message-bundle>org.zanata-helper.messages</message-bundle>
+    <message-bundle>messages</message-bundle>
   </application>
 </faces-config>

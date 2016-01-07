@@ -1,7 +1,7 @@
 package org.zanata.helper.model;
 
 import org.zanata.helper.common.model.SyncOption;
-import org.zanata.helper.controller.JobForm;
+import org.zanata.helper.action.JobForm;
 
 import lombok.NoArgsConstructor;
 
@@ -29,14 +29,14 @@ public class JobConfigBuilder {
     public JobConfigBuilder(JobForm jobForm) {
         this.name = jobForm.getName();
         this.description = jobForm.getDescription();
-        this.cron = jobForm.getCron();
-        this.jobType = jobForm.getJobType();
-        this.syncOption = jobForm.getSyncOption();
-        this.sourceRepoExecutorName = jobForm.getSourceRepoExecutorName();
-        this.translationServerExecutorName =
-            jobForm.getTranslationServerExecutorName();
-        this.sourceRepoConfig = jobForm.getSourceRepoConfig();
-        this.transServerConfig = jobForm.getTransServerConfig();
+//        this.cron = jobForm.getCron();
+//        this.jobType = jobForm.getJobType();
+//        this.syncOption = jobForm.getSyncOption();
+//        this.sourceRepoExecutorName = jobForm.getSourceRepoExecutorName();
+//        this.translationServerExecutorName =
+//            jobForm.getTranslationServerExecutorName();
+//        this.sourceRepoConfig = jobForm.getSourceRepoConfig();
+//        this.transServerConfig = jobForm.getTransServerConfig();
     }
 
     public JobConfigBuilder setName(String name) {
