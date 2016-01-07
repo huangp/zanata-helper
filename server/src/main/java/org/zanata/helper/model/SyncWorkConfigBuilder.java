@@ -1,6 +1,6 @@
 package org.zanata.helper.model;
 
-import org.zanata.helper.action.JobForm;
+import org.zanata.helper.action.SyncWorkForm;
 import org.zanata.helper.common.model.SyncOption;
 
 import lombok.NoArgsConstructor;
@@ -25,16 +25,16 @@ public class SyncWorkConfigBuilder {
     private Map<String, String> transServerConfig =
             new HashMap<String, String>();
 
-    public SyncWorkConfigBuilder(JobForm jobForm) {
-        this.name = jobForm.getName();
-        this.description = jobForm.getDescription();
+    public SyncWorkConfigBuilder(SyncWorkForm syncWorkForm) {
+        this.name = syncWorkForm.getName();
+        this.description = syncWorkForm.getDescription();
 //        this.cron = jobForm.getCron();
 //        this.syncOption = jobForm.getSyncOption();
 //        this.sourceRepoExecutorName = jobForm.getSourceRepoExecutorName();
 //        this.translationServerExecutorName =
 //                jobForm.getTranslationServerExecutorName();
 //        this.sourceRepoConfig = jobForm.getSourceRepoConfig();
-        this.transServerConfig = jobForm.getTransServerConfig();
+        this.transServerConfig = syncWorkForm.getTransServerConfig();
     }
 
     public SyncWorkConfigBuilder setName(String name) {

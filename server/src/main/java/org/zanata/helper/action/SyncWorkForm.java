@@ -17,7 +17,7 @@ import lombok.Setter;
  */
 @Getter
 @NoArgsConstructor
-public class JobForm implements Serializable {
+public class SyncWorkForm implements Serializable {
     private final int NAME_MIN = 5;
     private final int NAME_MAX = 100;
     private final int DESCRIPTION_MAX = 255;

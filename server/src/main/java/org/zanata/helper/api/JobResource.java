@@ -9,7 +9,7 @@ import org.zanata.helper.common.plugin.Plugin;
 import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.common.plugin.Validator;
-import org.zanata.helper.action.JobForm;
+import org.zanata.helper.action.SyncWorkForm;
 import org.zanata.helper.exception.JobNotFoundException;
 import org.zanata.helper.i18n.Messages;
 import org.zanata.helper.model.SyncWorkConfig;
@@ -96,7 +96,7 @@ public class JobResource {
     }
 
     @POST
-    public Response createJob(JobForm form) {
+    public Response createJob(SyncWorkForm form) {
         Map<String, String> errors = validateJobForm(form);
         if (!errors.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(errors).build();
@@ -116,7 +116,7 @@ public class JobResource {
     }
 
     // TODO use bean validation
-    private Map<String, String> validateJobForm(JobForm form) {
+    private Map<String, String> validateJobForm(SyncWorkForm form) {
         Map<String, String> errors = new HashMap<>();
 
         if (StringUtils.length(form.getName()) < form.getNAME_MIN() ||
@@ -184,7 +184,7 @@ public class JobResource {
         if(executor == null) {
             return new HashMap<>();
         }
-        return validateFields(config, executor, JobForm.repoSettingsPrefix);
+        return validateFields(config, executor, SyncWorkForm.repoSettingsPrefix);
     }
 
     private Map<String, String> validateTransFields(
@@ -194,7 +194,7 @@ public class JobResource {
         if(executor == null) {
             return new HashMap<>();
         }
-        return validateFields(config, executor, JobForm.transSettingsPrefix);
+        return validateFields(config, executor, SyncWorkForm.transSettingsPrefix);
     }
 
     private Map<String, String> validateFields(Map<String, String> config,

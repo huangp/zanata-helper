@@ -7,7 +7,6 @@ import javax.inject.Named;
 
 import org.zanata.helper.common.model.SyncOption;
 import org.zanata.helper.common.model.Field;
-import org.zanata.helper.common.plugin.Plugin;
 import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.i18n.Messages;
@@ -17,8 +16,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +40,7 @@ public class NewJobAction {
     private List<Field> syncOptions;
 
     @Getter
-    private JobForm form = new JobForm();
+    private SyncWorkForm form = new SyncWorkForm();
 
     @Getter
     private Map<String, String> errors = new HashMap<>();
