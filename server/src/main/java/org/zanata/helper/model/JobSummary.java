@@ -17,5 +17,6 @@ public class JobSummary implements Serializable {
     private Long id;
     private String name;
     private String description;
-    private JobStatus lastJobStatus;
+    private JobStatus syncToRepoJobStatus;
+    private JobStatus syncToTransServerJobStatus;
 }

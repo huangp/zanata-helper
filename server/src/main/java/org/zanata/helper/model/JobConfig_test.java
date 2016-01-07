@@ -92,4 +92,9 @@ public class JobConfig_test extends PersistModel {
                         sourceRepoExecutorName,
                         translationServerExecutorName, createdDate);
     }
+
+    public void setLastJobStatus(JobStatus status) {
+        //TODO implement this
+        //throw new UnsupportedOperationException("Implement me!");
+    }
 }

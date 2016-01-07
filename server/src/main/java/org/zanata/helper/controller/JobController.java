@@ -5,7 +5,7 @@ import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.zanata.helper.exception.JobNotFoundException;
-import org.zanata.helper.model.JobConfig;
+import org.zanata.helper.model.JobConfig_test;
 import org.zanata.helper.service.SchedulerService;
 
 /**
@@ -26,7 +26,7 @@ public class JobController {
         if(StringUtils.isEmpty(id)) {
             throw new JobNotFoundException(id);
         }
-        JobConfig jobConfig = schedulerServiceImpl.getJob(new Long(id));
+        JobConfig_test jobConfig = schedulerServiceImpl.getJob(new Long(id));
         if(jobConfig == null) {
             throw new JobNotFoundException(id);
         }

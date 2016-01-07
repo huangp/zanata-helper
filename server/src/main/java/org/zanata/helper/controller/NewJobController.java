@@ -12,7 +12,6 @@ import org.zanata.helper.common.model.Field;
 import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.component.MessageResource;
-import org.zanata.helper.model.JobConfig;
 import org.zanata.helper.service.PluginsService;
 import org.zanata.helper.service.SchedulerService;
 
@@ -151,19 +150,19 @@ public class NewJobController {
     }
 
     private List<Field> getJobTypes() {
-        if (jobTypes == null) {
-            jobTypes = new ArrayList<>();
-            jobTypes.add(
-                new Field(JobConfig.Type.SYNC_TO_REPO.name(), messageResource
-                    .getMessage("jsf.newJob.jobType.SyncToRepo.explanation"),
-                    "", ""));
-            jobTypes
-                .add(new Field(JobConfig.Type.SYNC_TO_SERVER.name(),
-                    messageResource
-                        .getMessage(
-                            "jsf.newJob.jobType.SyncToZanata.explanation"), "",
-                    ""));
-        }
+//        if (jobTypes == null) {
+//            jobTypes = new ArrayList<>();
+//            jobTypes.add(
+//                new Field(JobConfig.Type.SYNC_TO_REPO.name(), messageResource
+//                    .getMessage("jsf.newJob.jobType.SyncToRepo.explanation"),
+//                    "", ""));
+//            jobTypes
+//                .add(new Field(JobConfig.Type.SYNC_TO_SERVER.name(),
+//                    messageResource
+//                        .getMessage(
+//                            "jsf.newJob.jobType.SyncToZanata.explanation"), "",
+//                    ""));
+//        }
         return jobTypes;
     }
 

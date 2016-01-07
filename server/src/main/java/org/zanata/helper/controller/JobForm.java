@@ -7,7 +7,6 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.NotEmpty;
 import org.zanata.helper.common.model.SyncOption;
-import org.zanata.helper.model.JobConfig;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,8 +42,6 @@ public class JobForm implements Serializable {
     @Setter
     private String cron;
 
-    @Setter
-    private JobConfig.Type jobType = JobConfig.Type.SYNC_TO_SERVER;
 
     @Setter
     private SyncOption syncOption = SyncOption.SOURCE;

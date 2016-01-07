@@ -8,9 +8,9 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.UnableToInterruptJobException;
 import org.zanata.helper.events.JobProgressEvent;
-import org.zanata.helper.model.JobConfig;
 import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
+import org.zanata.helper.model.JobConfig_test;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,25 +18,21 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
 @Slf4j
-public class SyncJob implements InterruptableJob {
+public abstract class SyncJob implements InterruptableJob {
 
-    private String basedir;
-
-    private final int syncToRepoTotalSteps = 5;
-    private final int syncToServerTotalSteps = 4;
-
-    private JobConfig jobConfig;
+    protected String basedir;
+    protected JobConfig_test jobConfig;
 
     @Inject
     private Event<JobProgressEvent> jobProgressEvent;
 
     @Override
-    public void execute(JobExecutionContext context)
+    public final void execute(JobExecutionContext context)
         throws JobExecutionException {
 
         try {
             jobConfig =
-                    (JobConfig) context.getJobDetail().getJobDataMap()
+                    (JobConfig_test) context.getJobDetail().getJobDataMap()
                             .get("value");
             basedir =
                     (String) context.getJobDetail().getJobDataMap()
@@ -52,12 +48,7 @@ public class SyncJob implements InterruptableJob {
                             .get(TranslationServerExecutor.class
                                     .getSimpleName());
 
-            if (jobConfig.getJobType().equals(JobConfig.Type.SYNC_TO_REPO)) {
-                processSyncToRepo(srcExecutor, transServerExecutor);
-            } else if (jobConfig.getJobType()
-                    .equals(JobConfig.Type.SYNC_TO_SERVER)) {
-                processSyncToServer(srcExecutor, transServerExecutor);
-            }
+            doSync(srcExecutor, transServerExecutor);
         } catch (JobExecutionException e) {
             log.error("Error running sync job.", e);
         } finally {
@@ -65,83 +56,29 @@ public class SyncJob implements InterruptableJob {
         }
     }
 
+    protected abstract void doSync(RepoExecutor repoExecutor,
+            TranslationServerExecutor serverExecutor)
+            throws JobExecutionException;
+
     @Override
-    public void interrupt() throws UnableToInterruptJobException {
+    public final void interrupt() throws UnableToInterruptJobException {
         Thread.currentThread().interrupt();
         updateProgress(jobConfig.getId(), 0, 0, "interrupted");
     }
 
-    private void processSyncToRepo(RepoExecutor srcExecutor,
-        TranslationServerExecutor transServerExecutor)
-        throws JobExecutionException {
-
-        if (srcExecutor == null || transServerExecutor == null) {
-            log.info("No plugin in job. Skipping. {}", jobConfig.toString());
-            return;
-        }
-
-        try {
-            updateProgress(jobConfig.getId(), 1, syncToRepoTotalSteps,
-                "Sync to repository starts");
-            File destDir = getDestDirectory(jobConfig.getId().toString());
-            updateProgress(jobConfig.getId(),
-                2, syncToRepoTotalSteps, "Cloning repository to " + destDir);
-            srcExecutor.cloneRepo(destDir);
-            updateProgress(jobConfig.getId(),
-                3, syncToRepoTotalSteps,
-                "Pulling files to server from " + destDir);
-            transServerExecutor
-                .pullFromServer(destDir, jobConfig.getSyncOption());
-            updateProgress(jobConfig.getId(),
-                4, syncToRepoTotalSteps,
-                "Commits to repository from " + destDir);
-            srcExecutor.pushToRepo(destDir, jobConfig.getSyncOption());
-            updateProgress(jobConfig.getId(), 5, syncToRepoTotalSteps,
-                "Sync to repository completed");
-        } catch (Exception e) {
-            throw new JobExecutionException(e);
-        }
-    }
-
-    private void processSyncToServer(RepoExecutor repoExecutor,
-        TranslationServerExecutor transServerExecutor)
-        throws JobExecutionException {
-
-        if (repoExecutor == null || transServerExecutor == null) {
-            log.info("No plugin in job. Skipping." + jobConfig.toString());
-            return;
-        }
-        try {
-            updateProgress(jobConfig.getId(), 1, syncToServerTotalSteps,
-                "Sync to server starts");
-            File destDir = getDestDirectory(jobConfig.getId().toString());
-            updateProgress(jobConfig.getId(),
-                2, syncToServerTotalSteps, "Cloning repository to " + destDir);
-            repoExecutor.cloneRepo(destDir);
-            updateProgress(jobConfig.getId(),
-                3, syncToServerTotalSteps,
-                "Pushing files to server from " + destDir);
-            transServerExecutor.pushToServer(destDir, jobConfig.getSyncOption());
-            updateProgress(jobConfig.getId(), 4, syncToServerTotalSteps,
-                "Sync to server completed");
-        } catch (Exception e) {
-            throw new JobExecutionException(e);
-        }
-    }
-
-    private void updateProgress(Long id, int currentStep, int totalSteps,
+    protected final void updateProgress(Long id, int currentStep, int totalSteps,
         String description) {
         jobProgressEvent.fire(
             new JobProgressEvent(id, currentStep, totalSteps,
                 description));
     }
 
-    private File getDestDirectory(String name) {
+    protected final File getDestDirectory(String name) {
         File dest = new File(basedir, name);
         if (dest.exists()) {
             cleanupDirectory();
         }
-        dest.mkdir();
+        dest.mkdirs();
         return dest;
     }
 
@@ -150,8 +87,7 @@ public class SyncJob implements InterruptableJob {
         try {
             FileUtils.deleteDirectory(destDir);
         } catch (IOException e) {
-            log.error("Unable to remove directory {}. {}", destDir,
-                e.getStackTrace());
+            log.error("Unable to remove directory {}", destDir, e);
         }
     }
 }

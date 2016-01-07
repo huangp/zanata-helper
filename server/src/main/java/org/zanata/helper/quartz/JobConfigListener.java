@@ -9,7 +9,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerListener;
 import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.events.JobRunStartsEvent;
-import org.zanata.helper.model.JobConfig;
+import org.zanata.helper.model.JobConfig_test;
 
 @Slf4j
 public class JobConfigListener implements TriggerListener {
@@ -28,7 +28,7 @@ public class JobConfigListener implements TriggerListener {
 
     @Override
     public void triggerFired(Trigger trigger, JobExecutionContext context) {
-        JobConfig jobConfig = getJobConfigJob(context);
+        JobConfig_test jobConfig = getJobConfigJob(context);
         jobRunStartsEvent.fire(
             new JobRunStartsEvent(jobConfig.getId(),
                 context.getFireTime()));
@@ -50,14 +50,14 @@ public class JobConfigListener implements TriggerListener {
     public void triggerComplete(Trigger trigger, JobExecutionContext context,
         Trigger.CompletedExecutionInstruction triggerInstructionCode) {
 
-        JobConfig jobConfig = getJobConfigJob(context);
+        JobConfig_test jobConfig = getJobConfigJob(context);
         jobRunCompletedEvent.fire(
-            new JobRunCompletedEvent(jobConfig.getId(),
+            new JobRunCompletedEvent(jobConfig.getId(), trigger.getKey(),
                 context.getJobRunTime(),
                 context.getFireTime()));
     }
 
-    private JobConfig getJobConfigJob(JobExecutionContext context) {
-        return (JobConfig) context.getJobDetail().getJobDataMap().get("value");
+    private JobConfig_test getJobConfigJob(JobExecutionContext context) {
+        return (JobConfig_test) context.getJobDetail().getJobDataMap().get("value");
     }
 }

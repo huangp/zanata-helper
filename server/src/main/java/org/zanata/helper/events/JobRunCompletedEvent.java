@@ -2,6 +2,7 @@ package org.zanata.helper.events;
 
 import java.util.Date;
 
+import org.quartz.TriggerKey;
 import org.zanata.helper.util.DateUtil;
 
 import lombok.Getter;
@@ -13,11 +14,13 @@ import lombok.Getter;
 public class JobRunCompletedEvent {
     private Long id;
     private Date startTime;
+    private TriggerKey triggerKey;
     private long runDuration;
 
-    public JobRunCompletedEvent(Long id, long runDuration,
+    public JobRunCompletedEvent(Long id, TriggerKey key, long runDuration,
             Date startTime) {
         this.id = id;
+        triggerKey = key;
         this.runDuration = runDuration;
         this.startTime = startTime;
     }

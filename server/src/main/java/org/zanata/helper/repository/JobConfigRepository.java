@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -134,6 +135,10 @@ public class JobConfigRepository {
         return new File(jobConfigFolder(id), "current.yaml");
     }
 
+    private static File latestJobConfig(File jobConfigFolder) {
+        return new File(jobConfigFolder, "current.yaml");
+    }
+
 
     public List<JobConfig_test> getHistory(long id) {
         throw new UnsupportedOperationException("implement me");
@@ -157,5 +162,14 @@ public class JobConfigRepository {
             return Long.parseLong(largestJob.get());
         }
         return 0;
+    }
+
+    public List<JobConfig_test> getAllJobs() {
+        return Arrays.stream(configDirectory.listFiles(File::isDirectory))
+                .map(JobConfigRepository::latestJobConfig)
+                .filter(file -> file.exists() && file.canRead())
+                .map(YamlUtil::generateJobConfig)
+                .collect(Collectors.toList())
+                ;
     }
 }

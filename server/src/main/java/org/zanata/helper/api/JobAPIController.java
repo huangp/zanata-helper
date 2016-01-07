@@ -12,9 +12,8 @@ import org.zanata.helper.common.plugin.Validator;
 import org.zanata.helper.component.MessageResource;
 import org.zanata.helper.controller.JobForm;
 import org.zanata.helper.exception.JobNotFoundException;
-import org.zanata.helper.model.JobConfig;
 import org.zanata.helper.model.JobConfigBuilder;
-import org.zanata.helper.model.JobStatus;
+import org.zanata.helper.model.JobConfig_test;
 import org.zanata.helper.service.PluginsService;
 import org.zanata.helper.service.SchedulerService;
 
@@ -62,7 +61,7 @@ public class JobAPIController {
                 return Response.status(
                         Response.Status.NOT_FOUND).build();
             }
-            return Response.ok(schedulerServiceImpl.getLastStatus(new Long(id))).build();
+            return Response.ok(schedulerServiceImpl.getSyncToRepoJobLastStatus(new Long(id))).build();
         } catch (SchedulerException e) {
             log.error("get job status error", e);
             return Response.serverError().build();
@@ -100,7 +99,7 @@ public class JobAPIController {
             return Response.status(Response.Status.BAD_REQUEST).entity(errors).build();
         }
 
-        JobConfig jobConfig = new JobConfigBuilder(form).build();
+        JobConfig_test jobConfig = new JobConfigBuilder(form).build();
         try {
             schedulerServiceImpl.persistAndScheduleJob(jobConfig);
         }
