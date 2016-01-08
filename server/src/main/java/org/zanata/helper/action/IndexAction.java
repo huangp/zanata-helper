@@ -9,9 +9,11 @@ import javax.ws.rs.core.Response;
 
 import org.zanata.helper.api.JobsResource;
 import org.zanata.helper.api.JobResource;
+import org.zanata.helper.api.WorkResource;
 import org.zanata.helper.model.JobSummary;
 
 import lombok.extern.slf4j.Slf4j;
+import org.zanata.helper.model.WorkSummary;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
@@ -22,21 +24,22 @@ import lombok.extern.slf4j.Slf4j;
 public class IndexAction {
 
     @Inject
-    private JobsResource jobsResource;
+    private WorkResource workResource;
 
     @Inject
     private JobResource jobResource;
 
-    public List<JobSummary> getAllJobs() {
-        Response response = jobsResource.getAllJobs();
-        List<JobSummary> allJobs = (List<JobSummary>)response.getEntity();
-        return allJobs;
+    @Inject
+    private JobsResource jobsResource;
+
+    public List<WorkSummary> getAllWork() {
+        Response response = workResource.getAllWork();
+        return (List<WorkSummary>)response.getEntity();
     }
 
     public List<JobSummary> getRunningJobs() {
         Response response = jobsResource.getRunningJobs();
-        List<JobSummary> runningJobs = (List<JobSummary>)response.getEntity();
-        return runningJobs;
+        return (List<JobSummary>)response.getEntity();
     }
 
     /**

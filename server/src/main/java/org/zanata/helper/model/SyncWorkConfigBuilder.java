@@ -1,7 +1,6 @@
 package org.zanata.helper.model;
 
 import org.zanata.helper.action.SyncWorkForm;
-import org.zanata.helper.common.model.SyncOption;
 
 import lombok.NoArgsConstructor;
 
@@ -16,25 +15,35 @@ public class SyncWorkConfigBuilder {
 
     private String name;
     private String description;
-    private String cron;
-    private SyncOption syncOption;
-    private String sourceRepoExecutorName;
-    private Map<String, String> sourceRepoConfig =
+
+    private String srcRepoPluginName;
+    private Map<String, String> srcRepoPluginConfig =
             new HashMap<String, String>();
-    private String translationServerExecutorName;
-    private Map<String, String> transServerConfig =
+
+    private String transServerPluginName;
+    private Map<String, String> transServerPluginConfig =
             new HashMap<String, String>();
+
+    private JobConfig syncToServerConfig;
+    private JobConfig syncToRepoConfig;
 
     public SyncWorkConfigBuilder(SyncWorkForm syncWorkForm) {
         this.name = syncWorkForm.getName();
         this.description = syncWorkForm.getDescription();
-//        this.cron = jobForm.getCron();
-//        this.syncOption = jobForm.getSyncOption();
-//        this.sourceRepoExecutorName = jobForm.getSourceRepoExecutorName();
-//        this.translationServerExecutorName =
-//                jobForm.getTranslationServerExecutorName();
-//        this.sourceRepoConfig = jobForm.getSourceRepoConfig();
-        this.transServerConfig = syncWorkForm.getTransServerConfig();
+
+        this.syncToServerConfig = new JobConfig(JobConfig.Type.SYNC_TO_SERVER,
+            syncWorkForm.getSyncToServerCron(),
+            syncWorkForm.getSyncToServerOption());
+        
+        this.syncToRepoConfig = new JobConfig(JobConfig.Type.SYNC_TO_REPO,
+            syncWorkForm.getSyncToRepoCron(),
+            syncWorkForm.getSyncToRepoOption());
+
+        this.srcRepoPluginName = syncWorkForm.getSrcRepoPluginName();
+        this.transServerPluginName =
+            syncWorkForm.getTransServerPluginName();
+        this.srcRepoPluginConfig = syncWorkForm.getSrcRepoConfig();
+        this.transServerPluginConfig = syncWorkForm.getTransServerConfig();
     }
 
     public SyncWorkConfigBuilder setName(String name) {
@@ -47,50 +56,34 @@ public class SyncWorkConfigBuilder {
         return this;
     }
 
-    public SyncWorkConfigBuilder setCron(String cron) {
-        this.cron = cron;
+    public SyncWorkConfigBuilder setSrcRepoPluginConfig(
+        Map<String, String> srcRepoPluginConfig) {
+        this.srcRepoPluginConfig = srcRepoPluginConfig;
         return this;
     }
 
-    public SyncWorkConfigBuilder setSyncType(SyncOption syncOption) {
-        this.syncOption = syncOption;
+    public SyncWorkConfigBuilder setTransServerPluginConfig(
+            Map<String, String> transServerPluginConfig) {
+        this.transServerPluginConfig = transServerPluginConfig;
         return this;
     }
 
-    public SyncWorkConfigBuilder setSourceRepoConfig(
-            Map<String, String> sourceRepoConfig) {
-        this.sourceRepoConfig = sourceRepoConfig;
+    public SyncWorkConfigBuilder setSrcRepoPluginName(
+        String srcRepoPluginName) {
+        this.srcRepoPluginName = srcRepoPluginName;
         return this;
     }
 
-    public SyncWorkConfigBuilder setTransServerConfig(
-            Map<String, String> transServerConfig) {
-        this.transServerConfig = transServerConfig;
-        return this;
-    }
-
-    public SyncWorkConfigBuilder setSourceRepoExecutorName(
-            String sourceRepoExecutorName) {
-        this.sourceRepoExecutorName = sourceRepoExecutorName;
-        return this;
-    }
-
-    public SyncWorkConfigBuilder setTranslationServerExecutorName(
-            String translationServerExecutorName) {
-        this.translationServerExecutorName = translationServerExecutorName;
+    public SyncWorkConfigBuilder setTransServerPluginName(
+        String transServerPluginName) {
+        this.transServerPluginName = transServerPluginName;
         return this;
     }
 
     public SyncWorkConfig build() {
-        // TODO the two cron and options should be separated
-        JobConfig syncToServerConfig =
-                new JobConfig(JobConfig.Type.SYNC_TO_SERVER, cron,
-                        syncOption);
-        JobConfig syncToRepoConfig = new JobConfig(
-                JobConfig.Type.SYNC_TO_REPO, cron, syncOption);
         return new SyncWorkConfig(name, description,
-                syncToServerConfig, syncToRepoConfig, sourceRepoConfig,
-                sourceRepoExecutorName, transServerConfig,
-                translationServerExecutorName);
+            syncToServerConfig, syncToRepoConfig, srcRepoPluginConfig,
+            srcRepoPluginName, transServerPluginConfig,
+            transServerPluginName);
     }
 }

@@ -9,4 +9,5 @@ public interface APIResource {
     String JOBS_ROOT = "/jobs";
     String JOB_ROOT = "/job";
 
+    String WORK_ROOT = "/work";
 }

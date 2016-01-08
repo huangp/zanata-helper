@@ -6,7 +6,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.core.Response;
 
-import org.zanata.helper.api.JobResource;
+import org.zanata.helper.api.WorkResource;
 import org.zanata.helper.common.model.SyncOption;
 import org.zanata.helper.common.model.Field;
 import org.zanata.helper.common.plugin.RepoExecutor;
@@ -28,14 +28,14 @@ import java.util.Map;
  */
 @RequestScoped
 @Slf4j
-@Named("newJobAction")
-public class NewJobAction {
+@Named("newWorkAction")
+public class NewWorkAction {
 
     @Inject
     private PluginsService pluginsServiceImpl;
 
     @Inject
-    private JobResource jobResource;
+    private WorkResource workResource;
 
     @Inject
     private Messages msg;
@@ -88,73 +88,15 @@ public class NewJobAction {
         return Collections.emptyList();
     }
 
-    public String onSubmitNewJob() {
-        Response response = jobResource.createJob(form);
-        errors = (Map<String, String>)response.getEntity();
-        if(!errors.isEmpty()) {
+    public String submitNewWork() {
+        Response response = workResource.createWork(form);
+        errors = (Map<String, String>) response.getEntity();
+        if (!errors.isEmpty()) {
             return "/job/new.xhtml";
         } else {
             return "/home.xhtml";
         }
-
-
-//        for (Map.Entry<String, String[]> entry : request.getParameterMap()
-//            .entrySet()) {
-//            if (entry.getKey().startsWith(JobForm.repoSettingsPrefix)) {
-//                String newKey =
-//                    entry.getKey().replaceFirst(JobForm.repoSettingsPrefix, "");
-//                jobForm.getSourceRepoConfig().put(newKey, entry.getValue()[0]);
-//            } else if (entry.getKey().startsWith(JobForm.transSettingsPrefix)) {
-//                String newKey =
-//                    entry.getKey()
-//                        .replaceFirst(JobForm.transSettingsPrefix, "");
-//                jobForm.getTransServerConfig().put(newKey, entry.getValue()[0]);
-//            }
-//        }
-//        jobForm.setName(request.getParameterMap().get("name")[0]);
-//        jobForm.setDescription(request.getParameterMap().get("description")[0]);
-
-//        Map<String, String> errors = createNewJob(jobForm);
-//        if(!errors.isEmpty()) {
-//            model.put("errors", errors);
-//            initModel(model, jobForm);
-//            return "new_job";
-//        }
     }
-
-//    private Map<String, String> createNewJob(JobForm form) {
-//        RestTemplate restTemplate = new RestTemplate();
-//        restTemplate.setErrorHandler(new DefaultResponseErrorHandler(){
-//            protected boolean hasError(HttpStatus statusCode) {
-//                return false;
-//            }});
-//
-//        String url = APIController.getBaseUrl() + APIController.API_ROOT +
-//            APIController.JOB_ROOT;
-//        Map<String, String> errors = new HashMap<>();
-//        HttpEntity<JobForm> request = new HttpEntity<JobForm>(form);
-//
-//        ResponseEntity<Map> response =
-//            restTemplate.exchange(url, HttpMethod.POST, request, Map.class);
-//
-//        return response.getBody();
-//    }
-
-//    private void initModel(ModelMap model, JobForm jobForm) {
-//        model.addAttribute("jobForm", jobForm);
-//        model.addAttribute("repoSettingsPrefix", JobForm.repoSettingsPrefix);
-//        model.addAttribute("transSettingsPrefix", JobForm.transSettingsPrefix);
-//
-//        model.addAttribute("repoPluginOptions", getRepoExecutors());
-//        model.addAttribute("selectedSrcPlugin", getRepoExecutors().get(0));
-//
-//        model.addAttribute("serverPluginOptions", getTransServerExecutors());
-//        model.addAttribute("selectedTransPlugin", getTransServerExecutors().get(
-//            0));
-//
-//        model.addAttribute("syncOptions", getSyncTypes());
-//        model.addAttribute("jobTypes", getJobTypes());
-//    }
 
     public List<TranslationServerExecutor> getTransServerExecutors() {
         if (transServerExecutors == null) {
@@ -176,14 +118,14 @@ public class NewJobAction {
         if (syncOptions == null) {
             syncOptions = new ArrayList<>();
             syncOptions.add(new Field(SyncOption.SOURCE.name(),
-                    msg.get("jsf.newJob.syncType.sourceOnly.explanation"), "",
+                    msg.get("jsf.newWork.syncType.sourceOnly.explanation"), "",
                     ""));
             syncOptions
                     .add(new Field(SyncOption.TRANSLATIONS.name(), msg
-                            .get("jsf.newJob.syncType.translationsOnly.explanation"),
+                            .get("jsf.newWork.syncType.translationsOnly.explanation"),
                             "", ""));
             syncOptions.add(new Field(SyncOption.BOTH.name(), msg
-                    .get("jsf.newJob.syncType.both.explanation"), "",""));
+                    .get("jsf.newWork.syncType.both.explanation"), "",""));
         }
         return syncOptions;
     }

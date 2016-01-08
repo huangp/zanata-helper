@@ -24,41 +24,41 @@ public class SyncWorkConfig extends PersistModel {
     private JobConfig syncToServerConfig;
     private JobConfig syncToRepoConfig;
 
-    private Map<String, String> sourceRepoConfig =
+    private Map<String, String> srcRepoPluginConfig =
             new HashMap<>();
     private Map<String, String> transServerConfig =
             new HashMap<>();
 
-    private String sourceRepoExecutorName;
-    private String translationServerExecutorName;
+    private String srcRepoPluginName;
+    private String transServerPluginName;
 
     @Setter(AccessLevel.PROTECTED)
     private Date createdDate;
 
     public SyncWorkConfig(String name, String description,
             JobConfig syncToServerConfig, JobConfig syncToRepoConfig,
-            Map<String, String> sourceRepoConfig, String sourceRepoExecutorName,
+            Map<String, String> srcRepoPluginConfig, String srcRepoPluginName,
             Map<String, String> transServerConfig,
-            String translationServerExecutorName) {
+            String transServerPluginName) {
         this(SyncWorkIDGenerator.nextID(), name, description, syncToServerConfig,
-                syncToRepoConfig, sourceRepoConfig, sourceRepoExecutorName,
-                transServerConfig, translationServerExecutorName);
+                syncToRepoConfig, srcRepoPluginConfig, srcRepoPluginName,
+                transServerConfig, transServerPluginName);
     }
 
     public SyncWorkConfig(Long id, String name, String description,
             JobConfig syncToServerConfig, JobConfig syncToRepoConfig,
-            Map<String, String> sourceRepoConfig, String sourceRepoExecutorName,
+            Map<String, String> srcRepoPluginConfig, String srcRepoPluginName,
             Map<String, String> transServerConfig,
-            String translationServerExecutorName) {
+            String transServerPluginName) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.syncToServerConfig = syncToServerConfig;
         this.syncToRepoConfig = syncToRepoConfig;
-        this.sourceRepoConfig = sourceRepoConfig;
-        this.sourceRepoExecutorName = sourceRepoExecutorName;
+        this.srcRepoPluginConfig = srcRepoPluginConfig;
+        this.srcRepoPluginName = srcRepoPluginName;
         this.transServerConfig = transServerConfig;
-        this.translationServerExecutorName = translationServerExecutorName;
+        this.transServerPluginName = transServerPluginName;
     }
 
     @Override
@@ -72,13 +72,13 @@ public class SyncWorkConfig extends PersistModel {
                 Objects
                         .equals(syncToServerConfig, that.syncToServerConfig) &&
                 Objects.equals(syncToRepoConfig, that.syncToRepoConfig) &&
-                Objects.equals(sourceRepoConfig, that.sourceRepoConfig) &&
+                Objects.equals(srcRepoPluginConfig, that.srcRepoPluginConfig) &&
                 Objects
                         .equals(transServerConfig, that.transServerConfig) &&
-                Objects.equals(sourceRepoExecutorName,
-                        that.sourceRepoExecutorName) &&
-                Objects.equals(translationServerExecutorName,
-                        that.translationServerExecutorName) &&
+                Objects.equals(srcRepoPluginName,
+                        that.srcRepoPluginName) &&
+                Objects.equals(transServerPluginName,
+                        that.transServerPluginName) &&
                 Objects.equals(createdDate, that.createdDate);
     }
 
@@ -87,13 +87,20 @@ public class SyncWorkConfig extends PersistModel {
         return Objects
                 .hash(id, name, description, syncToServerConfig,
                         syncToRepoConfig,
-                        sourceRepoConfig, transServerConfig,
-                        sourceRepoExecutorName,
-                        translationServerExecutorName, createdDate);
+                    srcRepoPluginConfig, transServerConfig,
+                    srcRepoPluginName,
+                    transServerPluginName, createdDate);
     }
 
-    public void setLastJobStatus(JobStatus status) {
-        //TODO implement this
-        //throw new UnsupportedOperationException("Implement me!");
+    public void setLastJobStatus(JobStatus status, JobConfig.Type type) {
+        if (type.equals(JobConfig.Type.SYNC_TO_REPO)) {
+            this.syncToRepoConfig
+                .updateStatus(status.getStatus(), status.getLastStartTime(),
+                    status.getLastEndTime(), status.getNextStartTime());
+        } else if (type.equals(JobConfig.Type.SYNC_TO_SERVER)) {
+            this.syncToServerConfig
+                .updateStatus(status.getStatus(), status.getLastStartTime(),
+                    status.getLastEndTime(), status.getNextStartTime());
+        }
     }
 }

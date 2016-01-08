@@ -40,6 +40,7 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zanata.helper.component.AppConfiguration;
+import org.zanata.helper.model.PersistModel;
 import org.zanata.helper.model.SyncWorkConfig;
 import org.zanata.helper.model.SyncWorkIDGenerator;
 import org.zanata.helper.util.YamlUtil;
@@ -110,7 +111,7 @@ public class SyncWorkConfigRepository {
                 FileUtils.moveFile(latestConfigFile,
                         new File(jobConfigFolder, "-" + new Date().getTime()));
             }
-
+            syncWorkConfig.onPersist();
             // write new job config
             FileUtils.write(latestConfigFile, incomingYaml, UTF_8);
 

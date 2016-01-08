@@ -94,15 +94,15 @@ public class CronTrigger {
             jobDetail.getJobDataMap()
                     .put(RepoExecutor.class.getSimpleName(), pluginsService
                             .getNewSourceRepoPlugin(
-                                    syncWorkConfig.getSourceRepoExecutorName(),
-                                    syncWorkConfig.getSourceRepoConfig()));
+                                    syncWorkConfig.getSrcRepoPluginName(),
+                                    syncWorkConfig.getSrcRepoPluginConfig()));
 
             jobDetail.getJobDataMap()
                     .put(TranslationServerExecutor.class.getSimpleName(),
                             pluginsService
                                     .getNewTransServerPlugin(
                                             syncWorkConfig
-                                                    .getTranslationServerExecutorName(),
+                                                    .getTransServerPluginName(),
                                             syncWorkConfig.getTransServerConfig()));
 
             String cronExp;

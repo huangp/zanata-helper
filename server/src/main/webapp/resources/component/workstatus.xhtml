@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:composite="http://java.sun.com/jsf/composite"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:h="http://java.sun.com/jsf/html">
+
+  <composite:interface>
+    <composite:attribute name="jobStatus" type="org.zanata.helper.model.JobStatus"
+      shortDescription="status for the job" required="true"/>
+
+    <composite:attribute name="type" type="java.lang.String"
+      shortDescription="type of job. 'SYNC_TO_REPO' or 'SYNC_TO_SERVER'" required="true" />
+  </composite:interface>
+
+  <composite:implementation>
+    <ui:param name="title" value="#{msg.format('jsf.job.status.title', cc.attrs.jobStatus.status.name())}"/>
+    <ui:param name="statusClass" value="txt--neutral"/>
+
+    <ui:fragment rendered="#{cc.attrs.jobStatus.status.name() eq 'RUNNING'}">
+      <ui:param name="statusClass" value="txt--unsure"/>
+    </ui:fragment>
+    <ui:fragment rendered="#{cc.attrs.jobStatus.status.name() eq 'ERROR'}">
+      <ui:param name="statusClass" value="txt--danger"/>
+    </ui:fragment>
+    <ui:fragment rendered="#{cc.attrs.jobStatus.status.name() eq 'COMPLETE'}">
+      <ui:param name="statusClass" value="txt--success"/>
+    </ui:fragment>
+    <ui:fragment rendered="#{cc.attrs.jobStatus.status.name() eq 'PAUSE'}">
+      <ui:param name="statusClass" value="txt--neutral"/>
+    </ui:fragment>
+    <ui:fragment rendered="#{cc.attrs.jobStatus.status.name() eq 'NORMAL'}">
+      <ui:param name="statusClass" value=""/>
+    </ui:fragment>
+
+    <div title="#{title}" class="#{statusClass}">
+      <h:panelGroup styleClass="txt--meta" rendered="#{cc.attrs.type eq 'SYNC_TO_REPO'}">
+        #{msg['jsf.newWork.syncToRepo.title']}
+      </h:panelGroup>
+      <h:panelGroup styleClass="txt--meta" rendered="#{cc.attrs.type eq 'SYNC_TO_SERVER'}">
+        #{msg['jsf.newWork.syncToServer.title']}
+      </h:panelGroup>
+      <span class="l--push-right-quarter">
+        <i class="i i--clock"></i>
+      </span>
+      <span>#{cc.attrs.jobStatus.lastEndTime}</span>
+    </div>
+  </composite:implementation>
+</html>

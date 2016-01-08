@@ -19,7 +19,7 @@ import java.io.IOException;
 @Slf4j
 public abstract class SyncJob implements InterruptableJob {
 
-    protected String basedir;
+    protected File basedir;
     protected SyncWorkConfig syncWorkConfig;
 
     @Override
@@ -31,7 +31,7 @@ public abstract class SyncJob implements InterruptableJob {
                     (SyncWorkConfig) context.getJobDetail().getJobDataMap()
                             .get("value");
             basedir =
-                    (String) context.getJobDetail().getJobDataMap()
+                    (File) context.getJobDetail().getJobDataMap()
                             .get("basedir");
 
             RepoExecutor srcExecutor =
