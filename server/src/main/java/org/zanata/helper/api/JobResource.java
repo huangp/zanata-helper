@@ -109,10 +109,10 @@ public class JobResource {
         catch (SchedulerException e) {
             log.error("Error trying to schedule job", e.getMessage());
             errors.put("error", e.getMessage());
-            return Response.serverError().build();
+            return Response.serverError().entity(errors).build();
         }
         // TODO create URI
-        return Response.created(URI.create("")).build();
+        return Response.created(URI.create("")).entity(errors).build();
     }
 
     // TODO use bean validation

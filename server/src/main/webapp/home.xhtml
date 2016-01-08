@@ -28,18 +28,18 @@
                 <span class="loader__label">#{msg['jsf.newJob.refresh.button']}</span>
               </button>
             </div>
-            <ui:fragment rendered="${empty indexAction.runningJobs}">
+            <ui:fragment rendered="#{empty indexAction.runningJobs}">
               <p class="txt--meta l--pad-all-half">#{msg['jsp.noRunningJobs']}</p>
             </ui:fragment>
-            <ui:fragment rendered="${not empty indexAction.runningJobs}">
+            <ui:fragment rendered="#{not empty indexAction.runningJobs}">
               <ul class="list--panel" id="runningJobs">
-                <ui:repeat value="${indexAction.runningJobs}" var="job">
-                  <li class="l--pad-all-quarter" id="running-${job.id}">
-                    <a href="/job?id=${job.id}">
+                <ui:repeat value="#{indexAction.runningJobs}" var="job">
+                  <li class="l--pad-all-quarter" id="running-#{job.id}">
+                    <a href="/job?id=#{job.id}">
                       <div class="list__item__content">
                         <div class="list__item__info">
-                          <span>${job.name}</span>
-                          <span class="list__item__meta">${job.description}</span>
+                          <span>#{job.name}</span>
+                          <span class="list__item__meta">#{job.description}</span>
                         </div>
                         <div class="list__item__actions">
                           <button class="button--small button--danger loader" onclick="cancelJob('#{job.id}')"
@@ -69,7 +69,7 @@
                   </a>
                   <ul class="dropdown__content js-dropdown__content" role="content" aria-labelledby="dropdownContent">
                     <li>
-                      <a href="/job/new" class="i__item--right" >
+                      <a href="/job/new.xhtml" class="i__item--right" >
                         #{msg['jsf.newJob']} <i class="i i--plus i__item__icon"></i>
                       </a>
                     </li>
@@ -84,7 +84,7 @@
             <ui:fragment rendered="#{empty indexAction.allJobs}">
               <div class="l--pad-all-half">
                 <p class="txt--meta">#{msg['jsp.noJobs']}</p>
-                <a href="/job/new" class="button button--primary">#{msg['jsf.newJob']}</a>
+                <a href="/job/new.xhtml" class="button button--primary">#{msg['jsf.newJob']}</a>
               </div>
             </ui:fragment>
             <ui:fragment rendered="#{not empty indexAction.allJobs}">

@@ -47,14 +47,16 @@
     <ui:param name="errorClass" value=""/>
   </ui:fragment>
 
-  <div class="${errorClass} #{cc.attrs.styleClass}" title="${cc.attrs.tooltip}" id="${cc.attrs.id}}">
-    <label for="${cc.attrs.id}" style="#{cc.attrs.labelStyle}"><h:outputText value="${cc.attrs.label}" escape="false"/></label>
+  <h:panelGroup layout="block"
+    styleClass="#{errorClass} #{cc.attrs.styleClass}" title="#{cc.attrs.tooltip}" id="#{cc.attrs.id}">
+    <label for="input" style="#{cc.attrs.labelStyle}"><h:outputText value="#{cc.attrs.label}" escape="false"/></label>
 
-    <h:inputText id="${cc.attrs.id}" maxlength="${cc.attrs.maxlength}" pt:placeholder="${cc.attrs.placeholder}"
-      styleClass="l--push-bottom-quarter" value="${cc.attrs.value}"/>
+    <h:inputText maxlength="#{cc.attrs.maxlength}" pt:placeholder="#{cc.attrs.placeholder}" id="input"
+      styleClass="l--push-bottom-quarter" value="#{cc.attrs.value}"/>
+    <h:message for="input" styleClass="l--pad-all-quarter" errorClass="message--danger" />
     <ui:fragment rendered="#{cc.attrs.hasError}">
-      <span class="l--pad-all-quarter message--danger">${errors.get(key)}</span>
+      <span class="l--pad-all-quarter message--danger">#{errors.get(key)}</span>
     </ui:fragment>
-  </div>
+  </h:panelGroup>
 </composite:implementation>
 </html>

@@ -4,7 +4,9 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.ws.rs.core.Response;
 
+import org.zanata.helper.api.JobResource;
 import org.zanata.helper.common.model.SyncOption;
 import org.zanata.helper.common.model.Field;
 import org.zanata.helper.common.plugin.RepoExecutor;
@@ -31,6 +33,9 @@ public class NewJobAction {
 
     @Inject
     private PluginsService pluginsServiceImpl;
+
+    @Inject
+    private JobResource jobResource;
 
     @Inject
     private Messages msg;
@@ -84,7 +89,15 @@ public class NewJobAction {
     }
 
     public String onSubmitNewJob() {
-        System.out.println("submit");
+        Response response = jobResource.createJob(form);
+        errors = (Map<String, String>)response;
+        if(!errors.isEmpty()) {
+            return "/job/new.xhtml";
+        } else {
+            return "/home.xhtml";
+        }
+
+
 //        for (Map.Entry<String, String[]> entry : request.getParameterMap()
 //            .entrySet()) {
 //            if (entry.getKey().startsWith(JobForm.repoSettingsPrefix)) {
@@ -107,7 +120,6 @@ public class NewJobAction {
 //            initModel(model, jobForm);
 //            return "new_job";
 //        }
-        return "index";
     }
 
 //    private Map<String, String> createNewJob(JobForm form) {

@@ -129,7 +129,7 @@ public class PluginsServiceImpl implements PluginsService {
     @Override
     public RepoExecutor getNewSourceRepoPlugin(String className) {
         for (Class plugin : sourceRepoPluginMap.values()) {
-            if (plugin.getClass().getName().equals(className)) {
+            if (plugin.getName().equals(className)) {
                 try {
                     return getNewSourceRepoPlugin(plugin.getName(), null);
                 } catch (UnableLoadPluginException e) {
@@ -143,7 +143,7 @@ public class PluginsServiceImpl implements PluginsService {
     @Override
     public TranslationServerExecutor getNewTransServerPlugin(String className) {
         for (Class plugin : transServerPluginMap.values()) {
-            if (plugin.getClass().getName().equals(className)) {
+            if (plugin.getName().equals(className)) {
                 try {
                     return getNewTransServerPlugin(plugin.getName(), null);
                 } catch (UnableLoadPluginException e) {
