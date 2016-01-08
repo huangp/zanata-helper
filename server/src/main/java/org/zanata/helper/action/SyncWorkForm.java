@@ -18,35 +18,26 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 public class SyncWorkForm implements Serializable {
-    private static final int NAME_MIN = 5;
-    private static final int NAME_MAX = 100;
-    private static final int DESCRIPTION_MAX = 255;
-    private static final int CRON_MAX = 50;
-    private static final int SOURCE_REPO_NAME_MIN = 1;
-    private static final int SOURCE_REPO_NAME_MAX = 255;
-    private static final int TRAN_SERVER_NAME_MIN = 1;
-    private static final int TRAN_SERVER_NAME_MAX = 255;
-
     public final static String repoSettingsPrefix = "sourceSettingsConfig-";
     public final static String transSettingsPrefix = "transSettingsConfig-";
 
-    @Size(min = NAME_MIN, max = NAME_MAX)
+    @Size(min = 5, max = 100)
     @NotEmpty
     @Setter
     private String name;
 
-    @Size(max = DESCRIPTION_MAX)
+    @Size(max = 255)
     @Setter
     private String description;
 
-    @Size(max = CRON_MAX)
+    @Size(max = 50)
     @Setter
     private String syncToServerCron;
 
     @Setter
     private SyncOption syncToServerOption = SyncOption.SOURCE;
 
-    @Size(max = CRON_MAX)
+    @Size(max = 50)
     @Setter
     private String syncToRepoCron;
 
@@ -54,12 +45,12 @@ public class SyncWorkForm implements Serializable {
     private SyncOption syncToRepoOption = SyncOption.BOTH;
 
     @NotEmpty
-    @Size(min = SOURCE_REPO_NAME_MIN, max = SOURCE_REPO_NAME_MAX)
+    @Size(max = 255)
     @Setter
     private String srcRepoPluginName;
 
     @NotEmpty
-    @Size(min = TRAN_SERVER_NAME_MIN, max = TRAN_SERVER_NAME_MAX)
+    @Size(max = 255)
     @Setter
     private String transServerPluginName;
 

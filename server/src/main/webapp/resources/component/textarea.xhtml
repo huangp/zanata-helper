@@ -6,7 +6,7 @@
   xmlns:h="http://java.sun.com/jsf/html">
 
 <composite:interface>
-  <composite:attribute name="id" type="java.lang.String"
+  <composite:attribute name="componentId" type="java.lang.String"
     shortDescription="id of the text field" required="true"/>
 
   <composite:attribute name="value" type="java.lang.String"
@@ -33,14 +33,7 @@
 </composite:interface>
 
 <composite:implementation>
-  <ui:fragment rendered="#{cc.attrs.hasError}">
-    <ui:param name="errorClass" value="form__item--error"/>
-  </ui:fragment>
-  <ui:fragment rendered="#{not cc.attrs.hasError}">
-    <ui:param name="errorClass" value=""/>
-  </ui:fragment>
-
-  <h:panelGroup layout="block" styleClass="#{errorClass} #{cc.attrs.styleClass}" title="#{cc.attrs.tooltip}" id="#{cc.attrs.id}">
+  <div class="#{cc.attrs.hasError ? 'form__item--error' : ''} #{cc.attrs.styleClass}" title="#{cc.attrs.tooltip}" id="#{cc.attrs.componentId}">
     <label for="input" style="#{cc.attrs.labelStyle}">#{cc.attrs.label}</label>
 
     <h:inputTextarea id="input" styleClass="l--push-bottom-quarter" value="#{cc.attrs.value}"/>
@@ -48,6 +41,6 @@
     <ui:fragment rendered="#{cc.attrs.hasError}">
       <span class="l--pad-all-quarter message--danger">#{errors.get(key)}</span>
     </ui:fragment>
-  </h:panelGroup>
+  </div>
 </composite:implementation>
 </html>

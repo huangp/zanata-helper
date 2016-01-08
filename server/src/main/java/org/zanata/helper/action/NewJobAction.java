@@ -90,7 +90,7 @@ public class NewJobAction {
 
     public String onSubmitNewJob() {
         Response response = jobResource.createJob(form);
-        errors = (Map<String, String>)response;
+        errors = (Map<String, String>)response.getEntity();
         if(!errors.isEmpty()) {
             return "/job/new.xhtml";
         } else {

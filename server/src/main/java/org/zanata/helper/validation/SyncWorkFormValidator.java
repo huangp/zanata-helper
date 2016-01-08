@@ -46,7 +46,6 @@ public class SyncWorkFormValidator {
     @Inject
     PluginsService pluginsService;
 
-    // TODO use bean validation
     public Map<String, String> validateJobForm(SyncWorkForm form) {
 
         // validate the input

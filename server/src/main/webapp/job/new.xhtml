@@ -19,13 +19,13 @@
 
           <h:form id="jobForm" styleClass="l--push-top-1">
             <div class="g__item">
-              <c:textfield id="name" value="#{newJobAction.form.name}"
+              <c:textfield componentId="name" value="#{newJobAction.form.name}"
                 styleClass="form__item"
-                label="#{msg['jsf.newJob.name']}" maxlength="#{newJobAction.form.NAME_MAX}"
+                label="#{msg['jsf.newJob.name']}" maxlength="100"
                 hasError="#{newJobAction.hasError('name')}"
                 errorMessage="#{newJobAction.getErrorMessage('name')}"/>
 
-              <c:textarea id="description" value="#{newJobAction.form.description}"
+              <c:textarea componentId="description" value="#{newJobAction.form.description}"
                 styleClass="form__item"
                 label="#{msg['jsf.newJob.description']}"
                 hasError="#{newJobAction.hasError('description')}"
@@ -35,7 +35,7 @@
                 <h2 class="heading--secondary">
                   #{msg['jsf.newJob.syncToServer.settings']}
                 </h2>
-                <c:textfield id="syncToServerCron" value="#{newJobAction.form.syncToServerCron}"
+                <c:textfield componentId="syncToServerCron" value="#{newJobAction.form.syncToServerCron}"
                   label="#{msg['jsf.newJob.cron.label']}"
                   placeholder="#{msg['jsf.newJob.cron.placeholder']}"
                   hasError="#{newJobAction.hasError('syncToServerCron')}"
@@ -54,9 +54,9 @@
                 <h2 class="heading--secondary">
                   #{msg['jsf.newJob.syncToRepo.settings']}
                 </h2>
-                <c:textfield id="syncToRepoCron" value="#{newJobAction.form.syncToRepoCron}"
+                <c:textfield componentId="syncToRepoCron" value="#{newJobAction.form.syncToRepoCron}"
                   label="#{msg['jsf.newJob.cron.label']}"
-                  placeholder="#{jsf.newJob.cron.placeholder}"
+                  placeholder="#{msg['jsf.newJob.cron.placeholder']}"
                   hasError="#{newJobAction.hasError('syncToRepoCron')}"
                   errorMessage="#{newJobAction.getErrorMessage('syncToRepoCron')}"
                   styleClass="form__item"/>
@@ -86,10 +86,13 @@
                     <hr class="l--push-top-quarter"/>
                     <div class="form__item">
                       <ui:repeat value="#{newJobAction.selectedSrcPluginFields}" var="srcRepoField">
-                        <c:textfield id="#{newJobAction.form.getRepoSettingsPrefix()}#{srcRepoField.key}"
+                        <ui:param name="key" value="#{newJobAction.form.getRepoSettingsPrefix()}#{srcRepoField.key}"/>
+                        <c:textfield componentId="#{key}"
                           label="#{srcRepoField.label}" value="#{newJobAction.form.srcRepoConfig[srcRepoField.key]}"
                           styleClass="form__item" tooltip="#{srcRepoField.tooltip}"
-                          placeholder="#{srcRepoField.placeholder}">
+                          placeholder="#{srcRepoField.placeholder}"
+                          hasError="#{newJobAction.hasError(key)}"
+                          errorMessage="#{newJobAction.getErrorMessage(key)}">
                         </c:textfield>
                       </ui:repeat>
                     </div>
@@ -114,10 +117,13 @@
                     <hr class="l--push-top-quarter"/>
                     <div class="form__item">
                       <ui:repeat value="#{newJobAction.selectedServerPluginFields}" var="transPluginField">
-                        <c:textfield id="#{newJobAction.form.getTransSettingsPrefix()}#{transPluginField.key}"
+                        <ui:param name="key" value="#{newJobAction.form.getRepoSettingsPrefix()}#{srcRepoField.key}"/>
+                        <c:textfield componentId="#{key}"
                           label="#{transPluginField.label}" value="#{newJobAction.form.transServerConfig[transPluginField.key]}"
                           styleClass="form__item" tooltip="#{transPluginField.tooltip}"
-                          placeholder="#{transPluginField.placeholder}">
+                          placeholder="#{transPluginField.placeholder}"
+                          hasError="#{newJobAction.hasError(key)}"
+                          errorMessage="#{newJobAction.getErrorMessage(key)}">>
                         </c:textfield>
                       </ui:repeat>
                     </div>
