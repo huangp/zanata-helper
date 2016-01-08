@@ -23,6 +23,7 @@ package org.zanata.helper.validation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -40,6 +41,7 @@ import org.zanata.helper.service.PluginsService;
 /**
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
  */
+@RequestScoped
 public class SyncWorkFormValidator {
     @Inject
     PluginsService pluginsService;
