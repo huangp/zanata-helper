@@ -18,19 +18,20 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 public class SyncWorkForm implements Serializable {
-    private final int NAME_MIN = 5;
-    private final int NAME_MAX = 100;
-    private final int DESCRIPTION_MAX = 255;
-    private final int CRON_MAX = 50;
-    private final int SOURCE_REPO_NAME_MIN = 1;
-    private final int SOURCE_REPO_NAME_MAX = 255;
-    private final int TRAN_SERVER_NAME_MIN = 1;
-    private final int TRAN_SERVER_NAME_MAX = 255;
+    private static final int NAME_MIN = 5;
+    private static final int NAME_MAX = 100;
+    private static final int DESCRIPTION_MAX = 255;
+    private static final int CRON_MAX = 50;
+    private static final int SOURCE_REPO_NAME_MIN = 1;
+    private static final int SOURCE_REPO_NAME_MAX = 255;
+    private static final int TRAN_SERVER_NAME_MIN = 1;
+    private static final int TRAN_SERVER_NAME_MAX = 255;
 
     public final static String repoSettingsPrefix = "sourceSettingsConfig-";
     public final static String transSettingsPrefix = "transSettingsConfig-";
 
     @Size(min = NAME_MIN, max = NAME_MAX)
+    @NotEmpty
     @Setter
     private String name;
 

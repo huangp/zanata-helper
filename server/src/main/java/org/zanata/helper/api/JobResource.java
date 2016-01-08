@@ -8,8 +8,8 @@ import org.zanata.helper.common.model.Field;
 import org.zanata.helper.common.plugin.Plugin;
 import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
-import org.zanata.helper.common.plugin.Validator;
 import org.zanata.helper.action.SyncWorkForm;
+import org.zanata.helper.common.plugin.Validator;
 import org.zanata.helper.exception.JobNotFoundException;
 import org.zanata.helper.i18n.Messages;
 import org.zanata.helper.model.SyncWorkConfig;
@@ -17,12 +17,17 @@ import org.zanata.helper.model.SyncWorkConfigBuilder;
 import org.zanata.helper.model.JobConfig;
 import org.zanata.helper.service.PluginsService;
 import org.zanata.helper.service.SchedulerService;
+import org.zanata.helper.validation.SyncWorkFormValidator;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -30,6 +35,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
+
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
@@ -52,6 +59,9 @@ public class JobResource {
 
     @Inject
     private Messages msg;
+
+    @Inject
+    private SyncWorkFormValidator formValidator;
 
     @Path(STATUS_URL)
     @GET
@@ -97,7 +107,7 @@ public class JobResource {
 
     @POST
     public Response createJob(SyncWorkForm form) {
-        Map<String, String> errors = validateJobForm(form);
+        Map<String, String> errors = formValidator.validateJobForm(form);
         if (!errors.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(errors).build();
         }
@@ -113,104 +123,5 @@ public class JobResource {
         }
         // TODO create URI
         return Response.created(URI.create("")).entity(errors).build();
-    }
-
-    // TODO use bean validation
-    private Map<String, String> validateJobForm(SyncWorkForm form) {
-        Map<String, String> errors = new HashMap<>();
-
-        if (StringUtils.length(form.getName()) < form.getNAME_MIN() ||
-                StringUtils.length(form.getName()) > form.getNAME_MAX()) {
-            errors.put("name", msg
-                    .format("jsf.validation.constraints.Size.message",
-                            form.getNAME_MIN(),
-                            form.getNAME_MAX()));
-        }
-        if (StringUtils.length(form.getDescription()) > form
-                .getDESCRIPTION_MAX()) {
-            errors.put("description", msg
-                    .format("jsf.validation.constraints.Size.max",
-                            form.getDESCRIPTION_MAX()));
-        }
-
-        if (!StringUtils.isEmpty(form.getSyncToRepoCron()) &&
-            StringUtils.length(form.getSyncToRepoCron()) >
-                form.getCRON_MAX()) {
-            errors.put("syncToRepoCron", msg
-                .format("jsf.validation.constraints.Size.max",
-                    form.getCRON_MAX()));
-        }
-
-        if (!StringUtils.isEmpty(form.getSyncToServerCron()) &&
-            StringUtils.length(form.getSyncToServerCron()) >
-                form.getCRON_MAX()) {
-            errors.put("syncToServerCron", msg
-                .format("jsf.validation.constraints.Size.max",
-                    form.getCRON_MAX()));
-        }
-
-        if (StringUtils.length(form.getSrcRepoPluginName()) <
-            form.getSOURCE_REPO_NAME_MIN() ||
-            StringUtils.length(form.getSrcRepoPluginName()) >
-                form.getSOURCE_REPO_NAME_MAX()) {
-            errors.put("sourceRepoExecutorName", msg
-                .format("jsf.validation.constraints.Size.message",
-                    form.getSOURCE_REPO_NAME_MIN(),
-                    form.getSOURCE_REPO_NAME_MAX()));
-        }
-
-        if (StringUtils.length(form.getTransServerPluginName()) <
-            form.getTRAN_SERVER_NAME_MIN() ||
-            StringUtils.length(form.getTransServerPluginName()) >
-                form.getTRAN_SERVER_NAME_MAX()) {
-            errors.put("translationServerExecutorName", msg
-                .format("jsf.validation.constraints.Size.message",
-                    form.getTRAN_SERVER_NAME_MIN(),
-                    form.getTRAN_SERVER_NAME_MAX()));
-        }
-
-        errors.putAll(validateRepoFields(form.getSrcRepoConfig(),
-            form.getSrcRepoPluginName()));
-        errors.putAll(validateTransFields(form.getTransServerConfig(),
-            form.getTransServerPluginName()));
-
-        return errors;
-    }
-
-    private Map<String, String> validateRepoFields(
-        Map<String, String> config, String executorClass) {
-        RepoExecutor executor = pluginsServiceImpl.getNewSourceRepoPlugin(
-            executorClass);
-        if(executor == null) {
-            return new HashMap<>();
-        }
-        return validateFields(config, executor, SyncWorkForm.repoSettingsPrefix);
-    }
-
-    private Map<String, String> validateTransFields(
-        Map<String, String> config, String executorClass) {
-        TranslationServerExecutor executor =
-            pluginsServiceImpl.getNewTransServerPlugin(executorClass);
-        if(executor == null) {
-            return new HashMap<>();
-        }
-        return validateFields(config, executor, SyncWorkForm.transSettingsPrefix);
-    }
-
-    private Map<String, String> validateFields(Map<String, String> config,
-        Plugin executor, String prefix) {
-        Map<String, String> errors = new HashMap<>();
-
-        for (Map.Entry<String, String> entry : config.entrySet()) {
-            Field field = executor.getFields().get(entry.getKey());
-            if (field != null && field.getValidator() != null) {
-                Validator validator = field.getValidator();
-                String message = validator.validate(entry.getValue());
-                if (!StringUtils.isEmpty(message)) {
-                    errors.put(prefix + entry.getKey(), message);
-                }
-            }
-        }
-        return errors;
     }
 }
