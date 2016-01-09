@@ -17,7 +17,8 @@
         <a4j:param name="val2" assignTo="#{type}"/>
       </a4j:jsFunction>
 
-      <a4j:jsFunction name="refreshRunningJobs" limitRender="true" render="running-jobs-content"/>
+      <a4j:poll id="running-jobs-poll" interval="1000"
+        render="running-jobs-content" limitRender="true"/>
     </h:form>
 
     <div class="l__wrapper">
@@ -25,26 +26,21 @@
         <div class="g__item w--1-m w--3-8-l w--1-4 l--push-bottom-half">
           <h1>#{msg['Application.name']}</h1>
           <h:panelGroup layout="block" styleClass="l--push-top-quarter panel" id="running-jobs-content">
-            <div class="l--pad-all-quarter d--bottom">
-              <button class="button button--small button--primary loader" onclick="refreshRunningJobs()">
-                <span class="loader__label">#{msg['jsf.runningJobs.refresh.button']}</span>
-              </button>
-            </div>
             <ui:fragment rendered="#{empty indexAction.runningJobs}">
               <p class="txt--meta l--pad-all-half">#{msg['jsp.noRunningJobs']}</p>
             </ui:fragment>
             <ui:fragment rendered="#{not empty indexAction.runningJobs}">
               <ul class="list--panel" id="runningJobs">
                 <ui:repeat value="#{indexAction.runningJobs}" var="job">
-                  <li class="l--pad-all-quarter" id="running-#{job.id}">
-                    <a href="/job?id=#{job.id}">
+                  <li class="l--pad-all-quarter" id="running-#{job.key}">
+                    <a href="/job?id=#{job.key}">
                       <div class="list__item__content">
                         <div class="list__item__info">
-                          <span>#{job.name}</span>
+                          <span>#{job.name} - #{job.type}</span>
                           <span class="list__item__meta">#{job.description}</span>
                         </div>
                         <div class="list__item__actions">
-                          <button class="button--small button--danger loader" onclick="cancelJob('#{job.id}')"
+                          <button class="button--small button--danger loader" onclick="cancelJob('#{job.id}','#{job.type}')"
                             title="#{msg['jsf.job.cancel.button.title']}">
                             <span class="loader__label">
                               <i class="i i--cancel"></i>
