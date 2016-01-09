@@ -92,12 +92,12 @@ public class SyncWorkConfig extends PersistModel {
                     transServerPluginName, createdDate);
     }
 
-    public void setLastJobStatus(JobStatus status, JobConfig.Type type) {
-        if (type.equals(JobConfig.Type.SYNC_TO_REPO)) {
+    public void setLastJobStatus(JobStatus status, JobType type) {
+        if (type.equals(JobType.REPO_SYNC)) {
             this.syncToRepoConfig
                 .updateStatus(status.getStatus(), status.getLastStartTime(),
                     status.getLastEndTime(), status.getNextStartTime());
-        } else if (type.equals(JobConfig.Type.SYNC_TO_SERVER)) {
+        } else if (type.equals(JobType.SERVER_SYNC)) {
             this.syncToServerConfig
                 .updateStatus(status.getStatus(), status.getLastStartTime(),
                     status.getLastEndTime(), status.getNextStartTime());

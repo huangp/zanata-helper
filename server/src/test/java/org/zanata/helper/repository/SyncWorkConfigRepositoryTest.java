@@ -13,6 +13,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.zanata.helper.common.model.SyncOption;
+import org.zanata.helper.model.JobType;
 import org.zanata.helper.model.SyncWorkConfig;
 import org.zanata.helper.model.JobConfig;
 import org.zanata.helper.util.YamlUtil;
@@ -35,9 +36,9 @@ public class SyncWorkConfigRepositoryTest {
 
     private static SyncWorkConfig makeJobConfig(long id, String name) {
         return new SyncWorkConfig(id, name, "description",
-                new JobConfig(JobConfig.Type.SYNC_TO_SERVER, "",
+                new JobConfig(JobType.SERVER_SYNC, "",
                         SyncOption.SOURCE),
-                new JobConfig(JobConfig.Type.SYNC_TO_REPO, "",
+                new JobConfig(JobType.REPO_SYNC, "",
                         SyncOption.TRANSLATIONS),
                 new HashMap<>(), "sourceRepoPluginName",
                 new HashMap<>(),

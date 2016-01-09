@@ -22,11 +22,11 @@ import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.exception.UnableLoadPluginException;
+import org.zanata.helper.model.JobType;
 import org.zanata.helper.model.SyncWorkConfig;
 import org.zanata.helper.model.JobStatus;
 import org.zanata.helper.model.JobStatusType;
 import org.zanata.helper.component.AppConfiguration;
-import org.zanata.helper.model.JobConfig;
 import org.zanata.helper.service.PluginsService;
 
 import java.util.Date;
@@ -61,17 +61,17 @@ public class CronTrigger {
     public Optional<TriggerKey> scheduleMonitorForRepoSync(SyncWorkConfig syncWorkConfig)
             throws SchedulerException {
         return scheduleMonitor(syncWorkConfig, RepoSyncJob.class,
-            JobConfig.Type.SYNC_TO_REPO);
+            JobType.REPO_SYNC);
     }
 
     public Optional<TriggerKey> scheduleMonitorForServerSync(SyncWorkConfig syncWorkConfig)
             throws SchedulerException {
         return scheduleMonitor(syncWorkConfig, TransServerSyncJob.class,
-            JobConfig.Type.SYNC_TO_SERVER);
+            JobType.SERVER_SYNC);
     }
 
     private  <J extends SyncJob> Optional<TriggerKey> scheduleMonitor(
-            SyncWorkConfig syncWorkConfig, Class<J> jobClass, JobConfig.Type type)
+            SyncWorkConfig syncWorkConfig, Class<J> jobClass, JobType type)
             throws SchedulerException {
         JobKey jobKey = getJobKey(syncWorkConfig, getKeySuffix(type));
 
@@ -191,13 +191,13 @@ public class CronTrigger {
             .collect(Collectors.toList());
     }
 
-    public void cancelRunningJob(SyncWorkConfig syncWorkConfig, JobConfig.Type type)
+    public void cancelRunningJob(SyncWorkConfig syncWorkConfig, JobType type)
         throws UnableToInterruptJobException {
         JobKey jobKey = getJobKey(syncWorkConfig, getKeySuffix(type));
         scheduler.interrupt(jobKey);
     }
 
-    public void deleteJob(SyncWorkConfig syncWorkConfig, JobConfig.Type type)
+    public void deleteJob(SyncWorkConfig syncWorkConfig, JobType type)
             throws SchedulerException {
         JobKey jobKey = getJobKey(syncWorkConfig, getKeySuffix(type));
         scheduler.deleteJob(jobKey);
@@ -208,7 +208,7 @@ public class CronTrigger {
         scheduler.rescheduleJob(key, buildTrigger(cron, triggerKey));
     }
 
-    public void triggerJob(SyncWorkConfig syncWorkConfig, JobConfig.Type type)
+    public void triggerJob(SyncWorkConfig syncWorkConfig, JobType type)
             throws SchedulerException {
         JobKey key = getJobKey(syncWorkConfig, getKeySuffix(type));
         scheduler.triggerJob(key);
@@ -226,8 +226,8 @@ public class CronTrigger {
         return builder.build();
     }
 
-    private String getKeySuffix(JobConfig.Type type) {
-        if(type.equals(JobConfig.Type.SYNC_TO_REPO)) {
+    private String getKeySuffix(JobType type) {
+        if(type.equals(JobType.REPO_SYNC)) {
             return REPO_SYNC_KEY_SUFFIX;
         }
         return SERVER_SYNC_KEY_SUFFIX;

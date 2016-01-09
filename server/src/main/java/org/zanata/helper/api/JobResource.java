@@ -5,7 +5,7 @@ import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zanata.helper.exception.JobNotFoundException;
-import org.zanata.helper.model.JobConfig;
+import org.zanata.helper.model.JobType;
 import org.zanata.helper.service.SchedulerService;
 
 import javax.enterprise.context.RequestScoped;
@@ -46,7 +46,7 @@ public class JobResource {
                         Response.Status.NOT_FOUND).build();
             }
             return Response.ok(schedulerServiceImpl
-                .getJobLastStatus(new Long(id), JobConfig.Type.valueOf(type)))
+                .getJobLastStatus(new Long(id), JobType.valueOf(type)))
                 .build();
         } catch (SchedulerException e) {
             log.error("get job status error", e);
@@ -68,7 +68,7 @@ public class JobResource {
                         Response.Status.NOT_FOUND).build();
             }
             schedulerServiceImpl.cancelRunningJob(new Long(id),
-                    JobConfig.Type.valueOf(type));
+                    JobType.valueOf(type));
             return Response.ok().build();
         } catch (SchedulerException e) {
             log.error("cancel error", e);

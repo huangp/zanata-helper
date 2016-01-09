@@ -16,6 +16,7 @@ import org.zanata.helper.events.JobRunStartsEvent;
 import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.exception.JobNotFoundException;
 import org.zanata.helper.exception.WorkNotFoundException;
+import org.zanata.helper.model.JobType;
 import org.zanata.helper.model.SyncWorkConfig;
 import org.zanata.helper.model.JobSummary;
 import org.zanata.helper.model.JobStatus;
@@ -155,10 +156,10 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public JobStatus getJobLastStatus(Long id, JobConfig.Type type) throws JobNotFoundException {
+    public JobStatus getJobLastStatus(Long id, JobType type) throws JobNotFoundException {
         SyncWorkConfig syncWorkConfig = syncWorkConfigMap.get(id);
         if (syncWorkConfig != null) {
-            if(type.equals(JobConfig.Type.SYNC_TO_REPO)) {
+            if(type.equals(JobType.REPO_SYNC)) {
                 return syncWorkConfig.getSyncToRepoConfig().getLastJobStatus();
             }
             return syncWorkConfig.getSyncToServerConfig().getLastJobStatus();
@@ -188,7 +189,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public void cancelRunningJob(Long id, JobConfig.Type type)
+    public void cancelRunningJob(Long id, JobType type)
         throws UnableToInterruptJobException, JobNotFoundException {
         SyncWorkConfig syncWorkConfig = syncWorkConfigMap.get(id);
         if(syncWorkConfig == null) {
@@ -198,7 +199,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public void deleteJob(Long id, JobConfig.Type type)
+    public void deleteJob(Long id, JobType type)
         throws SchedulerException, JobNotFoundException {
         SyncWorkConfig syncWorkConfig = syncWorkConfigMap.get(id);
         if(syncWorkConfig == null) {
@@ -208,7 +209,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public void startJob(Long id, JobConfig.Type type)
+    public void startJob(Long id, JobType type)
         throws JobNotFoundException, SchedulerException {
         SyncWorkConfig syncWorkConfig = syncWorkConfigMap.get(id);
         if(syncWorkConfig == null) {
@@ -249,10 +250,10 @@ public class SchedulerServiceImpl implements SchedulerService {
             SyncWorkConfig syncWorkConfig =
                 syncWorkConfigMap.get(new Long(jobDetail.getKey().getName()));
 
-            JobConfig.Type type = JobConfig.Type.valueOf(
+            JobType type = JobType.valueOf(
                 (String) jobDetail.getJobDataMap().get("type"));
             JobStatus status;
-            if(type.equals(JobConfig.Type.SYNC_TO_REPO)) {
+            if(type.equals(JobType.REPO_SYNC)) {
                 status = syncWorkConfig.getSyncToRepoConfig().getLastJobStatus();
             } else {
                 status = syncWorkConfig.getSyncToServerConfig().getLastJobStatus();
@@ -270,11 +271,11 @@ public class SchedulerServiceImpl implements SchedulerService {
                     syncWorkConfig.getDescription(),
                     new JobSummary("", syncWorkConfig.getName(),
                             syncWorkConfig.getDescription(),
-                            JobConfig.Type.SYNC_TO_REPO,
+                            JobType.REPO_SYNC,
                             syncWorkConfig.getSyncToRepoConfig().getLastJobStatus()),
                     new JobSummary("", syncWorkConfig.getName(),
                             syncWorkConfig.getDescription(),
-                            JobConfig.Type.SYNC_TO_SERVER,
+                            JobType.SERVER_SYNC,
                             syncWorkConfig.getSyncToServerConfig()
                                     .getLastJobStatus()));
         }

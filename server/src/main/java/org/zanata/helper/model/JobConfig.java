@@ -17,7 +17,7 @@ import lombok.ToString;
 @NoArgsConstructor
 public class JobConfig implements Serializable {
 
-    private Type type;
+    private JobType type;
     /**
      * see http://en.wikipedia.org/wiki/Cron#CRON_expression
      */
@@ -25,15 +25,10 @@ public class JobConfig implements Serializable {
     private SyncOption option;
     private JobStatus lastJobStatus;
 
-    public JobConfig(Type type, String cron, SyncOption option) {
+    public JobConfig(JobType type, String cron, SyncOption option) {
         this.type = type;
         this.cron = cron;
         this.option = option;
-    }
-
-    public enum Type {
-        SYNC_TO_SERVER,
-        SYNC_TO_REPO;
     }
 
     public void updateStatus(JobStatusType status, Date lastStartTime,

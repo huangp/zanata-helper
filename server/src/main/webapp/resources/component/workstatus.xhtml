@@ -10,7 +10,7 @@
       shortDescription="status for the job" required="true"/>
 
     <composite:attribute name="type" type="java.lang.String"
-      shortDescription="type of job. 'SYNC_TO_REPO' or 'SYNC_TO_SERVER'" required="true" />
+      shortDescription="type of job. 'REPO_SYNC' or 'SERVER_SYNC'" required="true" />
   </composite:interface>
 
   <composite:implementation>
@@ -34,10 +34,10 @@
     </ui:fragment>
 
     <div title="#{title}" class="#{statusClass}">
-      <h:panelGroup styleClass="txt--meta" rendered="#{cc.attrs.type eq 'SYNC_TO_REPO'}">
+      <h:panelGroup styleClass="txt--meta" rendered="#{cc.attrs.type eq 'REPO_SYNC'}">
         #{msg['jsf.newWork.syncToRepo.title']}
       </h:panelGroup>
-      <h:panelGroup styleClass="txt--meta" rendered="#{cc.attrs.type eq 'SYNC_TO_SERVER'}">
+      <h:panelGroup styleClass="txt--meta" rendered="#{cc.attrs.type eq 'SERVER_SYNC'}">
         #{msg['jsf.newWork.syncToServer.title']}
       </h:panelGroup>
       <span class="l--push-right-quarter">

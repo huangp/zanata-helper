@@ -10,8 +10,8 @@ import org.quartz.Trigger;
 import org.quartz.TriggerListener;
 import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.events.JobRunStartsEvent;
+import org.zanata.helper.model.JobType;
 import org.zanata.helper.model.SyncWorkConfig;
-import org.zanata.helper.model.JobConfig;
 
 @Slf4j
 @Dependent
@@ -65,7 +65,7 @@ public class JobConfigListener implements TriggerListener {
         return (SyncWorkConfig) context.getJobDetail().getJobDataMap().get("value");
     }
 
-    private JobConfig.Type getType(JobExecutionContext context) {
-        return (JobConfig.Type) context.getJobDetail().getJobDataMap().get("type");
+    private JobType getType(JobExecutionContext context) {
+        return (JobType) context.getJobDetail().getJobDataMap().get("type");
     }
 }

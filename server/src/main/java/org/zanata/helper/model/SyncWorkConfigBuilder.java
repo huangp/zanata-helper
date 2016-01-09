@@ -31,11 +31,11 @@ public class SyncWorkConfigBuilder {
         this.name = syncWorkForm.getName();
         this.description = syncWorkForm.getDescription();
 
-        this.syncToServerConfig = new JobConfig(JobConfig.Type.SYNC_TO_SERVER,
+        this.syncToServerConfig = new JobConfig(JobType.SERVER_SYNC,
             syncWorkForm.getSyncToServerCron(),
             syncWorkForm.getSyncToServerOption());
         
-        this.syncToRepoConfig = new JobConfig(JobConfig.Type.SYNC_TO_REPO,
+        this.syncToRepoConfig = new JobConfig(JobType.REPO_SYNC,
             syncWorkForm.getSyncToRepoCron(),
             syncWorkForm.getSyncToRepoOption());
 
