@@ -13,12 +13,14 @@ public class EmailValidatorTest {
     @Test
     public void validEmailTest() {
         String validEmail = "test@domain.com";
-        Assertions.assertThat(emailValidator.validate(validEmail)).isNull();
+        String message = emailValidator.validate(validEmail);
+        Assertions.assertThat(message).isNull();
     }
 
     @Test
     public void invalidEmailTest() {
         String invalidEmail = "testdomain.com";
-        Assertions.assertThat(emailValidator.validate(invalidEmail)).isNotNull();
+        String message = emailValidator.validate(invalidEmail);
+        Assertions.assertThat(message).isNotNull();
     }
 }

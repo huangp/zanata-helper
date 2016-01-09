@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
+import org.zanata.helper.model.JobType;
 
 /**
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
@@ -38,6 +39,11 @@ public class RepoSyncJob extends SyncJob {
     private static final int syncToRepoTotalSteps = 5;
 
     @Override
+    protected JobType getJobType() {
+        return JobType.REPO_SYNC;
+    }
+
+    @Override
     protected void doSync(RepoExecutor srcExecutor,
             TranslationServerExecutor transServerExecutor)
             throws JobExecutionException {
@@ -47,19 +53,35 @@ public class RepoSyncJob extends SyncJob {
         }
 
         try {
+            if (interrupted) {
+                return;
+            }
             updateProgress(syncWorkConfig.getId(), 1, syncToRepoTotalSteps,
                     "Sync to repository starts");
             File destDir = getDestDirectory(syncWorkConfig.getId().toString());
+
+            if (interrupted) {
+                return;
+            }
             updateProgress(syncWorkConfig.getId(),
                     2, syncToRepoTotalSteps, "Cloning repository to " + destDir);
             srcExecutor.cloneRepo(destDir);
+
+            if (interrupted) {
+                return;
+            }
             updateProgress(syncWorkConfig.getId(), 3, syncToRepoTotalSteps,
                     "Pulling files to server from " + destDir);
             transServerExecutor
                     .pullFromServer(destDir, syncWorkConfig.getSyncToServerConfig().getOption());
+
+            if (interrupted) {
+                return;
+            }
             updateProgress(syncWorkConfig.getId(), 4, syncToRepoTotalSteps,
                     "Commits to repository from " + destDir);
             srcExecutor.pushToRepo(destDir, syncWorkConfig.getSyncToRepoConfig().getOption());
+
             updateProgress(syncWorkConfig.getId(), 5, syncToRepoTotalSteps,
                     "Sync to repository completed");
         } catch (Exception e) {

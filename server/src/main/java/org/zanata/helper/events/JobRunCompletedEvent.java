@@ -3,8 +3,6 @@ package org.zanata.helper.events;
 import java.util.Date;
 
 import org.quartz.TriggerKey;
-import org.zanata.helper.model.JobConfig;
-import org.zanata.helper.model.JobType;
 import org.zanata.helper.util.DateUtil;
 
 import lombok.Getter;
@@ -18,12 +16,10 @@ public class JobRunCompletedEvent {
     private Date startTime;
     private TriggerKey triggerKey;
     private long runDuration;
-    private JobType type;
 
-    public JobRunCompletedEvent(Long id, JobType type, TriggerKey key,
+    public JobRunCompletedEvent(Long id, TriggerKey key,
             long runDuration, Date startTime) {
         this.id = id;
-        this.type = type;
         triggerKey = key;
         this.runDuration = runDuration;
         this.startTime = startTime;

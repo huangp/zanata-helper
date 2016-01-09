@@ -39,8 +39,6 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class CronTrigger {
-    public static final String REPO_SYNC_KEY_SUFFIX = "-repoSync";
-    public static final String SERVER_SYNC_KEY_SUFFIX = "-serverSync";
     private final Scheduler scheduler =
         StdSchedulerFactory.getDefaultScheduler();
 
@@ -73,8 +71,7 @@ public class CronTrigger {
     private  <J extends SyncJob> Optional<TriggerKey> scheduleMonitor(
             SyncWorkConfig syncWorkConfig, Class<J> jobClass, JobType type)
             throws SchedulerException {
-        JobKey jobKey = getJobKey(syncWorkConfig, getKeySuffix(type));
-
+        JobKey jobKey = getJobKey(syncWorkConfig.getId(), type);
         if (scheduler.checkExists(jobKey)) {
             return Optional.empty();
         }
@@ -87,7 +84,6 @@ public class CronTrigger {
                             .build();
 
             jobDetail.getJobDataMap().put("value", syncWorkConfig);
-            jobDetail.getJobDataMap().put("type", getKeySuffix(type));
             jobDetail.getJobDataMap()
                     .put("basedir", appConfiguration.getRepoDirectory());
 
@@ -121,7 +117,8 @@ public class CronTrigger {
             }
 
             if(!StringUtils.isEmpty(cronExp)) {
-                Trigger trigger = buildTrigger(cronExp, jobKey.getName());
+                Trigger trigger =
+                    buildTrigger(cronExp, syncWorkConfig.getId(), type);
                 scheduler.scheduleJob(jobDetail, trigger);
                 return Optional.of(trigger.getKey());
             }
@@ -149,9 +146,10 @@ public class CronTrigger {
         return JobStatus.EMPTY;
     }
 
-    public JobStatus getTriggerStatus(SyncWorkConfig syncWorkConfig,
+    public JobStatus getTriggerStatus(Long id,
             JobRunCompletedEvent event) throws SchedulerException {
-        JobKey key = getJobKey(syncWorkConfig, getKeySuffix(event.getType()));
+        JobKey key =
+            getJobKey(id, JobType.valueOf(event.getTriggerKey().getName()));
 
         if (scheduler.checkExists(key)) {
             List<? extends Trigger> triggers = scheduler.getTriggersOfJob(key);
@@ -191,49 +189,44 @@ public class CronTrigger {
             .collect(Collectors.toList());
     }
 
-    public void cancelRunningJob(SyncWorkConfig syncWorkConfig, JobType type)
+    public void cancelRunningJob(Long id, JobType type)
         throws UnableToInterruptJobException {
-        JobKey jobKey = getJobKey(syncWorkConfig, getKeySuffix(type));
+        JobKey jobKey = getJobKey(id, type);
         scheduler.interrupt(jobKey);
     }
 
-    public void deleteJob(SyncWorkConfig syncWorkConfig, JobType type)
-            throws SchedulerException {
-        JobKey jobKey = getJobKey(syncWorkConfig, getKeySuffix(type));
+    public void deleteJob(Long id, JobType type) throws SchedulerException {
+        JobKey jobKey = getJobKey(id, type);
         scheduler.deleteJob(jobKey);
     }
 
-    public void reschedule(TriggerKey key, String cron, String triggerKey)
+    public void reschedule(TriggerKey key, String cron, Long id, JobType type)
         throws SchedulerException {
-        scheduler.rescheduleJob(key, buildTrigger(cron, triggerKey));
+        scheduler.rescheduleJob(key, buildTrigger(cron, id, type));
     }
 
-    public void triggerJob(SyncWorkConfig syncWorkConfig, JobType type)
-            throws SchedulerException {
-        JobKey key = getJobKey(syncWorkConfig, getKeySuffix(type));
+    public void triggerJob(Long id, JobType type) throws SchedulerException {
+        JobKey key = getJobKey(id, type);
         scheduler.triggerJob(key);
     }
 
     private <J extends SyncJob> Trigger buildTrigger(String cronExp,
-            String triggerKey) {
+        Long id, JobType type) {
         TriggerBuilder builder = TriggerBuilder
-                .newTrigger()
-                .withIdentity(triggerKey);
+            .newTrigger()
+            .withIdentity(getTriggerKey(id, type));
         if (!StringUtils.isEmpty(cronExp)) {
             builder.withSchedule(
-                    CronScheduleBuilder.cronSchedule(cronExp));
+                CronScheduleBuilder.cronSchedule(cronExp));
         }
         return builder.build();
     }
 
-    private String getKeySuffix(JobType type) {
-        if(type.equals(JobType.REPO_SYNC)) {
-            return REPO_SYNC_KEY_SUFFIX;
-        }
-        return SERVER_SYNC_KEY_SUFFIX;
+    private JobKey getJobKey(Long id, JobType type) {
+        return new JobKey(type.name(), id.toString());
     }
 
-    private JobKey getJobKey(SyncWorkConfig syncWorkConfig, String suffix) {
-        return new JobKey(syncWorkConfig.getId().toString() + suffix);
+    private TriggerKey getTriggerKey(Long id, JobType type) {
+        return new TriggerKey(type.name(), id.toString());
     }
 }

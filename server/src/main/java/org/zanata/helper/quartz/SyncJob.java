@@ -11,6 +11,7 @@ import org.quartz.UnableToInterruptJobException;
 import org.zanata.helper.events.JobProgressEvent;
 import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
+import org.zanata.helper.model.JobType;
 import org.zanata.helper.model.SyncWorkConfig;
 
 import java.io.File;
@@ -21,6 +22,7 @@ public abstract class SyncJob implements InterruptableJob {
 
     protected File basedir;
     protected SyncWorkConfig syncWorkConfig;
+    protected boolean interrupted = false;
 
     @Override
     public final void execute(JobExecutionContext context)
@@ -52,23 +54,25 @@ public abstract class SyncJob implements InterruptableJob {
         }
     }
 
+    protected abstract JobType getJobType();
+
     protected abstract void doSync(RepoExecutor repoExecutor,
             TranslationServerExecutor serverExecutor)
             throws JobExecutionException;
 
     @Override
     public final void interrupt() throws UnableToInterruptJobException {
+        interrupted = true;
         Thread.currentThread().interrupt();
         updateProgress(syncWorkConfig.getId(), 0, 0, "interrupted");
     }
 
-    protected final void updateProgress(Long id, int currentStep, int totalSteps,
-            String description) {
-        BeanManagerProvider.getInstance().getBeanManager()
-                .fireEvent(
-                        new JobProgressEvent(id, currentStep, totalSteps,
-                                description)
-                );
+    protected final void updateProgress(Long id, int currentStep,
+        int totalSteps, String description) {
+        BeanManagerProvider.getInstance().getBeanManager().fireEvent(
+            new JobProgressEvent(id, getJobType(), currentStep, totalSteps,
+                description)
+        );
     }
 
     protected final File getDestDirectory(String name) {

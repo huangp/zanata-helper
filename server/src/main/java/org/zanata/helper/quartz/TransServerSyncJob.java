@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
+import org.zanata.helper.model.JobType;
 
 /**
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
@@ -38,6 +39,11 @@ public class TransServerSyncJob extends SyncJob {
     private static final int syncToServerTotalSteps = 4;
 
     @Override
+    protected JobType getJobType() {
+        return JobType.SERVER_SYNC;
+    }
+
+    @Override
     protected void doSync(RepoExecutor repoExecutor,
             TranslationServerExecutor transServerExecutor)
             throws JobExecutionException {
@@ -46,18 +52,30 @@ public class TransServerSyncJob extends SyncJob {
             return;
         }
         try {
+            if (interrupted) {
+                return;
+            }
             updateProgress(syncWorkConfig.getId(), 1, syncToServerTotalSteps,
                     "Sync to server starts");
             File destDir = getDestDirectory(syncWorkConfig.getId().toString());
+
+            if (interrupted) {
+                return;
+            }
             updateProgress(syncWorkConfig.getId(),
                     2, syncToServerTotalSteps,
                     "Cloning repository to " + destDir);
             repoExecutor.cloneRepo(destDir);
+
+            if (interrupted) {
+                return;
+            }
             updateProgress(syncWorkConfig.getId(),
                     3, syncToServerTotalSteps,
                     "Pushing files to server from " + destDir);
             transServerExecutor.pushToServer(destDir,
                     syncWorkConfig.getSyncToServerConfig().getOption());
+
             updateProgress(syncWorkConfig.getId(), 4, syncToServerTotalSteps,
                     "Sync to server completed");
         } catch (Exception e) {

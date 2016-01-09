@@ -15,12 +15,10 @@ import org.zanata.helper.events.JobProgressEvent;
 import org.zanata.helper.events.JobRunStartsEvent;
 import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.exception.JobNotFoundException;
-import org.zanata.helper.exception.WorkNotFoundException;
 import org.zanata.helper.model.JobType;
 import org.zanata.helper.model.SyncWorkConfig;
 import org.zanata.helper.model.JobSummary;
 import org.zanata.helper.model.JobStatus;
-import org.zanata.helper.model.JobConfig;
 import org.zanata.helper.model.WorkSummary;
 import org.zanata.helper.quartz.CronTrigger;
 import org.zanata.helper.component.AppConfiguration;
@@ -58,11 +56,14 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Inject
     private JobConfigListener triggerListener;
 
+    //TODO: move this to dao or workRepository
     private Map<Long, SyncWorkConfig> syncWorkConfigMap =
             Collections.synchronizedMap(Maps.newHashMap());
 
+    //TODO: move this to dao or workRepository
     private Map<Long, JobKeys> jobConfigKeyMap =
             Collections.synchronizedMap(Maps.newHashMap());
+
     private CronTrigger cronTrigger;
 
     // TODO: database connection, thread count, scheduler, queue, event
@@ -104,22 +105,20 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     public void onApplicationEvent(@Observes ConfigurationChangeEvent event) {
-        if (syncWorkConfigMap.containsKey(event.getSyncWorkConfig().getId())) {
-            syncWorkConfigMap.put(event.getSyncWorkConfig().getId(),
-                event.getSyncWorkConfig());
+        Long id = event.getSyncWorkConfig().getId();
+        if (syncWorkConfigMap.containsKey(id)) {
+            syncWorkConfigMap.put(id, event.getSyncWorkConfig());
             try {
+
                 cronTrigger.reschedule(
-                        jobConfigKeyMap.get(event.getSyncWorkConfig()
-                                .getId()).repoSyncJobKey,
-                        event.getSyncWorkConfig().getSyncToRepoConfig().getCron(),
-                        event.getSyncWorkConfig().getId() +
-                                CronTrigger.REPO_SYNC_KEY_SUFFIX);
+                    jobConfigKeyMap.get(id).repoSyncJobKey,
+                    event.getSyncWorkConfig().getSyncToRepoConfig().getCron(),
+                    event.getSyncWorkConfig().getId(), JobType.REPO_SYNC);
+
                 cronTrigger.reschedule(
-                        jobConfigKeyMap.get(event.getSyncWorkConfig()
-                                .getId()).serverSyncJobKey,
-                        event.getSyncWorkConfig().getSyncToServerConfig().getCron(),
-                        event.getSyncWorkConfig().getId() +
-                                CronTrigger.SERVER_SYNC_KEY_SUFFIX);
+                    jobConfigKeyMap.get(id).serverSyncJobKey,
+                    event.getSyncWorkConfig().getSyncToServerConfig().getCron(),
+                    event.getSyncWorkConfig().getId(), JobType.SERVER_SYNC);
             } catch (SchedulerException e) {
                 log.error("Error rescheduling job:" + e.getMessage());
             }
@@ -151,7 +150,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         if (syncWorkConfig != null) {
             log.debug("Job : " + syncWorkConfig.getName() + " is completed.");
             syncWorkConfig.setLastJobStatus(getStatus(event.getId(), event),
-                event.getType());
+                JobType.valueOf(event.getTriggerKey().getName()));
         }
     }
 
@@ -191,31 +190,28 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     public void cancelRunningJob(Long id, JobType type)
         throws UnableToInterruptJobException, JobNotFoundException {
-        SyncWorkConfig syncWorkConfig = syncWorkConfigMap.get(id);
-        if(syncWorkConfig == null) {
+        if (!syncWorkConfigMap.containsKey(id)) {
             throw new JobNotFoundException(id.toString());
         }
-        cronTrigger.cancelRunningJob(syncWorkConfig, type);
+        cronTrigger.cancelRunningJob(id, type);
     }
 
     @Override
     public void deleteJob(Long id, JobType type)
         throws SchedulerException, JobNotFoundException {
-        SyncWorkConfig syncWorkConfig = syncWorkConfigMap.get(id);
-        if(syncWorkConfig == null) {
+        if (!syncWorkConfigMap.containsKey(id)) {
             throw new JobNotFoundException(id.toString());
         }
-        cronTrigger.deleteJob(syncWorkConfig, type);
+        cronTrigger.deleteJob(id, type);
     }
 
     @Override
     public void startJob(Long id, JobType type)
         throws JobNotFoundException, SchedulerException {
-        SyncWorkConfig syncWorkConfig = syncWorkConfigMap.get(id);
-        if(syncWorkConfig == null) {
+        if (!syncWorkConfigMap.containsKey(id)) {
             throw new JobNotFoundException(id.toString());
         }
-        cronTrigger.triggerJob(syncWorkConfig, type);
+        cronTrigger.triggerJob(id, type);
     }
 
     private void scheduleJob(SyncWorkConfig syncWorkConfig) throws SchedulerException {
@@ -242,16 +238,14 @@ public class SchedulerServiceImpl implements SchedulerService {
         if (triggerKeyOpt.isPresent()) {
             return cronTrigger.getTriggerStatus(triggerKeyOpt.get(), event);
         }
-        return cronTrigger.getTriggerStatus(syncWorkConfigMap.get(id), event);
+        return cronTrigger.getTriggerStatus(id, event);
     }
 
     private JobSummary convertToJobSummary(JobDetail jobDetail) {
         if (jobDetail != null) {
             SyncWorkConfig syncWorkConfig =
                 syncWorkConfigMap.get(new Long(jobDetail.getKey().getName()));
-
-            JobType type = JobType.valueOf(
-                (String) jobDetail.getJobDataMap().get("type"));
+            JobType type = JobType.valueOf(jobDetail.getKey().getName());
             JobStatus status;
             if(type.equals(JobType.REPO_SYNC)) {
                 status = syncWorkConfig.getSyncToRepoConfig().getLastJobStatus();
