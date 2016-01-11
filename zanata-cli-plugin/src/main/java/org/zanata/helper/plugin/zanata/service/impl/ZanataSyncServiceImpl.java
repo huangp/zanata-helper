@@ -48,6 +48,9 @@ public class ZanataSyncServiceImpl implements ZanataSyncService {
         this.pullOptions.setKey(apiKey);
         this.pushOptions.setUsername(username);
         this.pushOptions.setKey(apiKey);
+        this.pushOptions.setLogHttp(true);
+        this.pullOptions.setErrors(true);
+        this.pullOptions.setDebug(true);
     }
 
     @Override

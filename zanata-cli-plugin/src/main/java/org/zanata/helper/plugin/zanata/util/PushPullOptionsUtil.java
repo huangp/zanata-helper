@@ -58,6 +58,10 @@ public final class PushPullOptionsUtil {
             File projectConfig) {
         try {
             options.setProjectConfig(projectConfig);
+            // unset previous src and trans dir so that we can reload it from project config
+            options.setSrcDir(null);
+            options.setTransDir(null);
+
             OptionsUtil.applyConfigFiles(options);
 
             File baseDir = projectConfig.getParentFile();

@@ -31,12 +31,14 @@ import javax.validation.ValidatorFactory;
 
 import org.apache.commons.lang.StringUtils;
 import org.zanata.helper.action.SyncWorkForm;
+import org.zanata.helper.common.Messages;
 import org.zanata.helper.common.model.Field;
 import org.zanata.helper.common.plugin.Plugin;
 import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.common.plugin.Validator;
 import org.zanata.helper.service.PluginsService;
+import com.google.common.collect.Maps;
 
 /**
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
@@ -88,18 +90,23 @@ public class SyncWorkFormValidator {
 
     private Map<String, String> validateFields(Map<String, String> config,
             Plugin executor, String prefix) {
-        Map<String, String> errors = new HashMap<>();
+        Map<String, String> errors = Maps.newHashMap();
 
-        for (Map.Entry<String, String> entry : config.entrySet()) {
-            Field field = executor.getFields().get(entry.getKey());
-            if (field != null && field.getValidator() != null) {
+        for (Map.Entry<String, Field> fieldEntry : executor.getFields()
+                .entrySet()) {
+            String key = fieldEntry.getKey();
+
+            Field field = fieldEntry.getValue();
+            String configValue = config.get(key);
+            if (field.getValidator() != null) {
                 Validator validator = field.getValidator();
-                String message = validator.validate(entry.getValue());
+                String message = validator.validate(configValue);
                 if (!StringUtils.isEmpty(message)) {
-                    errors.put(prefix + entry.getKey(), message);
+                    errors.put(prefix + key, message);
                 }
             }
         }
+
         return errors;
     }
 }

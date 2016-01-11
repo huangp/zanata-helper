@@ -69,9 +69,12 @@ public abstract class SyncJob implements InterruptableJob {
 
     protected final void updateProgress(Long id, int currentStep,
         int totalSteps, String description) {
+        JobProgressEvent event =
+                new JobProgressEvent(id, getJobType(), currentStep, totalSteps,
+                        description);
+        log.info(">>>>>>>>>> {}", event);
         BeanManagerProvider.getInstance().getBeanManager().fireEvent(
-            new JobProgressEvent(id, getJobType(), currentStep, totalSteps,
-                description)
+                event
         );
     }
 
@@ -88,7 +91,8 @@ public abstract class SyncJob implements InterruptableJob {
                 FileUtils.deleteDirectory(destDir);
             }
         } catch (IOException e) {
-            log.error("Unable to remove directory {}", destDir, e);
+            log.warn("Unable to remove directory {}", destDir);
+            log.debug("Unable to remove directory", e);
         }
     }
 }

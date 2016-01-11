@@ -29,6 +29,7 @@ import org.zanata.helper.model.JobStatusType;
 import org.zanata.helper.component.AppConfiguration;
 import org.zanata.helper.service.PluginsService;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -85,7 +86,8 @@ public class CronTrigger {
 
             jobDetail.getJobDataMap().put("value", syncWorkConfig);
             jobDetail.getJobDataMap()
-                    .put("basedir", appConfiguration.getRepoDirectory());
+                    .put("basedir", type.baseWorkDir(
+                            appConfiguration.getRepoDirectory()));
 
             jobDetail.getJobDataMap()
                     .put(RepoExecutor.class.getSimpleName(), pluginsService

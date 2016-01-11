@@ -9,8 +9,9 @@ import org.zanata.helper.common.plugin.Validator;
 public class UrlValidator implements Validator {
 
     private final org.apache.commons.validator.routines.UrlValidator
-        urlValidator =
-        org.apache.commons.validator.routines.UrlValidator.getInstance();
+        urlValidator = new
+        org.apache.commons.validator.routines.UrlValidator(
+            org.apache.commons.validator.routines.UrlValidator.ALLOW_LOCAL_URLS);
 
     @Override
     public String validate(String value) {

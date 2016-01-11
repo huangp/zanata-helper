@@ -24,11 +24,25 @@ import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.PullCommand;
 import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.StatusCommand;
+import org.eclipse.jgit.api.errors.CanceledException;
+import org.eclipse.jgit.api.errors.DetachedHeadException;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.InvalidConfigurationException;
+import org.eclipse.jgit.api.errors.InvalidRemoteException;
+import org.eclipse.jgit.api.errors.NoHeadException;
+import org.eclipse.jgit.api.errors.RefNotAdvertisedException;
+import org.eclipse.jgit.api.errors.RefNotFoundException;
+import org.eclipse.jgit.api.errors.TransportException;
+import org.eclipse.jgit.api.errors.WrongRepositoryStateException;
+import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.RepositoryCache;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.util.FS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zanata.helper.common.model.Credentials;
@@ -59,10 +73,51 @@ public class GitSyncService implements RepoSyncService<String> {
 
     public void cloneRepo(String repoUrl, String branch, File destPath)
             throws RepoSyncException {
+        if (isGitCloneAlreadyBeenDone(destPath)) {
+            // directory is not a git repository
+            log.debug("git repo already exists. Skipping clone");
+            doGitPull(destPath);
+        } else {
+            doGitClone(repoUrl, destPath);
+        }
+
+    }
+
+    private void doGitPull(File destPath) {
+        try {
+            Git git = Git.open(destPath);
+            PullCommand pullCommand = git.pull();
+            pullCommand.setRemote("origin").setRemoteBranchName("master");
+            pullCommand.call();
+        } catch (IOException ioe) {
+            // ignore
+        } catch (Exception e) {
+            log.error("fail to call git pull", e);
+            throw new RepoSyncException(e);
+        }
+    }
+
+    private boolean isGitCloneAlreadyBeenDone(File folder) {
+        return RepositoryCache.FileKey.isGitRepository(folder, FS.DETECTED) &&
+                hasAtLeastOneReference(folder);
+    }
+
+    private static boolean hasAtLeastOneReference(File folder) {
+        try {
+            Repository repo = Git.open(folder).getRepository();
+            return repo.getAllRefs().values().stream()
+                    .anyMatch(ref -> ref.getObjectId() != null);
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    private void doGitClone(String repoUrl, File destPath) {
+        destPath.mkdirs();
         CloneCommand clone = Git.cloneRepository();
         clone.setBare(false);
         clone.setCloneAllBranches(false);
-        clone.setDirectory(destPath).setURI(repoUrl).setBranch(branch);
+        clone.setDirectory(destPath).setURI(repoUrl);
         UsernamePasswordCredentialsProvider user =
                 new UsernamePasswordCredentialsProvider(
                         getCredentials().getUsername(),

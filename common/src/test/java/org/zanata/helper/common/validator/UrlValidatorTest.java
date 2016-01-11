@@ -20,4 +20,10 @@ public class UrlValidatorTest {
         String invalidUrl = "zanata.org";
         Assertions.assertThat(urlValidator.validate(invalidUrl)).isNotNull();
     }
+
+    @Test
+    public void localUrlIsValid() {
+        String invalidUrl = "http://localhost:8080/zanata/";
+        Assertions.assertThat(urlValidator.validate(invalidUrl)).isNull();
+    }
 }

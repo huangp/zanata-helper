@@ -163,7 +163,7 @@ public class PluginsServiceImpl implements PluginsService {
             return executor.getDeclaredConstructor(Map.class)
                 .newInstance(fields);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("failed to get new source repo plugin", e);
             throw new UnableLoadPluginException(className);
         }
     }
@@ -178,7 +178,7 @@ public class PluginsServiceImpl implements PluginsService {
             return executor.getDeclaredConstructor(Map.class)
                 .newInstance(fields);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("failed to get new trans server plugin", e);
             throw new UnableLoadPluginException(className);
         }
     }

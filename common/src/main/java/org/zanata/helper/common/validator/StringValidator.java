@@ -12,11 +12,11 @@ public class StringValidator implements Validator {
     private Integer minLength;
     private Integer maxLength;
     //Allow empty string
-    private Boolean notEmpty;
+    private boolean notEmpty;
 
     @Override
     public String validate(String value) {
-        if (notEmpty != null && notEmpty) {
+        if (notEmpty) {
             if (value == null || value.length() <= 0) {
                 return Messages.getString("validation.string.notEmpty");
             }

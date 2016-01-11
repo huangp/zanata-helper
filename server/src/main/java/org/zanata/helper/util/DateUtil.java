@@ -1,6 +1,5 @@
 package org.zanata.helper.util;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -14,14 +13,12 @@ public final class DateUtil {
 //    private final static String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     private final static String DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
-    private final static SimpleDateFormat FORMATTER = new SimpleDateFormat(
-        DATE_TIME_FORMAT);
-
     public static String formatDate(Date date) {
         if (date == null) {
             return "";
         }
-        return FORMATTER.format(date);
+        return new SimpleDateFormat(
+            DATE_TIME_FORMAT).format(date);
     }
 
     public static Date addMilliseconds(Date date, long milliseconds) {
