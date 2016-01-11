@@ -71,7 +71,7 @@ public class CronTrigger {
     private  <J extends SyncJob> Optional<TriggerKey> scheduleMonitor(
             SyncWorkConfig syncWorkConfig, Class<J> jobClass, JobType type)
             throws SchedulerException {
-        JobKey jobKey = getJobKey(syncWorkConfig.getId(), type);
+        JobKey jobKey = type.toJobKey(syncWorkConfig.getId());
         if (scheduler.checkExists(jobKey)) {
             return Optional.empty();
         }
@@ -149,14 +149,14 @@ public class CronTrigger {
     public JobStatus getTriggerStatus(Long id,
             JobRunCompletedEvent event) throws SchedulerException {
         JobKey key =
-            getJobKey(id, JobType.valueOf(event.getTriggerKey().getName()));
+                JobType.valueOf(event.getTriggerKey().getName()).toJobKey(id);
 
         if (scheduler.checkExists(key)) {
             List<? extends Trigger> triggers = scheduler.getTriggersOfJob(key);
 
             if (!triggers.isEmpty()) {
                 Trigger trigger = triggers.get(0);
-                Date endTime = event != null ? event.getCompletedTime() : null;
+                Date endTime = event.getCompletedTime();
 
                 Trigger.TriggerState state =
                         scheduler.getTriggerState(trigger.getKey());
@@ -191,12 +191,12 @@ public class CronTrigger {
 
     public void cancelRunningJob(Long id, JobType type)
         throws UnableToInterruptJobException {
-        JobKey jobKey = getJobKey(id, type);
+        JobKey jobKey = type.toJobKey(id);
         scheduler.interrupt(jobKey);
     }
 
     public void deleteJob(Long id, JobType type) throws SchedulerException {
-        JobKey jobKey = getJobKey(id, type);
+        JobKey jobKey = type.toJobKey(id);
         scheduler.deleteJob(jobKey);
     }
 
@@ -206,7 +206,7 @@ public class CronTrigger {
     }
 
     public void triggerJob(Long id, JobType type) throws SchedulerException {
-        JobKey key = getJobKey(id, type);
+        JobKey key = type.toJobKey(id);
         scheduler.triggerJob(key);
     }
 
@@ -214,7 +214,7 @@ public class CronTrigger {
         Long id, JobType type) {
         TriggerBuilder builder = TriggerBuilder
             .newTrigger()
-            .withIdentity(getTriggerKey(id, type));
+            .withIdentity(type.toTriggerKey(id));
         if (!StringUtils.isEmpty(cronExp)) {
             builder.withSchedule(
                 CronScheduleBuilder.cronSchedule(cronExp));
@@ -222,11 +222,4 @@ public class CronTrigger {
         return builder.build();
     }
 
-    private JobKey getJobKey(Long id, JobType type) {
-        return new JobKey(type.name(), id.toString());
-    }
-
-    private TriggerKey getTriggerKey(Long id, JobType type) {
-        return new TriggerKey(type.name(), id.toString());
-    }
 }

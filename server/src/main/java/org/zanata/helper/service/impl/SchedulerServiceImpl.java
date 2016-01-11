@@ -56,10 +56,6 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Inject
     private JobConfigListener triggerListener;
 
-    //TODO: move this to dao or workRepository
-    private Map<Long, JobKeys> jobConfigKeyMap =
-            Collections.synchronizedMap(Maps.newHashMap());
-
     private CronTrigger cronTrigger;
 
     // TODO: database connection, thread count, scheduler, queue, event
@@ -104,12 +100,12 @@ public class SchedulerServiceImpl implements SchedulerService {
         Long id = event.getSyncWorkConfig().getId();
         try {
             cronTrigger.reschedule(
-                jobConfigKeyMap.get(id).repoSyncJobKey,
+                JobType.REPO_SYNC.toTriggerKey(id),
                 event.getSyncWorkConfig().getSyncToRepoConfig().getCron(),
                 event.getSyncWorkConfig().getId(), JobType.REPO_SYNC);
 
             cronTrigger.reschedule(
-                jobConfigKeyMap.get(id).serverSyncJobKey,
+                JobType.SERVER_SYNC.toTriggerKey(id),
                 event.getSyncWorkConfig().getSyncToServerConfig().getCron(),
                 event.getSyncWorkConfig().getId(), JobType.SERVER_SYNC);
         } catch (SchedulerException e) {
@@ -220,13 +216,8 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     private void scheduleJob(SyncWorkConfig syncWorkConfig) throws SchedulerException {
-        Optional<TriggerKey> keyForRepoJob =
-                cronTrigger.scheduleMonitorForRepoSync(syncWorkConfig);
-        Optional<TriggerKey> keyForServerJob =
-                cronTrigger.scheduleMonitorForServerSync(syncWorkConfig);
-        jobConfigKeyMap.put(syncWorkConfig.getId(),
-                new JobKeys(keyForRepoJob.orElse(null),
-                        keyForServerJob.orElse(null)));
+        cronTrigger.scheduleMonitorForRepoSync(syncWorkConfig);
+        cronTrigger.scheduleMonitorForServerSync(syncWorkConfig);
     }
 
     private JobStatus getStatus(Long id, JobRunCompletedEvent event)
@@ -238,12 +229,6 @@ public class SchedulerServiceImpl implements SchedulerService {
             throw new JobNotFoundException(stringId);
         }
 
-        JobKeys jobKeys = jobConfigKeyMap.get(id);
-
-        Optional<TriggerKey> triggerKeyOpt = jobKeys.matchedKey(event.getTriggerKey());
-        if (triggerKeyOpt.isPresent()) {
-            return cronTrigger.getTriggerStatus(triggerKeyOpt.get(), event);
-        }
         return cronTrigger.getTriggerStatus(id, event);
     }
 
@@ -283,22 +268,4 @@ public class SchedulerServiceImpl implements SchedulerService {
         return new WorkSummary();
     }
 
-    public static class JobKeys {
-        private final TriggerKey repoSyncJobKey;
-        private final TriggerKey serverSyncJobKey;
-
-        public JobKeys(TriggerKey repoSyncJobKey, TriggerKey serverSyncJobKey) {
-            this.repoSyncJobKey = repoSyncJobKey;
-            this.serverSyncJobKey = serverSyncJobKey;
-        }
-
-        Optional<TriggerKey> matchedKey(TriggerKey key) {
-            if (key.equals(repoSyncJobKey)) {
-                return Optional.of(repoSyncJobKey);
-            } else if (key.equals(serverSyncJobKey)) {
-                return Optional.of(serverSyncJobKey);
-            }
-            return Optional.empty();
-        }
-    }
 }
