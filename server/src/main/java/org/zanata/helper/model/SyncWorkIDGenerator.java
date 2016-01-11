@@ -42,6 +42,6 @@ public class SyncWorkIDGenerator {
 
     @PostConstruct
     public void postConstruct() {
-        latestId = syncWorkConfigRepository.largestStoredJobId();
+        latestId = syncWorkConfigRepository.largestStoredWorkId();
     }
 }

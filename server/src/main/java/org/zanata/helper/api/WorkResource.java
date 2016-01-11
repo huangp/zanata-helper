@@ -14,6 +14,7 @@ import org.zanata.helper.validation.SyncWorkFormValidator;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -52,6 +53,7 @@ public class WorkResource {
     }
 
     @POST
+    @Consumes("application/json")
     public Response createWork(SyncWorkForm form) {
         Map<String, String> errors = formValidator.validateJobForm(form);
         if (!errors.isEmpty()) {

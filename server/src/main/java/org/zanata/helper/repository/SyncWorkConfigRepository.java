@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -40,12 +41,13 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zanata.helper.component.AppConfiguration;
-import org.zanata.helper.model.PersistModel;
 import org.zanata.helper.model.SyncWorkConfig;
 import org.zanata.helper.model.SyncWorkIDGenerator;
 import org.zanata.helper.util.YamlUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import static org.apache.commons.io.Charsets.UTF_8;
 
@@ -57,6 +59,9 @@ public class SyncWorkConfigRepository {
     private static final Logger log =
             LoggerFactory.getLogger(SyncWorkConfigRepository.class);
 
+    private final Cache<Long, Optional<SyncWorkConfig>> cache = CacheBuilder
+            .newBuilder()
+            .build();
     private File configDirectory;
 
     private ReentrantLock lock = new ReentrantLock();
@@ -78,13 +83,22 @@ public class SyncWorkConfigRepository {
     }
 
     public Optional<SyncWorkConfig> load(long id) {
-        File latestJobConfig = latestJobConfig(id);
-        if (latestJobConfig.exists()) {
+        try {
+            return cache.get(id, () -> loadFromDisk(id));
+        } catch (ExecutionException e) {
+            log.error("error loading config: {}", id, e);
+            return Optional.empty();
+        }
+    }
+
+    private Optional<SyncWorkConfig> loadFromDisk(long id) {
+        File latestworkConfig = latestWorkConfig(id);
+        if (latestworkConfig.exists()) {
             try (InputStream inputStream = new FileInputStream(
-                    latestJobConfig)) {
+                    latestworkConfig)) {
                 return Optional.of(YamlUtil.generateJobConfig(inputStream));
             } catch (IOException e) {
-                log.error("error loading config file: {}", latestJobConfig, e);
+                log.error("error loading config file: {}", latestworkConfig, e);
             }
         }
         return Optional.empty();
@@ -94,12 +108,12 @@ public class SyncWorkConfigRepository {
         try {
             lock.tryLock(5, TimeUnit.SECONDS);
 
-            File jobConfigFolder = jobConfigFolder(syncWorkConfig.getId());
-            File latestConfigFile = latestJobConfig(syncWorkConfig.getId());
+            File workConfigFolder = workConfigFolder(syncWorkConfig.getId());
+            File latestConfigFile = latestWorkConfig(syncWorkConfig.getId());
 
             String incomingYaml = YamlUtil.generateYaml(syncWorkConfig);
 
-            boolean made = jobConfigFolder.mkdirs();
+            boolean made = workConfigFolder.mkdirs();
             if (!made && latestConfigFile.exists()) {
                 String current =
                         FileUtils.readFileToString(latestConfigFile, UTF_8);
@@ -107,13 +121,14 @@ public class SyncWorkConfigRepository {
                     log.info("config has not changed");
                     return;
                 }
-                // back up current job config
+                // back up current work config
                 FileUtils.moveFile(latestConfigFile,
-                        new File(jobConfigFolder, "-" + new Date().getTime()));
+                        new File(workConfigFolder, "-" + new Date().getTime()));
             }
             syncWorkConfig.onPersist();
-            // write new job config
+            // write new work config
             FileUtils.write(latestConfigFile, incomingYaml, UTF_8);
+            cache.invalidate(syncWorkConfig.getId());
 
         } catch (InterruptedException | IOException e) {
             throw Throwables.propagate(e);
@@ -123,26 +138,27 @@ public class SyncWorkConfigRepository {
     }
 
     public boolean delete(long id) {
-        File jobConfigFolder = jobConfigFolder(id);
+        File workConfigFolder = workConfigFolder(id);
         try {
-            FileUtils.deleteDirectory(jobConfigFolder);
+            FileUtils.deleteDirectory(workConfigFolder);
+            cache.invalidate(id);
             return true;
         } catch (IOException e) {
             log.error("failed to delete the job config folder: {}",
-                    jobConfigFolder, e);
+                    workConfigFolder, e);
             return false;
         }
     }
 
-    private File jobConfigFolder(long id) {
+    private File workConfigFolder(long id) {
         return new File(configDirectory, id + "");
     }
 
-    private File latestJobConfig(long id) {
-        return new File(jobConfigFolder(id), "current.yaml");
+    private File latestWorkConfig(long id) {
+        return new File(workConfigFolder(id), "current.yaml");
     }
 
-    private static File latestJobConfig(File jobConfigFolder) {
+    private static File latestWorkConfig(File jobConfigFolder) {
         return new File(jobConfigFolder, "current.yaml");
     }
 
@@ -153,12 +169,12 @@ public class SyncWorkConfigRepository {
 
     /**
      * Our job id is incremental so the largest number in the config directory
-     * will be the largest job id.
+     * will be the largest work id.
      *
-     * @return largest job id or 0 if there is no job yet
+     * @return largest work id or 0 if there is no work yet
      * @see SyncWorkIDGenerator
      */
-    public long largestStoredJobId() {
+    public long largestStoredWorkId() {
         File[] jobConfigFolders = configDirectory.listFiles(File::isDirectory);
         Optional<String> largestJob =
                 Arrays.stream(jobConfigFolders)
@@ -171,11 +187,15 @@ public class SyncWorkConfigRepository {
         return 0;
     }
 
-    public List<SyncWorkConfig> getAllJobs() {
-        return Arrays.stream(configDirectory.listFiles(File::isDirectory))
-                .map(SyncWorkConfigRepository::latestJobConfig)
-                .filter(file -> file.exists() && file.canRead())
-                .map(YamlUtil::generateJobConfig)
-                .collect(Collectors.toList());
+    public List<SyncWorkConfig> getAllWorks() {
+        List<SyncWorkConfig> allWorkConfig =
+                Arrays.stream(configDirectory.listFiles(File::isDirectory))
+                        .map(SyncWorkConfigRepository::latestWorkConfig)
+                        .filter(file -> file.exists() && file.canRead())
+                        .map(YamlUtil::generateJobConfig)
+                        .collect(Collectors.toList());
+        allWorkConfig.forEach(
+                config -> cache.put(config.getId(), Optional.of(config)));
+        return allWorkConfig;
     }
 }

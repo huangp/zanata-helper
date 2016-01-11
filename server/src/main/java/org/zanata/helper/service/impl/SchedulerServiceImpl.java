@@ -101,7 +101,7 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     //TODO: need to validate all config
     private List<SyncWorkConfig> getJobs() {
-        return syncWorkConfigRepository.getAllJobs();
+        return syncWorkConfigRepository.getAllWorks();
     }
 
     public void onApplicationEvent(@Observes ConfigurationChangeEvent event) {
