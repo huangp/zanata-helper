@@ -29,4 +29,9 @@ public interface Plugin extends Serializable {
      * Initialise fields needed for this plugin before constructor
      */
     void initFields();
+
+    default <F extends Field> F getField(String key) {
+        return (F) getFields().get(key);
+    }
+
 }

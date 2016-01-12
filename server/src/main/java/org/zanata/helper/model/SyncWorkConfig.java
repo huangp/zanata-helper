@@ -1,10 +1,14 @@
 package org.zanata.helper.model;
 
+import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import org.zanata.helper.util.EncryptionUtil;
+import org.zanata.helper.util.YamlUtil;
+import com.google.common.collect.Maps;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,8 +19,9 @@ import lombok.Setter;
  */
 @Getter
 @NoArgsConstructor
-public class SyncWorkConfig extends PersistModel {
+public class SyncWorkConfig extends PersistModel implements CanConvertToYaml<SyncWorkConfig> {
 
+    public static final byte[] ENCRYPTION_KEYBytes = "this_is_a_key".getBytes();
     private Long id;
     private String name;
     private String description;
@@ -96,11 +101,51 @@ public class SyncWorkConfig extends PersistModel {
         if (type.equals(JobType.REPO_SYNC)) {
             this.syncToRepoConfig
                 .updateStatus(status.getStatus(), status.getLastStartTime(),
-                    status.getLastEndTime(), status.getNextStartTime());
+                        status.getLastEndTime(), status.getNextStartTime());
         } else if (type.equals(JobType.SERVER_SYNC)) {
             this.syncToServerConfig
                 .updateStatus(status.getStatus(), status.getLastStartTime(),
-                    status.getLastEndTime(), status.getNextStartTime());
+                        status.getLastEndTime(), status.getNextStartTime());
         }
+    }
+
+    @Override
+    public String toYaml() {
+        SyncWorkConfig config =
+                new SyncWorkConfig(id, name, description, syncToServerConfig,
+                        syncToRepoConfig, encryptValues(srcRepoPluginConfig),
+                        srcRepoPluginName, encryptValues(transServerConfig),
+                        transServerPluginName);
+        return YamlUtil.generateYaml(config);
+    }
+
+    private static Map<String, String> encryptValues(Map<String, String> srcMap) {
+        Map<String, String> encryptedConfig =
+                Maps.newHashMap();
+        EncryptionUtil encryption =
+                new EncryptionUtil(ENCRYPTION_KEYBytes);
+        srcMap.forEach(
+                (key, value) -> encryptedConfig.put(key,
+                        encryption.encrypt(value)));
+        return encryptedConfig;
+    }
+
+    @Override
+    public SyncWorkConfig fromYaml(InputStream inputStream) {
+        SyncWorkConfig config = YamlUtil.generateJobConfig(inputStream);
+        config.srcRepoPluginConfig = decryptValues(config.srcRepoPluginConfig);
+        config.transServerConfig = decryptValues(config.transServerConfig);
+        return config;
+    }
+
+    private static Map<String, String> decryptValues(Map<String, String> srcMap) {
+        Map<String, String> encryptedConfig =
+                Maps.newHashMap();
+        EncryptionUtil encryption =
+                new EncryptionUtil(ENCRYPTION_KEYBytes);
+        srcMap.forEach(
+                (key, value) -> encryptedConfig.put(key,
+                        encryption.decryptValue(value)));
+        return encryptedConfig;
     }
 }

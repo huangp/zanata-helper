@@ -96,7 +96,7 @@ public class SyncWorkConfigRepository {
         if (latestworkConfig.exists()) {
             try (InputStream inputStream = new FileInputStream(
                     latestworkConfig)) {
-                return Optional.of(YamlUtil.generateJobConfig(inputStream));
+                return Optional.of(new SyncWorkConfig().fromYaml(inputStream));
             } catch (IOException e) {
                 log.error("error loading config file: {}", latestworkConfig, e);
             }
@@ -111,7 +111,8 @@ public class SyncWorkConfigRepository {
             File workConfigFolder = workConfigFolder(syncWorkConfig.getId());
             File latestConfigFile = latestWorkConfig(syncWorkConfig.getId());
 
-            String incomingYaml = YamlUtil.generateYaml(syncWorkConfig);
+            syncWorkConfig.onPersist();
+            String incomingYaml = syncWorkConfig.toYaml();
 
             boolean made = workConfigFolder.mkdirs();
             if (!made && latestConfigFile.exists()) {
@@ -125,7 +126,6 @@ public class SyncWorkConfigRepository {
                 FileUtils.moveFile(latestConfigFile,
                         new File(workConfigFolder, "-" + new Date().getTime()));
             }
-            syncWorkConfig.onPersist();
             // write new work config
             FileUtils.write(latestConfigFile, incomingYaml, UTF_8);
             cache.invalidate(syncWorkConfig.getId());

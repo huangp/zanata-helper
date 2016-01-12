@@ -1,6 +1,7 @@
 package org.zanata.helper.plugin.git;
 
 import org.eclipse.jgit.util.StringUtils;
+import org.zanata.helper.common.model.EncryptedField;
 import org.zanata.helper.common.model.SyncOption;
 import org.zanata.helper.common.model.UsernamePasswordCredential;
 import org.zanata.helper.common.exception.RepoSyncException;
@@ -27,11 +28,9 @@ public class Plugin extends RepoExecutor {
 
     public Plugin(Map<String, String> fields) {
         super(fields);
-
         gitSyncService = new GitSyncService(
-            new UsernamePasswordCredential(
-                this.fields.get("username").getValue(),
-                this.fields.get("apiKey").getValue()));
+            new UsernamePasswordCredential(getField("username"),
+                    getField("apiKey")));
     }
 
     @Override
@@ -42,13 +41,13 @@ public class Plugin extends RepoExecutor {
         Field branchField =
                 new Field("branch", Messages.getString("field.branch.label"),
                         "master", Messages.getString("field.branch.tooltip"));
-        Field usernameField =
-                new Field("username",
+        EncryptedField usernameField =
+                new EncryptedField("username",
                         Messages.getString("field.username.label"),
                         "", Messages.getString("field.username.tooltip"),
                         new StringValidator(1, null, true));
-        Field apiKeyField =
-                new Field("apiKey", Messages.getString("field.apiKey.label"),
+        EncryptedField apiKeyField =
+                new EncryptedField("apiKey", Messages.getString("field.apiKey.label"),
                         "",
                         Messages.getString("field.apiKey.tooltip"),
                         new StringValidator(1, null, true));
