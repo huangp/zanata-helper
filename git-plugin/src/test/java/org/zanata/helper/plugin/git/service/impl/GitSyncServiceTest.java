@@ -8,7 +8,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.zanata.helper.common.model.EncryptedField;
 import org.zanata.helper.common.model.UsernamePasswordCredential;
 
 public class GitSyncServiceTest {
@@ -24,16 +23,8 @@ public class GitSyncServiceTest {
         String password = JunitAssumptions.assumeGitPasswordExists();
         syncService =
                 new GitSyncService(new UsernamePasswordCredential(
-                        makeFieldWithValue(username),
-                        makeFieldWithValue(password)));
+                        username, password));
         dest = temporaryFolder.newFolder();
-    }
-
-    private static EncryptedField makeFieldWithValue(String value) {
-        EncryptedField encryptedField =
-                new EncryptedField(null, null, null, null);
-        encryptedField.setValue(value);
-        return encryptedField;
     }
 
     @Test

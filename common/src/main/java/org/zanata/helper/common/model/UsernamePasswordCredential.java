@@ -5,20 +5,20 @@ package org.zanata.helper.common.model;
  */
 public class UsernamePasswordCredential implements Credentials<String> {
 
-    private final EncryptedField username;
-    private final EncryptedField apiKey;
+    private final String username;
+    private final String apiKey;
 
-    public UsernamePasswordCredential(EncryptedField username,
-            EncryptedField apiKey) {
+    public UsernamePasswordCredential(String username,
+            String apiKey) {
         this.username = username;
         this.apiKey = apiKey;
     }
 
     public String getUsername() {
-        return username.decryptValue();
+        return username;
     }
 
     public String getSecret() {
-        return apiKey.decryptValue();
+        return apiKey;
     }
 }
