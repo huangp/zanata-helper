@@ -7,12 +7,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.core.Response;
 
-import org.zanata.helper.api.JobsResource;
 import org.zanata.helper.api.JobResource;
-import org.zanata.helper.api.WorkResource;
+import org.zanata.helper.api.impl.WorkResourceImpl;
+import org.zanata.helper.model.JobStatusType;
 import org.zanata.helper.model.JobSummary;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.zanata.helper.model.JobType;
 import org.zanata.helper.model.WorkSummary;
 
 /**
@@ -24,22 +26,20 @@ import org.zanata.helper.model.WorkSummary;
 public class IndexAction {
 
     @Inject
-    private WorkResource workResource;
+    private WorkResourceImpl workResource;
 
     @Inject
     private JobResource jobResource;
 
-    @Inject
-    private JobsResource jobsResource;
-
     public List<WorkSummary> getAllWork() {
-        Response response = workResource.getAllWork();
+        Response response = workResource.getWork("", "summary");
         return (List<WorkSummary>)response.getEntity();
     }
 
     public List<JobSummary> getRunningJobs() {
-        Response response = jobsResource.getRunningJobs();
-        return (List<JobSummary>)response.getEntity();
+        Response response =
+                jobResource.getJob(null, null, JobStatusType.RUNNING);
+        return (List<JobSummary>) response.getEntity();
     }
 
     /**
@@ -48,6 +48,6 @@ public class IndexAction {
      * @param type - SyncConfig.Type
      */
     public void cancelRunningJob(String id, String type) {
-        jobResource.cancelRunningJob(id, type);
+        jobResource.cancelRunningJob(id, JobType.valueOf(type));
     }
 }

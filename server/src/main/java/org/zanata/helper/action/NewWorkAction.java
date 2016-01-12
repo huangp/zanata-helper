@@ -6,7 +6,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.core.Response;
 
-import org.zanata.helper.api.WorkResource;
+import org.zanata.helper.api.impl.WorkResourceImpl;
 import org.zanata.helper.common.model.SyncOption;
 import org.zanata.helper.common.model.Field;
 import org.zanata.helper.common.plugin.RepoExecutor;
@@ -35,7 +35,7 @@ public class NewWorkAction {
     private PluginsService pluginsServiceImpl;
 
     @Inject
-    private WorkResource workResource;
+    private WorkResourceImpl workResource;
 
     @Inject
     private Messages msg;

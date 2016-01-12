@@ -1,13 +1,11 @@
 package org.zanata.helper.service.impl;
 
 import com.google.common.base.Throwables;
-import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.deltaspike.core.api.lifecycle.Initialized;
 import org.quartz.JobDetail;
 import org.quartz.SchedulerException;
-import org.quartz.TriggerKey;
 import org.quartz.UnableToInterruptJobException;
 
 import org.zanata.helper.events.ConfigurationChangeEvent;
@@ -15,6 +13,7 @@ import org.zanata.helper.events.JobProgressEvent;
 import org.zanata.helper.events.JobRunStartsEvent;
 import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.exception.JobNotFoundException;
+import org.zanata.helper.exception.WorkNotFoundException;
 import org.zanata.helper.model.JobType;
 import org.zanata.helper.model.SyncWorkConfig;
 import org.zanata.helper.model.JobSummary;
@@ -32,9 +31,7 @@ import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -77,7 +74,7 @@ public class SchedulerServiceImpl implements SchedulerService {
 
         log.info("Initialising jobs...");
 
-        List<SyncWorkConfig> syncWorkConfigs = getJobs();
+        List<SyncWorkConfig> syncWorkConfigs = syncWorkConfigRepository.getAllWorks();
         try {
             cronTrigger = new CronTrigger(appConfiguration,
                 pluginsServiceImpl, triggerListener);
@@ -89,11 +86,6 @@ public class SchedulerServiceImpl implements SchedulerService {
         }
 
         log.info("Initialised {} jobs.", syncWorkConfigs.size());
-    }
-
-    //TODO: need to validate all config
-    private List<SyncWorkConfig> getJobs() {
-        return syncWorkConfigRepository.getAllWorks();
     }
 
     public void onApplicationEvent(@Observes ConfigurationChangeEvent event) {
@@ -161,16 +153,15 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public List<JobSummary> getRunningJobs() throws SchedulerException {
+    public List<JobSummary> getJobs() throws SchedulerException {
         List<JobDetail> runningJobs = cronTrigger.getRunningJobs();
         return runningJobs.stream().map(this::convertToJobSummary)
             .collect(Collectors.toList());
     }
 
     @Override
-    public List<WorkSummary> getAllWork() throws SchedulerException {
-        Collection<SyncWorkConfig> syncList =
-                syncWorkConfigRepository.getAllWorks();
+    public List<WorkSummary> getAllWorkSummary() throws SchedulerException {
+        Collection<SyncWorkConfig> syncList = getAllWork();
         return syncList.stream().map(this::convertToWorkSummary)
             .collect(Collectors.toList());
     }
@@ -213,6 +204,27 @@ public class SchedulerServiceImpl implements SchedulerService {
             throw new JobNotFoundException(id.toString());
         }
         cronTrigger.triggerJob(id, type);
+    }
+
+    @Override
+    public SyncWorkConfig getWork(String id) throws WorkNotFoundException {
+        Optional<SyncWorkConfig> syncWorkConfig =
+                syncWorkConfigRepository.load(new Long(id));
+        if(!syncWorkConfig.isPresent()) {
+            throw new WorkNotFoundException(id);
+        }
+        return syncWorkConfig.get();
+    }
+
+    @Override
+    public WorkSummary getWorkSummary(String id) throws WorkNotFoundException {
+        SyncWorkConfig syncWorkConfig = getWork(id);
+        return convertToWorkSummary(syncWorkConfig);
+    }
+
+    @Override
+    public List<SyncWorkConfig> getAllWork() throws SchedulerException {
+        return syncWorkConfigRepository.getAllWorks();
     }
 
     private void scheduleJob(SyncWorkConfig syncWorkConfig) throws SchedulerException {
