@@ -1,6 +1,7 @@
 package org.zanata.helper.service.impl;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.deltaspike.core.api.lifecycle.Initialized;
@@ -31,8 +32,12 @@ import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -49,9 +54,6 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     @Inject
     private SyncWorkConfigRepository syncWorkConfigRepository;
-
-    @Inject
-    private JobConfigListener triggerListener;
 
     @Inject
     private CronTrigger cronTrigger;

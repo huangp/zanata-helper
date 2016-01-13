@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang.StringUtils;
 import org.quartz.CronScheduleBuilder;
+import org.quartz.Job;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -59,6 +60,10 @@ public class CronTrigger {
     @PostConstruct
     public void start() throws SchedulerException {
         scheduler = StdSchedulerFactory.getDefaultScheduler();
+        if (scheduler.getListenerManager().getJobListeners().isEmpty()) {
+            scheduler.getListenerManager()
+                    .addTriggerListener(triggerListener);
+        }
         scheduler.start();;
     }
 
@@ -75,7 +80,7 @@ public class CronTrigger {
     }
 
     private JobDetail buildJobDetail(SyncWorkConfig syncWorkConfig, JobKey key,
-            Class jobClass, String cronExp) {
+            Class<? extends Job> jobClass, String cronExp) {
         JobBuilder builder = JobBuilder
                 .newJob(jobClass)
                 .withIdentity(key.getName())
@@ -113,6 +118,8 @@ public class CronTrigger {
                     .put("basedir", type.baseWorkDir(
                             appConfiguration.getRepoDirectory()));
 
+            jobDetail.getJobDataMap().put("jobType", type);
+
             jobDetail.getJobDataMap()
                     .put(RepoExecutor.class.getSimpleName(), pluginsService
                             .getNewSourceRepoPlugin(
@@ -127,10 +134,6 @@ public class CronTrigger {
                                                     .getTransServerPluginName(),
                                             syncWorkConfig.getTransServerConfig()));
 
-            if (scheduler.getListenerManager().getJobListeners().isEmpty()) {
-                scheduler.getListenerManager()
-                        .addTriggerListener(triggerListener);
-            }
 
             if(!StringUtils.isEmpty(cronExp)) {
                 Trigger trigger =
