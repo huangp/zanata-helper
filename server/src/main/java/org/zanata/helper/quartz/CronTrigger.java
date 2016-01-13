@@ -21,7 +21,6 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
-import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.events.JobRunUpdate;
 import org.zanata.helper.exception.UnableLoadPluginException;
 import org.zanata.helper.model.JobType;
@@ -31,31 +30,42 @@ import org.zanata.helper.model.JobStatusType;
 import org.zanata.helper.component.AppConfiguration;
 import org.zanata.helper.service.PluginsService;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
+@ApplicationScoped
 @Slf4j
 public class CronTrigger {
-    private final Scheduler scheduler =
-        StdSchedulerFactory.getDefaultScheduler();
+    private Scheduler scheduler;
 
-    private final AppConfiguration appConfiguration;
+    @Inject
+    private AppConfiguration appConfiguration;
 
-    private final PluginsService pluginsService;
-    private final JobConfigListener triggerListener;
+    @Inject
+    private PluginsService pluginsService;
 
-    public CronTrigger(AppConfiguration appConfiguration,
-            PluginsService pluginsService, JobConfigListener triggerListener)
-        throws SchedulerException {
-        this.appConfiguration = appConfiguration;
-        this.pluginsService = pluginsService;
-        this.triggerListener = triggerListener;
-        scheduler.start();
+    @Inject
+    private JobConfigListener triggerListener;
+
+
+    @PostConstruct
+    public void start() throws SchedulerException {
+        scheduler = StdSchedulerFactory.getDefaultScheduler();
+        if (scheduler.getListenerManager().getJobListeners().isEmpty()) {
+            scheduler.getListenerManager()
+                    .addTriggerListener(triggerListener);
+        }
+        scheduler.start();;
     }
 
     public Optional<TriggerKey> scheduleMonitorForRepoSync(SyncWorkConfig syncWorkConfig)
@@ -74,7 +84,7 @@ public class CronTrigger {
             Class jobClass, String cronExp) {
         JobBuilder builder = JobBuilder
                 .newJob(jobClass)
-                .withIdentity(key)
+                .withIdentity(key.getName())
                 .withDescription(syncWorkConfig.toString());
 
         if(StringUtils.isEmpty(cronExp)) {
@@ -109,6 +119,8 @@ public class CronTrigger {
                     .put("basedir", type.baseWorkDir(
                             appConfiguration.getRepoDirectory()));
 
+            jobDetail.getJobDataMap().put("jobType", type);
+
             jobDetail.getJobDataMap()
                     .put(RepoExecutor.class.getSimpleName(), pluginsService
                             .getNewSourceRepoPlugin(
@@ -142,10 +154,25 @@ public class CronTrigger {
         return Optional.empty();
     }
 
+    public JobStatus getTriggerStatus(TriggerKey key,
+        JobRunUpdate event) throws SchedulerException {
+        if (scheduler.checkExists(key)) {
+            Trigger.TriggerState state = scheduler.getTriggerState(key);
+            Trigger trigger = scheduler.getTrigger(key);
+            Date endTime =
+                event != null ? event.getCompletedTime() : null;
+
+            return new JobStatus(
+                JobStatusType.getType(state, isJobRunning(key)),
+                trigger.getPreviousFireTime(), endTime,
+                trigger.getNextFireTime());
+        }
+        return JobStatus.EMPTY;
+    }
+
     public JobStatus getTriggerStatus(Long id,
             JobRunUpdate event) throws SchedulerException {
-        JobKey key =
-                JobType.valueOf(event.getJobKey().getName()).toJobKey(id);
+        JobKey key = event.getJobType().toJobKey(id);
 
         if (scheduler.checkExists(key)) {
             List<? extends Trigger> triggers = scheduler.getTriggersOfJob(key);

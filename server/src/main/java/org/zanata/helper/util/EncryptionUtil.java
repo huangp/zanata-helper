@@ -54,7 +54,8 @@ public class EncryptionUtil {
     public EncryptionUtil(byte[] keyBytes) {
         this.keyBytes = keyBytes;
     }
-    private SecretKeySpec key = new SecretKeySpec(keyBytes, "AES");
+    // java only allow 128bit (16 chars) in key by default
+    private SecretKeySpec key = new SecretKeySpec(keyBytes, 0, 16, "AES");
 
     public String encrypt(String input) {
         // encryption pass

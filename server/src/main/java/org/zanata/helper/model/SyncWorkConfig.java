@@ -111,6 +111,7 @@ public class SyncWorkConfig extends PersistModel implements CanConvertToYaml<Syn
 
     @Override
     public String toYaml() {
+        // TODO we should only encrypt apiKey not all the config fields
         SyncWorkConfig config =
                 new SyncWorkConfig(id, name, description, syncToServerConfig,
                         syncToRepoConfig, encryptValues(srcRepoPluginConfig),

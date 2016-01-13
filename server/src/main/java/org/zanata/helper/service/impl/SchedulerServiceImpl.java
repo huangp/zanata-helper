@@ -22,7 +22,6 @@ import org.zanata.helper.model.JobStatus;
 import org.zanata.helper.model.WorkSummary;
 import org.zanata.helper.quartz.CronTrigger;
 import org.zanata.helper.component.AppConfiguration;
-import org.zanata.helper.quartz.JobConfigListener;
 import org.zanata.helper.repository.SyncWorkConfigRepository;
 import org.zanata.helper.service.PluginsService;
 import org.zanata.helper.service.SchedulerService;
@@ -52,8 +51,6 @@ public class SchedulerServiceImpl implements SchedulerService {
     private SyncWorkConfigRepository syncWorkConfigRepository;
 
     @Inject
-    private JobConfigListener triggerListener;
-
     private CronTrigger cronTrigger;
 
     // TODO: database connection, thread count, scheduler, queue, event
@@ -77,8 +74,6 @@ public class SchedulerServiceImpl implements SchedulerService {
 
         List<SyncWorkConfig> syncWorkConfigs = syncWorkConfigRepository.getAllWorks();
         try {
-            cronTrigger = new CronTrigger(appConfiguration,
-                pluginsServiceImpl, triggerListener);
             for (SyncWorkConfig syncWorkConfig : syncWorkConfigs) {
                 scheduleJob(syncWorkConfig);
             }
@@ -124,7 +119,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         if (syncWorkConfigOpt.isPresent()) {
             SyncWorkConfig syncWorkConfig = syncWorkConfigOpt.get();
             syncWorkConfig.setLastJobStatus(getStatus(event.getId(), event),
-                JobType.valueOf(event.getJobKey().getName()));
+                event.getJobType());
             log.debug("Job : " + syncWorkConfig.getName() + " starting.");
             syncWorkConfigRepository.persist(syncWorkConfig);
         }
@@ -139,7 +134,7 @@ public class SchedulerServiceImpl implements SchedulerService {
             SyncWorkConfig syncWorkConfig = syncWorkConfigOpt.get();
             log.debug("Job : " + syncWorkConfig.getName() + " is completed.");
             syncWorkConfig.setLastJobStatus(getStatus(event.getId(), event),
-                JobType.valueOf(event.getJobKey().getName()));
+                event.getJobType());
             syncWorkConfigRepository.persist(syncWorkConfig);
         }
     }

@@ -21,8 +21,10 @@
 package org.zanata.helper.plugin.git.service.impl;
 
 import org.eclipse.jgit.api.AddCommand;
+import org.eclipse.jgit.api.CheckoutCommand;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.CommitCommand;
+import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.PullCommand;
@@ -53,7 +55,9 @@ import org.zanata.helper.plugin.git.service.RepoSyncService;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
@@ -138,12 +142,38 @@ public class GitSyncService implements RepoSyncService<String> {
             Git git = Git.open(destPath);
             List<Ref> refs = git.branchList().setListMode(
                     ListBranchCommand.ListMode.ALL).call();
-            boolean hasBranch =
-                    refs.stream().anyMatch(
-                            ref -> ref.getName().matches(".*/?" + branch));
-            Ref ref =
-                    git.checkout().setName(branch).setCreateBranch(!hasBranch)
-                            .call();
+            /* refs will have name like these:
+            refs/heads/master
+            refs/remotes/origin/master
+            refs/remotes/origin/zanata
+            */
+            Optional<String> localBranchRef = Optional.empty();
+            Optional<String> remoteBranchRef = Optional.empty();
+            for (Ref ref : refs) {
+                String refName = ref.getName();
+                if (refName.equals("refs/heads/" + branch)) {
+                    localBranchRef = Optional.of(refName);
+                }
+                if (refName.equals("refs/remotes/origin/" + branch)) {
+                    remoteBranchRef = Optional.of(refName);
+                }
+            }
+
+
+            CheckoutCommand checkoutCommand = git.checkout();
+            Ref ref;
+            if (localBranchRef.isPresent()) {
+                ref = checkoutCommand.setName(branch).call();
+            } else if (remoteBranchRef.isPresent()) {
+                ref = git.branchCreate()
+                        .setForce(true).setName(branch)
+                        .setStartPoint("origin/" + branch)
+                        .setUpstreamMode(
+                        CreateBranchCommand.SetupUpstreamMode.SET_UPSTREAM)
+                        .call();
+            } else {
+                ref = checkoutCommand.setName(branch).setCreateBranch(true).call();
+            }
             log.debug("checked out {}", ref);
         } catch (IOException | GitAPIException e) {
             throw new RepoSyncException(e);

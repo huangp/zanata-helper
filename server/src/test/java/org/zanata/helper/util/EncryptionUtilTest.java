@@ -11,7 +11,8 @@ public class EncryptionUtilTest {
 
     @Before
     public void setUp() throws Exception {
-        encryptionUtil = new EncryptionUtil("secretKey".getBytes("UTF-8"));
+        byte[] bytes = "this is a secret key".getBytes("UTF-8");
+        encryptionUtil = new EncryptionUtil(bytes);
     }
 
     @Test
