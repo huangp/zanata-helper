@@ -83,9 +83,9 @@ public class WorkResourceImpl implements WorkResource {
     private Response getAllWork(String type) {
         try {
             if(!type.equals("summary")) {
-                return Response.ok(schedulerServiceImpl.getAllWorkSummary()).build();
-            } else {
                 return Response.ok(schedulerServiceImpl.getAllWork()).build();
+            } else {
+                return Response.ok(schedulerServiceImpl.getAllWorkSummary()).build();
             }
         } catch (SchedulerException e) {
             log.error("fail getting all jobs", e);

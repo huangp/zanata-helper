@@ -19,17 +19,21 @@ import org.zanata.helper.model.JobType;
 public interface JobResource {
 
     /**
+     * Get job last status
+     *
      * @param id - work identifier
      * @param type - {@link JobType}
      */
     @Path("/status")
     @GET
-    public Response getJobStatus(
+    public Response getJobLastStatus(
         @QueryParam(value = "id") @DefaultValue("") String id,
         @QueryParam(value = "type") @DefaultValue("")
         JobType type);
 
     /**
+     * Cancel job if it is running
+     *
      * @param id - work identifier
      * @param type - {@link JobType}
      */
@@ -40,9 +44,26 @@ public interface JobResource {
         @QueryParam(value = "type") @DefaultValue("") JobType type);
 
     /**
+     * trigger job
+     *
+     * @param id - work identifier
+     * @param type - {@link JobType}
+     */
+    @Path("/start")
+    @POST
+    public Response triggerJob(
+        @QueryParam(value = "id") @DefaultValue("") String id,
+        @QueryParam(value = "type") @DefaultValue("") JobType type);
+
+    /**
+     * Get list of job with matching filter.
+     *
      * @param id - work identifier, empty for all job
      * @param type - required if id is present. {@link JobType}
      * @param status - {@link JobStatusType},  empty for all status
+     *
+     * return List<JobSummary> or 1 object of List<JobSummary> if id and type is present.
+     *
      */
     @GET
     Response getJob(

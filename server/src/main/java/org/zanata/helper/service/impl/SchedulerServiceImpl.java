@@ -257,7 +257,7 @@ public class SchedulerServiceImpl implements SchedulerService {
                 status = syncWorkConfig.getSyncToServerConfig().getLastJobStatus();
             }
             return new JobSummary(jobDetail.getKey().toString(),
-                    syncWorkConfig.getName(),
+                    syncWorkConfig.getId().toString(), syncWorkConfig.getName(),
                     syncWorkConfig.getDescription(), type, status);
         }
         return new JobSummary();
@@ -265,13 +265,17 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     private WorkSummary convertToWorkSummary(SyncWorkConfig syncWorkConfig) {
         if (syncWorkConfig != null) {
-            return new WorkSummary(syncWorkConfig.getId(), syncWorkConfig.getName(),
+            return new WorkSummary(syncWorkConfig.getId(),
+                    syncWorkConfig.getName(),
                     syncWorkConfig.getDescription(),
                     new JobSummary("", syncWorkConfig.getName(),
+                            syncWorkConfig.getId().toString(),
                             syncWorkConfig.getDescription(),
                             JobType.REPO_SYNC,
-                            syncWorkConfig.getSyncToRepoConfig().getLastJobStatus()),
+                            syncWorkConfig.getSyncToRepoConfig()
+                                    .getLastJobStatus()),
                     new JobSummary("", syncWorkConfig.getName(),
+                            syncWorkConfig.getId().toString(),
                             syncWorkConfig.getDescription(),
                             JobType.SERVER_SYNC,
                             syncWorkConfig.getSyncToServerConfig()

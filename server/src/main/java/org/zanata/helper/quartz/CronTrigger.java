@@ -69,6 +69,19 @@ public class CronTrigger {
             JobType.SERVER_SYNC);
     }
 
+    private JobDetail buildJobDetail(SyncWorkConfig syncWorkConfig, JobKey key,
+            Class jobClass, String cronExp) {
+        JobBuilder builder = JobBuilder
+                .newJob(jobClass)
+                .withIdentity(key.getName())
+                .withDescription(syncWorkConfig.toString());
+
+        if(StringUtils.isEmpty(cronExp)) {
+            builder.storeDurably();
+        }
+        return builder.build();
+    }
+
     private  <J extends SyncJob> Optional<TriggerKey> scheduleMonitor(
             SyncWorkConfig syncWorkConfig, Class<J> jobClass, JobType type)
             throws SchedulerException {
@@ -77,12 +90,18 @@ public class CronTrigger {
             return Optional.empty();
         }
         try {
+            String cronExp;
+            if (jobClass.equals(RepoSyncJob.class)) {
+                cronExp = syncWorkConfig.getSyncToRepoConfig().getCron();
+            } else if (jobClass.equals(TransServerSyncJob.class)) {
+                cronExp = syncWorkConfig.getSyncToServerConfig().getCron();
+            } else {
+                throw new IllegalStateException(
+                    "can not determine what job to run for " + jobClass);
+            }
+
             JobDetail jobDetail =
-                    JobBuilder
-                            .newJob(jobClass)
-                            .withIdentity(jobKey.getName())
-                            .withDescription(syncWorkConfig.toString())
-                            .build();
+                    buildJobDetail(syncWorkConfig, jobKey, jobClass, cronExp);
 
             jobDetail.getJobDataMap().put("value", syncWorkConfig);
             jobDetail.getJobDataMap()
@@ -102,16 +121,6 @@ public class CronTrigger {
                                             syncWorkConfig
                                                     .getTransServerPluginName(),
                                             syncWorkConfig.getTransServerConfig()));
-
-            String cronExp;
-            if (jobClass.equals(RepoSyncJob.class)) {
-                cronExp = syncWorkConfig.getSyncToRepoConfig().getCron();
-            } else if (jobClass.equals(TransServerSyncJob.class)) {
-                cronExp = syncWorkConfig.getSyncToServerConfig().getCron();
-            } else {
-                throw new IllegalStateException(
-                        "can not determine what job to run for " + jobClass);
-            }
 
             if (scheduler.getListenerManager().getJobListeners().isEmpty()) {
                 scheduler.getListenerManager()

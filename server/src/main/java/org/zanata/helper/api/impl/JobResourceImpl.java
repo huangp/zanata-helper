@@ -40,14 +40,13 @@ public class JobResourceImpl implements JobResource {
     private SchedulerService schedulerServiceImpl;
 
     @Override
-    public Response getJobStatus(
+    public Response getJobLastStatus(
         @QueryParam(value = "id") @DefaultValue("") String id,
         @QueryParam(value = "type") @DefaultValue("")
         JobType type) {
         try {
             if(StringUtils.isEmpty(id) || type == null) {
-                return Response.status(
-                        Response.Status.NOT_FOUND).build();
+                return Response.status(Response.Status.NOT_FOUND).build();
             }
             return Response.ok(schedulerServiceImpl
                 .getJobLastStatus(new Long(id), type)).build();
@@ -75,6 +74,25 @@ public class JobResourceImpl implements JobResource {
             return Response.serverError().build();
         } catch (JobNotFoundException e) {
             log.warn("cancel job not found", e);
+            return Response.status(
+                    Response.Status.NOT_FOUND).build();
+        }
+    }
+
+    @Override
+    public Response triggerJob(@DefaultValue("") String id,
+            @DefaultValue("") JobType type) {
+        try {
+            if (StringUtils.isEmpty(id)) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            schedulerServiceImpl.startJob(new Long(id), type);
+            return Response.ok().build();
+        } catch (SchedulerException e) {
+            log.error("trigger job error", e);
+            return Response.serverError().build();
+        } catch (JobNotFoundException e) {
+            log.warn("job not found", e);
             return Response.status(
                     Response.Status.NOT_FOUND).build();
         }

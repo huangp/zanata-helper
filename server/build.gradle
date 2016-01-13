@@ -14,6 +14,7 @@ gretty {
   servletContainer = 'jetty8'
   port= 8081
   contextPath = ''
+  scanInterval = 0
 }
 
 description = 'Zanata helper server'

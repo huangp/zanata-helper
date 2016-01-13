@@ -1,0 +1,102 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:a4j="http://richfaces.org/a4j"
+  xmlns:c="http://java.sun.com/jsf/composite/component"
+  template="/WEB-INF/includes/template.xhtml">
+
+  <f:metadata>
+    <f:viewParam name="id" value="#{workAction.id}" />
+  </f:metadata>
+
+  <ui:define name="content">
+    <div class="l__wrapper">
+      <div class="g">
+        <ui:fragment rendered="#{workAction.syncWorkConfig eq null}">
+          <div class="g__item g__item g--centered ">
+            <div class="l--pad-all-half panel">
+              #{msg.format('jsp.noWorkFound', workAction.id)}
+            </div>
+          </div>
+        </ui:fragment>
+
+
+        <ui:fragment rendered="#{workAction.syncWorkConfig ne null}">
+          <h:form styleClass="l--push-bottom-0">
+
+            <a4j:jsFunction name="triggerSyncToRepoJob" render="jobStatus"
+              action="#{workAction.triggerSyncToRepoJob()}" limitRender="true">
+            </a4j:jsFunction>
+
+            <a4j:jsFunction name="triggerSyncToServerJob" render="jobStatus"
+              action="#{workAction.triggerSyncToServerJob()}" limitRender="true">
+            </a4j:jsFunction>
+          </h:form>
+
+          <div class="g__item w--1-m w--3-8-l w--1-4 l--push-bottom-half">
+            <p class="txt--meta l--push-all-0">
+              <a href="/home.xhtml">#{msg['jsf.home']}</a>
+            </p>
+
+            <h1>#{workAction.syncWorkConfig.name}</h1>
+            <p class="txt--understated">
+              #{workAction.syncWorkConfig.description}
+            </p>
+            <h:panelGroup layout="block" id="jobStatus">
+              <div>
+                  <ui:fragment rendered="#{not workAction.isSyncToRepoRunning()}">
+                    <button class="button--small button--warning" onclick="triggerSyncToRepoJob;return false">#{msg['jsf.work.runJobNow']}</button>
+                  </ui:fragment>
+                  <ui:fragment rendered="#{workAction.isSyncToRepoRunning()}">
+                    <div class="loader--mini is-active">
+                      <span class="loader__spinner">
+                        <span></span><span></span><span></span>
+                      </span>
+                    </div>
+                  </ui:fragment>
+                <c:workstatus jobStatus="#{workAction.syncWorkConfig.syncToRepoConfig.lastJobStatus}" type="REPO_SYNC" styleClass="bx--inline-block"/>
+              </div>
+
+              <div class="l--push-top-half">
+                  <ui:fragment rendered="#{not workAction.isSyncToServerRunning()}">
+                      <button class="button--small button--warning" onclick="triggerSyncToServerJob;return false">#{msg['jsf.work.runJobNow']}</button>
+                  </ui:fragment>
+                  <ui:fragment rendered="#{workAction.isSyncToServerRunning()}">
+                    <div class="loader--mini is-active">
+                      <span class="loader__spinner">
+                        <span></span><span></span><span></span>
+                      </span>
+                    </div>
+                  </ui:fragment>
+                <c:workstatus jobStatus="#{workAction.syncWorkConfig.syncToServerConfig.lastJobStatus}" type="SERVER_SYNC" styleClass="bx--inline-block"/>
+              </div>
+            </h:panelGroup>
+          </div>
+
+          <div class="g__item w--1-m w--5-8-l w--3-4">
+            <div class="panel">
+              <div class="panel__header">
+                <h2 class="panel__heading">
+                  #{msg['jsf.work.configuration']}
+                </h2>
+              </div>
+
+              <div class="l--pad-all-half">
+                //form here
+                <button class="button--danger l--push-right-half">Delete work</button>
+                <button class="button--warning">Disable work</button>
+              </div>
+            </div>
+          </div>
+
+        </ui:fragment>
+
+
+
+      </div>
+    </div>
+  </ui:define>
+</ui:composition>

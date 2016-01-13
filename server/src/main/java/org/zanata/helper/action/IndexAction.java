@@ -8,7 +8,7 @@ import javax.inject.Named;
 import javax.ws.rs.core.Response;
 
 import org.zanata.helper.api.JobResource;
-import org.zanata.helper.api.impl.WorkResourceImpl;
+import org.zanata.helper.api.WorkResource;
 import org.zanata.helper.model.JobStatusType;
 import org.zanata.helper.model.JobSummary;
 
@@ -26,13 +26,13 @@ import org.zanata.helper.model.WorkSummary;
 public class IndexAction {
 
     @Inject
-    private WorkResourceImpl workResource;
+    private WorkResource workResourceImpl;
 
     @Inject
     private JobResource jobResource;
 
     public List<WorkSummary> getAllWork() {
-        Response response = workResource.getWork("", "summary");
+        Response response = workResourceImpl.getWork("", "summary");
         return (List<WorkSummary>)response.getEntity();
     }
 

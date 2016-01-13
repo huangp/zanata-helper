@@ -17,7 +17,7 @@
         <a4j:param name="val2" assignTo="#{type}"/>
       </a4j:jsFunction>
 
-      <a4j:poll id="running-jobs-poll" interval="1000"
+      <a4j:poll id="running-jobs-poll" interval="1000000"
         render="running-jobs-content" limitRender="true"/>
     </h:form>
 
@@ -33,7 +33,7 @@
               <ul class="list--panel" id="runningJobs">
                 <ui:repeat value="#{indexAction.runningJobs}" var="job">
                   <li class="l--pad-all-quarter" id="running-#{job.key}">
-                    <a href="/job?id=#{job.key}">
+                    <a href="/work/home.xhtml?id=#{job.workId}">
                       <div class="list__item__content">
                         <div class="list__item__info">
                           <span>#{job.name} - #{job.type}</span>
@@ -89,7 +89,7 @@
               <ul class="list--panel">
                 <ui:repeat value="#{indexAction.allWork}" var="work">
                   <li class="l--pad-all-quarter">
-                    <a href="/work?id=#{work.id}">
+                    <a href="/work/home.xhtml?id=#{work.id}">
                       <div class="list__item__content">
                         <div class="list__item__info">
                           <h3 class="list__title">#{work.name}</h3>

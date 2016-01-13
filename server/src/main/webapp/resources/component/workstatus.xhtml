@@ -11,6 +11,9 @@
 
     <composite:attribute name="type" type="java.lang.String"
       shortDescription="type of job. 'REPO_SYNC' or 'SERVER_SYNC'" required="true" />
+
+    <composite:attribute name="styleClass" type="java.lang.String"
+      shortDescription="styleClass for component"/>
   </composite:interface>
 
   <composite:implementation>
@@ -32,18 +35,21 @@
     <ui:fragment rendered="#{cc.attrs.jobStatus.status.name() eq 'NORMAL'}">
       <ui:param name="statusClass" value=""/>
     </ui:fragment>
+    <ui:fragment rendered="#{cc.attrs.jobStatus eq null}">
+      <ui:param name="title" value="#{msg.format('jsf.job.status.title', 'none')}"/>
+      <ui:param name="statusClass" value="txt--neutral"/>
+    </ui:fragment>
 
-    <div title="#{title}" class="#{statusClass}">
-      <h:panelGroup styleClass="txt--meta" rendered="#{cc.attrs.type eq 'REPO_SYNC'}">
+    <div title="#{title}" class="#{statusClass} #{cc.attrs.styleClass}">
+      <h:panelGroup styleClass="txt--meta bx--inline-block" rendered="#{cc.attrs.type eq 'REPO_SYNC'}">
         #{msg['jsf.newWork.syncToRepo.title']}
       </h:panelGroup>
-      <h:panelGroup styleClass="txt--meta" rendered="#{cc.attrs.type eq 'SERVER_SYNC'}">
+      <h:panelGroup styleClass="txt--meta bx--inline-block" rendered="#{cc.attrs.type eq 'SERVER_SYNC'}">
         #{msg['jsf.newWork.syncToServer.title']}
       </h:panelGroup>
-      <span class="l--push-right-quarter">
-        <i class="i i--clock"></i>
+      <span class="l--push-left-quarter bx--inline-block">
+        <i class="i i--clock"></i> <span>#{cc.attrs.jobStatus.lastEndTime}</span>
       </span>
-      <span>#{cc.attrs.jobStatus.lastEndTime}</span>
     </div>
   </composite:implementation>
 </html>

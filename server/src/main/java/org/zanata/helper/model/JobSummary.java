@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class JobSummary implements Serializable {
     private String key;
+    private String workId;
     private String name;
     private String description;
     private JobType type;

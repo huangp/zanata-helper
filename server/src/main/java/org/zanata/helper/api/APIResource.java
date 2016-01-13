@@ -6,8 +6,6 @@ package org.zanata.helper.api;
 public interface APIResource {
     String API_ROOT = "/api";
 
-    String JOBS_ROOT = "/jobs";
     String JOB_ROOT = "/job";
-
     String WORK_ROOT = "/work";
 }
