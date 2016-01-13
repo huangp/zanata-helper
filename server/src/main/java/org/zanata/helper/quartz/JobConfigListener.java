@@ -23,6 +23,7 @@ package org.zanata.helper.quartz;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
@@ -39,7 +40,7 @@ import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Dependent
+@ApplicationScoped
 public class JobConfigListener implements TriggerListener {
     public static final String LISTENER_NAME = "JobConfigListener";
 
