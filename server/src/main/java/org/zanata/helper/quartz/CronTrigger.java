@@ -34,27 +34,32 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
+@ApplicationScoped
 @Slf4j
 public class CronTrigger {
-    private final Scheduler scheduler =
-        StdSchedulerFactory.getDefaultScheduler();
+    private Scheduler scheduler;
 
-    private final AppConfiguration appConfiguration;
+    @Inject
+    private AppConfiguration appConfiguration;
 
-    private final PluginsService pluginsService;
-    private final JobConfigListener triggerListener;
+    @Inject
+    private PluginsService pluginsService;
 
-    public CronTrigger(AppConfiguration appConfiguration,
-            PluginsService pluginsService, JobConfigListener triggerListener)
-        throws SchedulerException {
-        this.appConfiguration = appConfiguration;
-        this.pluginsService = pluginsService;
-        this.triggerListener = triggerListener;
-        scheduler.start();
+    @Inject
+    private JobConfigListener triggerListener;
+
+
+    @PostConstruct
+    public void start() throws SchedulerException {
+        scheduler = StdSchedulerFactory.getDefaultScheduler();
+        scheduler.start();;
     }
 
     public Optional<TriggerKey> scheduleMonitorForRepoSync(SyncWorkConfig syncWorkConfig)

@@ -53,6 +53,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Inject
     private JobConfigListener triggerListener;
 
+    @Inject
     private CronTrigger cronTrigger;
 
     // TODO: database connection, thread count, scheduler, queue, event
@@ -76,8 +77,6 @@ public class SchedulerServiceImpl implements SchedulerService {
 
         List<SyncWorkConfig> syncWorkConfigs = syncWorkConfigRepository.getAllWorks();
         try {
-            cronTrigger = new CronTrigger(appConfiguration,
-                pluginsServiceImpl, triggerListener);
             for (SyncWorkConfig syncWorkConfig : syncWorkConfigs) {
                 scheduleJob(syncWorkConfig);
             }
