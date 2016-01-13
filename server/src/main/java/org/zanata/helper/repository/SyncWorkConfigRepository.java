@@ -93,12 +93,16 @@ public class SyncWorkConfigRepository {
 
     private Optional<SyncWorkConfig> loadFromDisk(long id) {
         File latestworkConfig = latestWorkConfig(id);
-        if (latestworkConfig.exists()) {
+        return loadConfigFile(latestworkConfig);
+    }
+
+    private Optional<SyncWorkConfig> loadConfigFile(File configFile) {
+        if (configFile.exists()) {
             try (InputStream inputStream = new FileInputStream(
-                    latestworkConfig)) {
+                    configFile)) {
                 return Optional.of(new SyncWorkConfig().fromYaml(inputStream));
             } catch (IOException e) {
-                log.error("error loading config file: {}", latestworkConfig, e);
+                log.error("error loading config file: {}", configFile, e);
             }
         }
         return Optional.empty();
@@ -192,7 +196,7 @@ public class SyncWorkConfigRepository {
                 Arrays.stream(configDirectory.listFiles(File::isDirectory))
                         .map(SyncWorkConfigRepository::latestWorkConfig)
                         .filter(file -> file.exists() && file.canRead())
-                        .map(YamlUtil::generateJobConfig)
+                        .map(file -> loadConfigFile(file).get())
                         .collect(Collectors.toList());
         allWorkConfig.forEach(
                 config -> cache.put(config.getId(), Optional.of(config)));

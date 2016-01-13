@@ -50,6 +50,7 @@ public abstract class SyncJob implements InterruptableJob {
         } catch (JobExecutionException e) {
             log.error("Error running sync job.", e);
         } finally {
+            // TODO make this an option (whether or not to clean up the folder)
             cleanupDirectory(new File(basedir, syncWorkConfig.getId().toString()));
         }
     }
