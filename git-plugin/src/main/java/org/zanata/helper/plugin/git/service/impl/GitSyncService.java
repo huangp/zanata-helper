@@ -24,6 +24,7 @@ import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.PullCommand;
 import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.Status;
@@ -51,6 +52,7 @@ import org.zanata.helper.plugin.git.service.RepoSyncService;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -74,13 +76,13 @@ public class GitSyncService implements RepoSyncService<String> {
     public void cloneRepo(String repoUrl, String branch, File destPath)
             throws RepoSyncException {
         if (isGitCloneAlreadyBeenDone(destPath)) {
-            // directory is not a git repository
-            log.debug("git repo already exists. Skipping clone");
+            log.info("git repo already exists. Skipping clone");
             doGitPull(destPath);
         } else {
+            // directory is not a git repository
             doGitClone(repoUrl, destPath);
         }
-
+        checkOutBranch(destPath, branch);
     }
 
     private void doGitPull(File destPath) {
@@ -98,7 +100,7 @@ public class GitSyncService implements RepoSyncService<String> {
     }
 
     private boolean isGitCloneAlreadyBeenDone(File folder) {
-        return RepositoryCache.FileKey.isGitRepository(folder, FS.DETECTED) &&
+        return /*RepositoryCache.FileKey.isGitRepository(folder, FS.DETECTED) &&*/
                 hasAtLeastOneReference(folder);
     }
 
@@ -126,6 +128,24 @@ public class GitSyncService implements RepoSyncService<String> {
         try {
             clone.call();
         } catch (GitAPIException e) {
+            throw new RepoSyncException(e);
+        }
+    }
+
+
+    private void checkOutBranch(File destPath, String branch) {
+        try {
+            Git git = Git.open(destPath);
+            List<Ref> refs = git.branchList().setListMode(
+                    ListBranchCommand.ListMode.ALL).call();
+            boolean hasBranch =
+                    refs.stream().anyMatch(
+                            ref -> ref.getName().matches(".*/?" + branch));
+            Ref ref =
+                    git.checkout().setName(branch).setCreateBranch(!hasBranch)
+                            .call();
+            log.debug("checked out {}", ref);
+        } catch (IOException | GitAPIException e) {
             throw new RepoSyncException(e);
         }
     }

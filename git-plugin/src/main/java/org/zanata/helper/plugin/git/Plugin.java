@@ -69,7 +69,7 @@ public class Plugin extends RepoExecutor {
 
     @Override
     public void cloneRepo(File dir) throws RepoSyncException {
-        gitSyncService.cloneRepo(getFields().get("url").getValue(),
+        gitSyncService.cloneRepo(getField("url").getValue(),
             getBranch(), dir);
     }
 
@@ -82,10 +82,10 @@ public class Plugin extends RepoExecutor {
     }
 
     /**
-     * Default to {@link DEFAULT_BRANCH} branch if it is not specify
+     * Default to {@link Plugin#DEFAULT_BRANCH} branch if it is not specify
      */
     private String getBranch() {
-        String branch = getFields().get("branch").getValue();
+        String branch = getField("branch").getValue();
         if (StringUtils.isEmptyOrNull(branch)) {
             return DEFAULT_BRANCH;
         }
