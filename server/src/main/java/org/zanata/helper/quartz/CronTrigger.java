@@ -18,9 +18,11 @@ import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.UnableToInterruptJobException;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.events.JobRunCompletedEvent;
+import org.zanata.helper.events.JobRunUpdate;
 import org.zanata.helper.exception.UnableLoadPluginException;
 import org.zanata.helper.model.JobType;
 import org.zanata.helper.model.SyncWorkConfig;
@@ -29,11 +31,10 @@ import org.zanata.helper.model.JobStatusType;
 import org.zanata.helper.component.AppConfiguration;
 import org.zanata.helper.service.PluginsService;
 
-import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
@@ -73,7 +74,7 @@ public class CronTrigger {
             Class jobClass, String cronExp) {
         JobBuilder builder = JobBuilder
                 .newJob(jobClass)
-                .withIdentity(key.getName())
+                .withIdentity(key)
                 .withDescription(syncWorkConfig.toString());
 
         if(StringUtils.isEmpty(cronExp)) {
@@ -141,26 +142,10 @@ public class CronTrigger {
         return Optional.empty();
     }
 
-    public JobStatus getTriggerStatus(TriggerKey key,
-        JobRunCompletedEvent event) throws SchedulerException {
-        if (scheduler.checkExists(key)) {
-            Trigger.TriggerState state = scheduler.getTriggerState(key);
-            Trigger trigger = scheduler.getTrigger(key);
-            Date endTime =
-                event != null ? event.getCompletedTime() : null;
-
-            return new JobStatus(
-                JobStatusType.getType(state, isJobRunning(key)),
-                trigger.getPreviousFireTime(), endTime,
-                trigger.getNextFireTime());
-        }
-        return JobStatus.EMPTY;
-    }
-
     public JobStatus getTriggerStatus(Long id,
-            JobRunCompletedEvent event) throws SchedulerException {
+            JobRunUpdate event) throws SchedulerException {
         JobKey key =
-                JobType.valueOf(event.getTriggerKey().getName()).toJobKey(id);
+                JobType.valueOf(event.getJobKey().getName()).toJobKey(id);
 
         if (scheduler.checkExists(key)) {
             List<? extends Trigger> triggers = scheduler.getTriggersOfJob(key);
@@ -194,10 +179,20 @@ public class CronTrigger {
         return false;
     }
 
-    public List<JobDetail> getRunningJobs() throws SchedulerException {
-        return scheduler.getCurrentlyExecutingJobs().stream()
-            .map(JobExecutionContext::getJobDetail)
-            .collect(Collectors.toList());
+    public List<JobDetail> getJobs() throws SchedulerException {
+        List<JobDetail> jobs = new ArrayList<>();
+        for (String groupName : scheduler.getJobGroupNames()) {
+            for (JobKey jobKey : scheduler
+                    .getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
+                JobType jobType = JobType.valueOf(jobKey.getName());
+                Long workId = new Long(jobKey.getGroup());
+
+                JobDetail jobDetail =
+                        scheduler.getJobDetail(jobType.toJobKey(workId));
+                jobs.add(jobDetail);
+            }
+        }
+        return jobs;
     }
 
     public void cancelRunningJob(Long id, JobType type)

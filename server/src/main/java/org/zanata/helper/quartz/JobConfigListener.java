@@ -33,7 +33,7 @@ public class JobConfigListener implements TriggerListener {
         SyncWorkConfig syncWorkConfig = getJobConfigJob(context);
         jobRunStartsEvent.fire(
             new JobRunStartsEvent(syncWorkConfig.getId(),
-                context.getFireTime()));
+                context.getFireTime(), context.getJobDetail().getKey()));
     }
 
     @Override
@@ -55,7 +55,7 @@ public class JobConfigListener implements TriggerListener {
         SyncWorkConfig syncWorkConfig = getJobConfigJob(context);
         jobRunCompletedEvent.fire(
             new JobRunCompletedEvent(syncWorkConfig.getId(),
-                trigger.getKey(),
+                context.getJobDetail().getKey(),
                 context.getJobRunTime(),
                 context.getFireTime()));
     }

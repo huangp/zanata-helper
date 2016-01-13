@@ -46,9 +46,11 @@
               #{workAction.syncWorkConfig.description}
             </p>
             <h:panelGroup layout="block" id="jobStatus">
-              <div>
+              <div class="l--pad-all-quarter">
                   <ui:fragment rendered="#{not workAction.isSyncToRepoRunning()}">
-                    <button class="button--small button--warning" onclick="triggerSyncToRepoJob;return false">#{msg['jsf.work.runJobNow']}</button>
+                    <button class="button--small button--warning button loader" onclick="triggerSyncToRepoJob();return false">
+                      <span class="loader__label">#{msg['jsf.work.runJobNow']}</span>
+                    </button>
                   </ui:fragment>
                   <ui:fragment rendered="#{workAction.isSyncToRepoRunning()}">
                     <div class="loader--mini is-active">
@@ -57,12 +59,14 @@
                       </span>
                     </div>
                   </ui:fragment>
-                <c:workstatus jobStatus="#{workAction.syncWorkConfig.syncToRepoConfig.lastJobStatus}" type="REPO_SYNC" styleClass="bx--inline-block"/>
+                <c:workstatus jobStatus="#{workAction.syncWorkConfig.syncToRepoConfig.lastJobStatus}" type="REPO_SYNC" styleClass="l--push-bottom-quarter"/>
               </div>
 
-              <div class="l--push-top-half">
+              <div class="l--pad-all-quarter l--push-top-half">
                   <ui:fragment rendered="#{not workAction.isSyncToServerRunning()}">
-                      <button class="button--small button--warning" onclick="triggerSyncToServerJob;return false">#{msg['jsf.work.runJobNow']}</button>
+                    <button class="button--small button--warning button loader" onclick="triggerSyncToServerJob();return false">
+                      <span class="loader__label">#{msg['jsf.work.runJobNow']}</span>
+                    </button>
                   </ui:fragment>
                   <ui:fragment rendered="#{workAction.isSyncToServerRunning()}">
                     <div class="loader--mini is-active">
@@ -71,7 +75,7 @@
                       </span>
                     </div>
                   </ui:fragment>
-                <c:workstatus jobStatus="#{workAction.syncWorkConfig.syncToServerConfig.lastJobStatus}" type="SERVER_SYNC" styleClass="bx--inline-block"/>
+                <c:workstatus jobStatus="#{workAction.syncWorkConfig.syncToServerConfig.lastJobStatus}" type="SERVER_SYNC" styleClass="l--push-bottom-quarter"/>
               </div>
             </h:panelGroup>
           </div>
@@ -86,8 +90,11 @@
 
               <div class="l--pad-all-half">
                 //form here
-                <button class="button--danger l--push-right-half">Delete work</button>
-                <button class="button--warning">Disable work</button>
+
+                <div>
+                  <button class="button--danger l--push-right-half">Delete work</button>
+                  <button class="button--warning">Disable work</button>
+                </div>
               </div>
             </div>
           </div>

@@ -114,21 +114,21 @@ public class JobResourceImpl implements JobResource {
                 boolean filterByStatus = status != null;
 
                 for(JobSummary summary: jobs) {
-                    JobKey key = type.toJobKey(new Long(id));
-
                     if (filterByKey && filterByStatus) {
+                        JobKey key = type.toJobKey(new Long(id));
                         if (summary.getKey().equals(key.toString())
-                                && summary.getJobStatus().equals(status)) {
+                                && status.equals(summary.getJobStatus())) {
                             filteredList.add(summary);
                             continue;
                         }
                     } else if(filterByKey) {
+                        JobKey key = type.toJobKey(new Long(id));
                         if (summary.getKey().equals(key.toString())) {
                             filteredList.add(summary);
                             continue;
                         }
                     } else if(filterByStatus) {
-                        if (summary.getJobStatus().equals(status)) {
+                        if (status.equals(summary.getJobStatus())) {
                             filteredList.add(summary);
                             continue;
                         }

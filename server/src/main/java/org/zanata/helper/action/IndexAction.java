@@ -1,8 +1,9 @@
 package org.zanata.helper.action;
 
+import java.io.Serializable;
 import java.util.List;
 
-import javax.enterprise.context.RequestScoped;
+import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.core.Response;
@@ -21,9 +22,9 @@ import org.zanata.helper.model.WorkSummary;
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
 @Named("indexAction")
-@RequestScoped
+@ViewScoped
 @Slf4j
-public class IndexAction {
+public class IndexAction implements Serializable {
 
     @Inject
     private WorkResource workResourceImpl;

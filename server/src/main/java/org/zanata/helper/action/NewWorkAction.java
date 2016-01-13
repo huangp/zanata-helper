@@ -1,7 +1,7 @@
 package org.zanata.helper.action;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.RequestScoped;
+import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.core.Response;
@@ -17,6 +17,7 @@ import org.zanata.helper.service.PluginsService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,10 +27,10 @@ import java.util.Map;
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
-@RequestScoped
+@ViewScoped
 @Slf4j
 @Named("newWorkAction")
-public class NewWorkAction {
+public class NewWorkAction implements Serializable {
 
     @Inject
     private PluginsService pluginsServiceImpl;

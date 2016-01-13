@@ -12,6 +12,7 @@ import org.zanata.helper.events.ConfigurationChangeEvent;
 import org.zanata.helper.events.JobProgressEvent;
 import org.zanata.helper.events.JobRunStartsEvent;
 import org.zanata.helper.events.JobRunCompletedEvent;
+import org.zanata.helper.events.JobRunUpdate;
 import org.zanata.helper.exception.JobNotFoundException;
 import org.zanata.helper.exception.WorkNotFoundException;
 import org.zanata.helper.model.JobType;
@@ -116,12 +117,16 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     // TODO: fire websocket event
-    public void onJobStarts(@Observes JobRunStartsEvent event) {
+    public void onJobStarts(@Observes JobRunStartsEvent event)
+        throws JobNotFoundException, SchedulerException {
         Optional<SyncWorkConfig> syncWorkConfigOpt =
                 syncWorkConfigRepository.load(event.getId());
         if (syncWorkConfigOpt.isPresent()) {
             SyncWorkConfig syncWorkConfig = syncWorkConfigOpt.get();
+            syncWorkConfig.setLastJobStatus(getStatus(event.getId(), event),
+                JobType.valueOf(event.getJobKey().getName()));
             log.debug("Job : " + syncWorkConfig.getName() + " starting.");
+            syncWorkConfigRepository.persist(syncWorkConfig);
         }
     }
 
@@ -134,7 +139,8 @@ public class SchedulerServiceImpl implements SchedulerService {
             SyncWorkConfig syncWorkConfig = syncWorkConfigOpt.get();
             log.debug("Job : " + syncWorkConfig.getName() + " is completed.");
             syncWorkConfig.setLastJobStatus(getStatus(event.getId(), event),
-                JobType.valueOf(event.getTriggerKey().getName()));
+                JobType.valueOf(event.getJobKey().getName()));
+            syncWorkConfigRepository.persist(syncWorkConfig);
         }
     }
 
@@ -154,7 +160,7 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     @Override
     public List<JobSummary> getJobs() throws SchedulerException {
-        List<JobDetail> runningJobs = cronTrigger.getRunningJobs();
+        List<JobDetail> runningJobs = cronTrigger.getJobs();
         return runningJobs.stream().map(this::convertToJobSummary)
             .collect(Collectors.toList());
     }
@@ -232,7 +238,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         cronTrigger.scheduleMonitorForServerSync(syncWorkConfig);
     }
 
-    private JobStatus getStatus(Long id, JobRunCompletedEvent event)
+    private JobStatus getStatus(Long id, JobRunUpdate event)
         throws SchedulerException, JobNotFoundException {
         Optional<SyncWorkConfig> workConfigOptional =
                 syncWorkConfigRepository.load(id);
@@ -248,7 +254,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         if (jobDetail != null) {
             SyncWorkConfig syncWorkConfig =
                     syncWorkConfigRepository
-                            .load(new Long(jobDetail.getKey().getName())).get();
+                            .load(new Long(jobDetail.getKey().getGroup())).get();
             JobType type = JobType.valueOf(jobDetail.getKey().getName());
             JobStatus status;
             if(type.equals(JobType.REPO_SYNC)) {
