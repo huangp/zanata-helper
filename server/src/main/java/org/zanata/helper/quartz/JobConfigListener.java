@@ -40,7 +40,9 @@ import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@ApplicationScoped
+// NOTE: if I use ApplicationScope it will fail (on second time onwards) with WELD-001303: No active contexts for scope type javax.enterprise.context.ApplicationScoped
+// Although it's dependent scope but it's used by an application scoped bean so there should only be one instance
+@Dependent
 public class JobConfigListener implements TriggerListener {
     public static final String LISTENER_NAME = "JobConfigListener";
 
@@ -50,7 +52,7 @@ public class JobConfigListener implements TriggerListener {
     @Inject
     private Event<JobRunStartsEvent> jobRunStartsEvent;
 
-    private Map<RunningJobKey, AtomicInteger> runningJobs = Maps.newConcurrentMap();
+    private static Map<RunningJobKey, AtomicInteger> runningJobs = Maps.newConcurrentMap();
 
     public String getName() {
         return LISTENER_NAME;

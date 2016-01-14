@@ -16,8 +16,6 @@ import org.zanata.helper.common.model.SyncOption;
 import org.zanata.helper.model.JobType;
 import org.zanata.helper.model.SyncWorkConfig;
 import org.zanata.helper.model.JobConfig;
-import org.zanata.helper.util.YamlUtil;
-import com.google.common.base.Throwables;
 
 public class SyncWorkConfigRepositoryTest {
     @Rule
@@ -42,7 +40,7 @@ public class SyncWorkConfigRepositoryTest {
                         SyncOption.TRANSLATIONS),
                 new HashMap<>(), "sourceRepoPluginName",
                 new HashMap<>(),
-                "translationServerExecutorName");
+                "translationServerExecutorName", null);
     }
 
     @Test
@@ -111,13 +109,10 @@ public class SyncWorkConfigRepositoryTest {
         Assertions.assertThat(files).contains(latestFile);
         Assertions.assertThat(files).hasSize(3);
 
-        try (InputStream inputStream = new FileInputStream(latestFile)) {
-            Assertions.assertThat(
-                    YamlUtil.generateJobConfig(inputStream).getName())
-                    .isEqualTo("name3");
-        } catch (IOException e) {
-            throw Throwables.propagate(e);
-        }
+        Assertions.assertThat(
+                new SyncWorkConfigSerializerImpl().fromYaml(latestFile)
+                        .getName()).isEqualTo("name3");
+
     }
 
     @Test

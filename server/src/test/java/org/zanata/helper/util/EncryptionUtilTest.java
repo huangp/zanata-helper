@@ -11,7 +11,7 @@ public class EncryptionUtilTest {
 
     @Before
     public void setUp() throws Exception {
-        byte[] bytes = "this is a secret key".getBytes("UTF-8");
+        byte[] bytes = "hahahah".getBytes("UTF-8");
         encryptionUtil = new EncryptionUtil(bytes);
     }
 
@@ -22,7 +22,7 @@ public class EncryptionUtilTest {
         Assertions.assertThat(encrypt).isNotEqualTo(
                 "plain value");
 
-        Assertions.assertThat(encryptionUtil.decryptValue(encrypt)).isEqualTo(
+        Assertions.assertThat(encryptionUtil.decrypt(encrypt)).isEqualTo(
                 "plain value");
     }
 

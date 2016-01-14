@@ -55,13 +55,22 @@ public class SyncWorkForm implements Serializable {
     private String transServerPluginName;
 
     /**
-     * All field id must prefix with {@link repoSettingsPrefix}
+     * If specified, it will encrypt field listed in config properties whose
+     * value matches key in {@link SyncWorkForm#srcRepoConfig} and {@link
+     * SyncWorkForm#transServerConfig}
+     */
+    @Size(max = 16)
+    @Setter
+    private String encryptionKey;
+
+    /**
+     * All field id must prefix with {@link SyncWorkForm#repoSettingsPrefix}
      */
     @Setter
     private Map<String, String> srcRepoConfig = new HashMap<>();
 
     /**
-     * All field id must prefix with {@link transSettingsPrefix}
+     * All field id must prefix with {@link SyncWorkForm#transSettingsPrefix}
      */
     @Setter
     private Map<String, String> transServerConfig = new HashMap<>();
@@ -72,5 +81,9 @@ public class SyncWorkForm implements Serializable {
 
     public static String getTransSettingsPrefix() {
         return transSettingsPrefix;
+    }
+
+    public String getEncryptionKey() {
+        return encryptionKey;
     }
 }

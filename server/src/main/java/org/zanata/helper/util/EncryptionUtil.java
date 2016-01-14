@@ -45,17 +45,21 @@ public class EncryptionUtil {
         }
     }
 
-    // TODO make key configurable
-    private byte[] keyBytes = new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05,
-            0x06, 0x07, 0x08, 0x09,
-            0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
-            0x15, 0x16, 0x17 };
+    private final SecretKeySpec key;
 
     public EncryptionUtil(byte[] keyBytes) {
-        this.keyBytes = keyBytes;
+        // java only allow 128bit (16 chars) in key by default (seems to vary between openJDK and sun JDK)
+        byte[] validKeyBytes = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00 };
+        // make sure we have an array of 16 length
+        System.arraycopy(keyBytes, 0, validKeyBytes, 0, Math.min(keyBytes.length, 16));
+        // it seems to do some padding internally and will make the keyBytes
+        // become 192 bits. Here we set the length to 16 to force it to 128 bit
+        key = new SecretKeySpec(validKeyBytes, 0, 16, "AES");
     }
-    // java only allow 128bit (16 chars) in key by default
-    private SecretKeySpec key = new SecretKeySpec(keyBytes, 0, 16, "AES");
+
 
     public String encrypt(String input) {
         // encryption pass
@@ -71,7 +75,7 @@ public class EncryptionUtil {
 
 
 
-    public String decryptValue(String cipherText) {
+    public String decrypt(String cipherText) {
         // decryption pass
         try {
             cipher.init(Cipher.DECRYPT_MODE, key);

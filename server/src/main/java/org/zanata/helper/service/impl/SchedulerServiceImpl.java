@@ -65,6 +65,8 @@ public class SchedulerServiceImpl implements SchedulerService {
                 appConfiguration.getRepoDirectory());
         log.info("== config directory:  {}",
                 appConfiguration.getConfigDirectory());
+        log.info("== fields to encrypt: {}",
+                appConfiguration.getFieldsNeedEncryption());
         log.info("=====================================================");
         log.info("=====================================================");
 

@@ -43,7 +43,6 @@ import org.slf4j.LoggerFactory;
 import org.zanata.helper.component.AppConfiguration;
 import org.zanata.helper.model.SyncWorkConfig;
 import org.zanata.helper.model.SyncWorkIDGenerator;
-import org.zanata.helper.util.YamlUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 import com.google.common.cache.Cache;
@@ -68,6 +67,9 @@ public class SyncWorkConfigRepository {
 
     @Inject
     protected AppConfiguration appConfiguration;
+
+    @Inject
+    private SyncWorkConfigSerializer serializer;
 
     @VisibleForTesting
     protected SyncWorkConfigRepository(File configDirectory) {
@@ -98,12 +100,7 @@ public class SyncWorkConfigRepository {
 
     private Optional<SyncWorkConfig> loadConfigFile(File configFile) {
         if (configFile.exists()) {
-            try (InputStream inputStream = new FileInputStream(
-                    configFile)) {
-                return Optional.of(new SyncWorkConfig().fromYaml(inputStream));
-            } catch (IOException e) {
-                log.error("error loading config file: {}", configFile, e);
-            }
+            return Optional.of(serializer.fromYaml(configFile));
         }
         return Optional.empty();
     }
@@ -116,7 +113,7 @@ public class SyncWorkConfigRepository {
             File latestConfigFile = latestWorkConfig(syncWorkConfig.getId());
 
             syncWorkConfig.onPersist();
-            String incomingYaml = syncWorkConfig.toYaml();
+            String incomingYaml = serializer.toYaml(syncWorkConfig);
 
             boolean made = workConfigFolder.mkdirs();
             if (!made && latestConfigFile.exists()) {
@@ -196,7 +193,7 @@ public class SyncWorkConfigRepository {
                 Arrays.stream(configDirectory.listFiles(File::isDirectory))
                         .map(SyncWorkConfigRepository::latestWorkConfig)
                         .filter(file -> file.exists() && file.canRead())
-                        .map(file -> loadConfigFile(file).get())
+                        .map(serializer::fromYaml)
                         .collect(Collectors.toList());
         allWorkConfig.forEach(
                 config -> cache.put(config.getId(), Optional.of(config)));

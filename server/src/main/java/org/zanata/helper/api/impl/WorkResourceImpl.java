@@ -5,22 +5,17 @@ import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zanata.helper.action.SyncWorkForm;
-import org.zanata.helper.api.APIResource;
 import org.zanata.helper.api.WorkResource;
 import org.zanata.helper.exception.WorkNotFoundException;
 import org.zanata.helper.model.SyncWorkConfig;
 import org.zanata.helper.model.SyncWorkConfigBuilder;
+import org.zanata.helper.model.SyncWorkConfigBuilderImpl;
 import org.zanata.helper.service.SchedulerService;
 import org.zanata.helper.validation.SyncWorkFormValidator;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import java.net.URI;
@@ -40,6 +35,9 @@ public class WorkResourceImpl implements WorkResource {
 
     @Inject
     private SyncWorkFormValidator formValidator;
+
+    @Inject
+    private SyncWorkConfigBuilder syncWorkConfigBuilder;
 
     @Override
     public Response
@@ -68,7 +66,7 @@ public class WorkResourceImpl implements WorkResource {
             return Response.status(Response.Status.BAD_REQUEST).entity(errors).build();
         }
 
-        SyncWorkConfig syncWorkConfig = new SyncWorkConfigBuilder(form).build();
+        SyncWorkConfig syncWorkConfig = syncWorkConfigBuilder.build(form);
         try {
             schedulerServiceImpl.persistAndScheduleWork(syncWorkConfig);
         } catch (SchedulerException e) {

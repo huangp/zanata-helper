@@ -4,13 +4,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Properties;
 import javax.enterprise.context.Dependent;
 
 import org.apache.commons.lang.StringUtils;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 
 /**
@@ -22,6 +25,7 @@ public class AppConfiguration {
     private final static String repoDirectory = "repository";
     private final File configDir;
     private final File repoDir;
+    private List<String> fieldsNeedEncryption;
 
     public AppConfiguration() {
         ClassLoader contextClassLoader =
@@ -36,6 +40,10 @@ public class AppConfiguration {
             buildVersion = properties.getProperty("build.version");
             properties.load(config);
             storageDirectory = properties.getProperty("store.directory");
+            String fields =
+                    properties.getProperty("fields.need.encryption", "");
+            fieldsNeedEncryption = ImmutableList.copyOf(Splitter.on(",").omitEmptyStrings().trimResults()
+                   .split(fields));
 
             configDir = Paths.get(buildConfigDirectory()).toFile();
             checkDirectory("configuration", configDir);
@@ -102,5 +110,9 @@ public class AppConfiguration {
 
     private static String removeTrailingSlash(String string) {
         return StringUtils.chomp(string, "" + File.separatorChar);
+    }
+
+    public List<String> getFieldsNeedEncryption() {
+        return fieldsNeedEncryption;
     }
 }

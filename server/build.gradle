@@ -36,6 +36,8 @@ dependencies {
     runtime group: 'org.apache.deltaspike.modules', name: 'deltaspike-servlet-module-impl', version: '1.5.2'
     compile 'org.apache.deltaspike.cdictrl:deltaspike-cdictrl-api:1.5.2'
     runtime 'org.apache.deltaspike.cdictrl:deltaspike-cdictrl-weld:1.5.2'
+//    compile 'org.apache.deltaspike.modules:deltaspike-scheduler-module-api:1.5.2'
+//    runtime 'org.apache.deltaspike.modules:deltaspike-scheduler-module-impl:1.5.2'
 
     // jax-rs
     compile group: 'javax.ws.rs', name: 'jsr311-api', version: '1.1.1'
@@ -70,6 +72,7 @@ processResources {
     filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [
         version: version,
         build: versioning.info.full,
-        storeDirectory: '/tmp'
+        storeDirectory: '/tmp',
+        fieldsNeedEncryption: 'apiKey'
     ])
 }

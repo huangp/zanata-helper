@@ -7,4 +7,7 @@
   <!--<alternatives>-->
     <!--<class>org.mycompany.mock.MockPaymentProcessor</class>-->
   <!--</alternatives>-->
+  <decorators>
+    <class>org.zanata.helper.repository.SyncWorkConfigSerializerEncryptionDecorator</class>
+  </decorators>
 </beans>

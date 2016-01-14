@@ -18,14 +18,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.zanata.helper.model;
+package org.zanata.helper.repository;
 
-import java.io.InputStream;
+import java.io.File;
 
-public interface CanConvertToYaml<T> {
+import org.zanata.helper.model.SyncWorkConfig;
 
-    String toYaml();
+/**
+ * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
+ */
+public interface SyncWorkConfigSerializer {
 
-    T fromYaml(InputStream inputStream);
 
+    SyncWorkConfig fromYaml(File file);
+
+    String toYaml(SyncWorkConfig syncWorkConfig);
 }
