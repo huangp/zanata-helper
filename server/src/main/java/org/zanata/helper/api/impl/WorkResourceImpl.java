@@ -70,7 +70,7 @@ public class WorkResourceImpl implements WorkResource {
         try {
             schedulerServiceImpl.persistAndScheduleWork(syncWorkConfig);
         } catch (SchedulerException e) {
-            log.error("Error trying to schedule job", e.getMessage());
+            log.error("Error trying to schedule job", e);
             errors.put("error", e.getMessage());
             return Response.serverError().entity(errors).build();
         }

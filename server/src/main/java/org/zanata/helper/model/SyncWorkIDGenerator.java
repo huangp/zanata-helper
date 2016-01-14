@@ -20,6 +20,7 @@
  */
 package org.zanata.helper.model;
 
+import java.util.concurrent.atomic.AtomicLong;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -31,17 +32,17 @@ import org.zanata.helper.repository.SyncWorkConfigRepository;
  */
 @ApplicationScoped
 public class SyncWorkIDGenerator {
-    private static long latestId;
+    private AtomicLong latestId;
 
     @Inject
     private SyncWorkConfigRepository syncWorkConfigRepository;
 
-    public synchronized static Long nextID() {
-        return ++latestId;
+    public long nextID() {
+        return latestId.incrementAndGet();
     }
 
     @PostConstruct
     public void postConstruct() {
-        latestId = syncWorkConfigRepository.largestStoredWorkId();
+        latestId = new AtomicLong(syncWorkConfigRepository.largestStoredWorkId());
     }
 }

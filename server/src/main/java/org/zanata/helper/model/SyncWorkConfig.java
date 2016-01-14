@@ -37,16 +37,6 @@ public class SyncWorkConfig extends PersistModel {
     @Setter(AccessLevel.PROTECTED)
     private Date createdDate;
 
-    public SyncWorkConfig(String name, String description,
-            JobConfig syncToServerConfig, JobConfig syncToRepoConfig,
-            Map<String, String> srcRepoPluginConfig, String srcRepoPluginName,
-            Map<String, String> transServerConfig,
-            String transServerPluginName, String encryptionKey) {
-        this(SyncWorkIDGenerator.nextID(), name, description, syncToServerConfig,
-                syncToRepoConfig, srcRepoPluginConfig, srcRepoPluginName,
-                transServerConfig, transServerPluginName, encryptionKey);
-    }
-
     public SyncWorkConfig(Long id, String name, String description,
             JobConfig syncToServerConfig, JobConfig syncToRepoConfig,
             Map<String, String> srcRepoPluginConfig, String srcRepoPluginName,

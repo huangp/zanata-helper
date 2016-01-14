@@ -7,12 +7,15 @@ import lombok.NoArgsConstructor;
 import java.util.HashMap;
 import java.util.Map;
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
 @RequestScoped
 public class SyncWorkConfigBuilderImpl implements SyncWorkConfigBuilder {
+    @Inject
+    private SyncWorkIDGenerator idGenerator;
 
     @Override
     public SyncWorkConfig build(SyncWorkForm syncWorkForm) {
@@ -24,7 +27,8 @@ public class SyncWorkConfigBuilderImpl implements SyncWorkConfigBuilder {
                 syncWorkForm.getSyncToRepoCron(),
                 syncWorkForm.getSyncToRepoOption());
 
-        return new SyncWorkConfig(syncWorkForm.getName(),
+        return new SyncWorkConfig(idGenerator.nextID(),
+                syncWorkForm.getName(),
                 syncWorkForm.getDescription(),
                 syncToServerConfig,
                 syncToRepoConfig,

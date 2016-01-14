@@ -58,6 +58,8 @@ public class SyncWorkConfigRepository {
     private static final Logger log =
             LoggerFactory.getLogger(SyncWorkConfigRepository.class);
 
+    private static final String historyFileFormat = "archive-%s.yaml";
+
     private final Cache<Long, Optional<SyncWorkConfig>> cache = CacheBuilder
             .newBuilder()
             .build();
@@ -125,7 +127,9 @@ public class SyncWorkConfigRepository {
                 }
                 // back up current work config
                 FileUtils.moveFile(latestConfigFile,
-                        new File(workConfigFolder, "-" + new Date().getTime()));
+                        new File(workConfigFolder,
+                                String.format(historyFileFormat,
+                                        new Date().getTime())));
             }
             // write new work config
             FileUtils.write(latestConfigFile, incomingYaml, UTF_8);

@@ -84,7 +84,7 @@ public class CronTrigger {
             Class jobClass, String cronExp) {
         JobBuilder builder = JobBuilder
                 .newJob(jobClass)
-                .withIdentity(key.getName())
+                .withIdentity(key.toString())
                 .withDescription(syncWorkConfig.toString());
 
         if(StringUtils.isEmpty(cronExp)) {
