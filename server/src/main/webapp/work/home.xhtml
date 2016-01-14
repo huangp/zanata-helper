@@ -46,7 +46,7 @@
               #{workAction.syncWorkConfig.description}
             </p>
             <h:panelGroup layout="block" id="jobStatus">
-              <div class="l--pad-all-quarter">
+              <div class="l--pad-all-quarter panel">
                   <ui:fragment rendered="#{not workAction.isSyncToRepoRunning()}">
                     <button class="button--small button--warning button loader" onclick="triggerSyncToRepoJob();return false">
                       <span class="loader__label">#{msg['jsf.work.runJobNow']}</span>
@@ -59,10 +59,10 @@
                       </span>
                     </div>
                   </ui:fragment>
-                <c:workstatus jobStatus="#{workAction.syncWorkConfig.syncToRepoConfig.lastJobStatus}" type="REPO_SYNC" styleClass="l--push-bottom-quarter"/>
+                <c:workstatus jobStatus="#{workAction.syncWorkConfig.syncToRepoConfig.lastJobStatus}" type="REPO_SYNC" styleClass="l--pad-top-quarter"/>
               </div>
 
-              <div class="l--pad-all-quarter l--push-top-half">
+              <div class="l--pad-all-quarter l--push-top-half panel">
                   <ui:fragment rendered="#{not workAction.isSyncToServerRunning()}">
                     <button class="button--small button--warning button loader" onclick="triggerSyncToServerJob();return false">
                       <span class="loader__label">#{msg['jsf.work.runJobNow']}</span>
@@ -75,7 +75,7 @@
                       </span>
                     </div>
                   </ui:fragment>
-                <c:workstatus jobStatus="#{workAction.syncWorkConfig.syncToServerConfig.lastJobStatus}" type="SERVER_SYNC" styleClass="l--push-bottom-quarter"/>
+                <c:workstatus jobStatus="#{workAction.syncWorkConfig.syncToServerConfig.lastJobStatus}" type="SERVER_SYNC" styleClass="l--pad-top-quarter"/>
               </div>
             </h:panelGroup>
           </div>

@@ -84,7 +84,7 @@ public class CronTrigger {
             Class jobClass, String cronExp) {
         JobBuilder builder = JobBuilder
                 .newJob(jobClass)
-                .withIdentity(key.toString())
+                .withIdentity(key)
                 .withDescription(syncWorkConfig.toString());
 
         if(StringUtils.isEmpty(cronExp)) {
@@ -154,22 +154,6 @@ public class CronTrigger {
         return Optional.empty();
     }
 
-    public JobStatus getTriggerStatus(TriggerKey key,
-        JobRunUpdate event) throws SchedulerException {
-        if (scheduler.checkExists(key)) {
-            Trigger.TriggerState state = scheduler.getTriggerState(key);
-            Trigger trigger = scheduler.getTrigger(key);
-            Date endTime =
-                event != null ? event.getCompletedTime() : null;
-
-            return new JobStatus(
-                JobStatusType.getType(state, isJobRunning(key)),
-                trigger.getPreviousFireTime(), endTime,
-                trigger.getNextFireTime());
-        }
-        return JobStatus.EMPTY;
-    }
-
     public JobStatus getTriggerStatus(Long id,
             JobRunUpdate event) throws SchedulerException {
         JobKey key = event.getJobType().toJobKey(id);
@@ -208,16 +192,12 @@ public class CronTrigger {
 
     public List<JobDetail> getJobs() throws SchedulerException {
         List<JobDetail> jobs = new ArrayList<>();
-        for (String groupName : scheduler.getJobGroupNames()) {
-            for (JobKey jobKey : scheduler
-                    .getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
-                JobType jobType = JobType.valueOf(jobKey.getName());
-                Long workId = new Long(jobKey.getGroup());
-
-                JobDetail jobDetail =
-                        scheduler.getJobDetail(jobType.toJobKey(workId));
-                jobs.add(jobDetail);
-            }
+        for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.anyJobGroup())) {
+            JobType jobType = JobType.valueOf(jobKey.getName());
+            Long workId = new Long(jobKey.getGroup());
+            JobDetail jobDetail =
+                    scheduler.getJobDetail(jobType.toJobKey(workId));
+            jobs.add(jobDetail);
         }
         return jobs;
     }

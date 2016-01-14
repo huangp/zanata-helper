@@ -134,7 +134,7 @@ public class SchedulerServiceImpl implements SchedulerService {
                 syncWorkConfigRepository.load(event.getId());
         if (syncWorkConfigOpt.isPresent()) {
             SyncWorkConfig syncWorkConfig = syncWorkConfigOpt.get();
-            log.debug("Job : " + syncWorkConfig.getName() + " is completed.");
+            log.debug("Job: " + event.getJobType() + "-" + syncWorkConfig.getName() + " is completed.");
             syncWorkConfig.setLastJobStatus(getStatus(event.getId(), event),
                 event.getJobType());
             syncWorkConfigRepository.persist(syncWorkConfig);
