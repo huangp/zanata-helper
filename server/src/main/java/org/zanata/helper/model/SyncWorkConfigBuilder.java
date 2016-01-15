@@ -23,5 +23,7 @@ package org.zanata.helper.model;
 import org.zanata.helper.action.SyncWorkForm;
 
 public interface SyncWorkConfigBuilder {
-    SyncWorkConfig build(SyncWorkForm syncWorkForm);
+    SyncWorkConfig buildObject(SyncWorkForm syncWorkForm);
+
+    SyncWorkForm buildForm(SyncWorkConfig syncWorkConfig);
 }

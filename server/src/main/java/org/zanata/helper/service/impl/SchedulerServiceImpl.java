@@ -31,7 +31,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -79,7 +78,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         List<SyncWorkConfig> syncWorkConfigs = syncWorkConfigRepository.getAllWorks();
         try {
             for (SyncWorkConfig syncWorkConfig : syncWorkConfigs) {
-                scheduleJob(syncWorkConfig);
+                scheduleWork(syncWorkConfig);
             }
         } catch (SchedulerException e) {
             throw Throwables.propagate(e);
@@ -136,7 +135,9 @@ public class SchedulerServiceImpl implements SchedulerService {
                 syncWorkConfigRepository.load(event.getId());
         if (syncWorkConfigOpt.isPresent()) {
             SyncWorkConfig syncWorkConfig = syncWorkConfigOpt.get();
-            log.debug("Job: " + event.getJobType() + "-" + syncWorkConfig.getName() + " is completed.");
+            log.debug(
+                "Job: " + event.getJobType() + "-" + syncWorkConfig.getName() +
+                    " is completed.");
             syncWorkConfig.setLastJobStatus(getStatus(event.getId(), event),
                 event.getJobType());
             syncWorkConfigRepository.persist(syncWorkConfig);
@@ -172,10 +173,25 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public void persistAndScheduleWork(SyncWorkConfig syncWorkConfig)
+    public void scheduleWork(SyncWorkConfig syncWorkConfig)
         throws SchedulerException {
-        syncWorkConfigRepository.persist(syncWorkConfig);
-        scheduleJob(syncWorkConfig);
+        cronTrigger.scheduleMonitorForRepoSync(syncWorkConfig);
+        cronTrigger.scheduleMonitorForServerSync(syncWorkConfig);
+    }
+
+    @Override
+    public void rescheduleWork(SyncWorkConfig syncWorkConfig)
+        throws SchedulerException {
+
+        cronTrigger.reschedule(
+            JobType.REPO_SYNC.toTriggerKey(syncWorkConfig.getId()),
+            syncWorkConfig.getSyncToRepoConfig().getCron(),
+            syncWorkConfig.getId(), JobType.REPO_SYNC);
+
+        cronTrigger.reschedule(
+            JobType.SERVER_SYNC.toTriggerKey(syncWorkConfig.getId()),
+            syncWorkConfig.getSyncToServerConfig().getCron(),
+            syncWorkConfig.getId(), JobType.SERVER_SYNC);
     }
 
     @Override
@@ -240,11 +256,6 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     public List<SyncWorkConfig> getAllWork() throws SchedulerException {
         return syncWorkConfigRepository.getAllWorks();
-    }
-
-    private void scheduleJob(SyncWorkConfig syncWorkConfig) throws SchedulerException {
-        cronTrigger.scheduleMonitorForRepoSync(syncWorkConfig);
-        cronTrigger.scheduleMonitorForServerSync(syncWorkConfig);
     }
 
     private JobStatus getStatus(Long id, JobRunUpdate event)

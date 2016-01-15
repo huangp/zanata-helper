@@ -58,7 +58,7 @@ public class WorkResourceImpl implements WorkResource {
                 }
             } catch (WorkNotFoundException e) {
                 log.error("fail getting all jobs", e);
-                return Response.serverError().build();
+                return Response.status(Response.Status.NOT_FOUND).build();
             }
         }
     }
@@ -69,14 +69,37 @@ public class WorkResourceImpl implements WorkResource {
         if (!errors.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(errors).build();
         }
-
-        SyncWorkConfig syncWorkConfig = syncWorkConfigBuilder.build(form);
+        SyncWorkConfig syncWorkConfig = syncWorkConfigBuilder.buildObject(form);
         try {
-            schedulerServiceImpl.persistAndScheduleWork(syncWorkConfig);
+            workServiceImpl.updateOrPersist(syncWorkConfig);
+            schedulerServiceImpl.scheduleWork(syncWorkConfig);
         } catch (SchedulerException e) {
             log.error("Error trying to schedule job", e);
             errors.put("error", e.getMessage());
             return Response.serverError().entity(errors).build();
+        }
+        // TODO create URI
+        return Response.created(URI.create("")).entity(errors).build();
+    }
+
+    @Override
+    public Response updateWork(SyncWorkForm form) {
+        if(form.getId() == null) {
+            return createWork(form);
+        }
+        Map<String, String> errors = formValidator.validateJobForm(form);
+        if (!errors.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(errors).build();
+        }
+        SyncWorkConfig syncWorkConfig = syncWorkConfigBuilder.buildObject(form);
+
+        try {
+            workServiceImpl.updateOrPersist(syncWorkConfig);
+            schedulerServiceImpl.rescheduleWork(syncWorkConfig);
+        } catch (SchedulerException e) {
+            log.error("Error rescheduling work", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(errors).build();
         }
         // TODO create URI
         return Response.created(URI.create("")).entity(errors).build();

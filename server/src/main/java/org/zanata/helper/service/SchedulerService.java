@@ -25,7 +25,11 @@ public interface SchedulerService {
 
     List<SyncWorkConfig> getAllWork() throws SchedulerException;
 
-    void persistAndScheduleWork(SyncWorkConfig syncWorkConfig) throws SchedulerException;
+    void scheduleWork(SyncWorkConfig syncWorkConfig)
+        throws SchedulerException;
+
+    void rescheduleWork(SyncWorkConfig syncWorkConfig)
+        throws SchedulerException;
 
     void cancelRunningJob(Long id, JobType type)
         throws UnableToInterruptJobException, JobNotFoundException;

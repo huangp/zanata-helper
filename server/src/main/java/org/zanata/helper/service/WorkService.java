@@ -1,6 +1,7 @@
 package org.zanata.helper.service;
 
 import org.zanata.helper.exception.WorkNotFoundException;
+import org.zanata.helper.model.SyncWorkConfig;
 import org.zanata.helper.model.WorkSummary;
 
 /**
@@ -12,4 +13,6 @@ public interface WorkService {
     WorkSummary disableWork(Long id) throws WorkNotFoundException;
 
     WorkSummary enableWork(Long id) throws WorkNotFoundException;
+
+    void updateOrPersist(SyncWorkConfig syncWorkConfig);
 }

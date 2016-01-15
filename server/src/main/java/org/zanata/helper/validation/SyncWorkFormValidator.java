@@ -60,9 +60,9 @@ public class SyncWorkFormValidator {
             errors.put(violation.getPropertyPath().toString(), violation.getMessage());
         });
 
-        errors.putAll(validateRepoFields(form.getSrcRepoConfig(),
+        errors.putAll(validateRepoFields(form.getSrcRepoPluginConfig(),
                 form.getSrcRepoPluginName()));
-        errors.putAll(validateTransFields(form.getTransServerConfig(),
+        errors.putAll(validateTransFields(form.getTransServerPluginConfig(),
                 form.getTransServerPluginName()));
 
         return errors;

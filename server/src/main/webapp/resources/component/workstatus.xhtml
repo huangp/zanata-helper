@@ -41,10 +41,10 @@
 
     <div title="#{title}" class="#{statusClass} #{cc.attrs.styleClass}">
       <h:panelGroup styleClass="txt--meta #{cc.attrs.displayType eq 'block' ? 'bx--block' : 'bx--inline-block'}" rendered="#{cc.attrs.type eq 'REPO_SYNC'}">
-        #{msg['jsf.newWork.syncToRepo.title']}
+        #{msg['jsf.work.field.syncToRepo.title']}
       </h:panelGroup>
       <h:panelGroup styleClass="txt--meta #{cc.attrs.displayType eq 'block' ? 'bx--block' : 'bx--inline-block'}" rendered="#{cc.attrs.type eq 'SERVER_SYNC'}">
-        #{msg['jsf.newWork.syncToServer.title']}
+        #{msg['jsf.work.field.syncToServer.title']}
       </h:panelGroup>
       <span class="txt--meta bx--inline-block #{cc.attrs.displayType eq 'block' ? '' : 'l--push-left-quarter'}">
         <i class="i i--clock"></i> <span>#{cc.attrs.jobStatus.lastEndTime}</span>

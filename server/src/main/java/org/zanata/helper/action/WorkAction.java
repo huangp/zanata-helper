@@ -1,10 +1,10 @@
 package org.zanata.helper.action;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
-import javax.faces.context.ExternalContext;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
@@ -13,14 +13,17 @@ import javax.ws.rs.core.Response;
 
 import org.zanata.helper.api.JobResource;
 import org.zanata.helper.api.WorkResource;
+import org.zanata.helper.i18n.Messages;
 import org.zanata.helper.model.JobStatusType;
 import org.zanata.helper.model.JobSummary;
 import org.zanata.helper.model.JobType;
-import org.zanata.helper.model.SyncWorkConfig;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.zanata.helper.model.SyncWorkConfig;
+import org.zanata.helper.model.SyncWorkConfigBuilder;
+import org.zanata.helper.service.PluginsService;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
@@ -28,13 +31,22 @@ import lombok.extern.slf4j.Slf4j;
 @Named("workAction")
 @Slf4j
 @ViewScoped
-public class WorkAction implements Serializable {
+public class WorkAction extends HasFormAction {
 
     @Inject
     private WorkResource workResourceImpl;
 
     @Inject
     private JobResource jobResource;
+
+    @Inject
+    private PluginsService pluginsServiceImpl;
+
+    @Inject
+    private SyncWorkConfigBuilder syncWorkConfigBuilderImpl;
+
+    @Inject
+    private Messages msg;
 
     @Getter
     @Setter
@@ -44,6 +56,13 @@ public class WorkAction implements Serializable {
 
     @PostConstruct
     public void init() {
+    }
+
+    public SyncWorkForm getForm() {
+        if(form == null) {
+            form = syncWorkConfigBuilderImpl.buildForm(getSyncWorkConfig());
+        }
+        return form;
     }
 
     public SyncWorkConfig getSyncWorkConfig() {
@@ -84,14 +103,32 @@ public class WorkAction implements Serializable {
         workResourceImpl.enableWork(id);
     }
 
-    public void saveChanges() {
-
-    }
-
     private boolean isJobRunning(JobType jobType) {
         Response response =
                 jobResource.getJob(id, jobType, JobStatusType.RUNNING);
         List<JobSummary> result = (List<JobSummary>) response.getEntity();
         return !result.isEmpty();
+    }
+
+    @Override
+    protected Messages getMessage() {
+        return msg;
+    }
+
+    @Override
+    protected PluginsService getPluginService() {
+        return pluginsServiceImpl;
+    }
+
+    @Override
+    public String onSubmit() throws IOException {
+        Response response = workResourceImpl.updateWork(form);
+        errors = (Map<String, String>) response.getEntity();
+        if (!errors.isEmpty()) {
+            return "/work/home.xhtml";
+        }
+        FacesContext.getCurrentInstance().getExternalContext()
+            .redirect("/home.xhtml");
+        return "";
     }
 }

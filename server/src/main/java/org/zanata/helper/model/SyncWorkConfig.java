@@ -26,7 +26,7 @@ public class SyncWorkConfig extends PersistModel {
 
     private Map<String, String> srcRepoPluginConfig =
             new HashMap<>();
-    private Map<String, String> transServerConfig =
+    private Map<String, String> transServerPluginConfig =
             new HashMap<>();
 
     private String srcRepoPluginName;
@@ -42,7 +42,7 @@ public class SyncWorkConfig extends PersistModel {
     public SyncWorkConfig(Long id, String name, String description,
             JobConfig syncToServerConfig, JobConfig syncToRepoConfig,
             Map<String, String> srcRepoPluginConfig, String srcRepoPluginName,
-            Map<String, String> transServerConfig,
+            Map<String, String> transServerPluginConfig,
             String transServerPluginName, String encryptionKey, boolean disabled) {
         this.id = id;
         this.name = name;
@@ -51,7 +51,7 @@ public class SyncWorkConfig extends PersistModel {
         this.syncToRepoConfig = syncToRepoConfig;
         this.srcRepoPluginConfig = srcRepoPluginConfig;
         this.srcRepoPluginName = srcRepoPluginName;
-        this.transServerConfig = transServerConfig;
+        this.transServerPluginConfig = transServerPluginConfig;
         this.transServerPluginName = transServerPluginName;
         this.encryptionKey = encryptionKey;
         this.disabled = disabled;
@@ -70,7 +70,7 @@ public class SyncWorkConfig extends PersistModel {
                 Objects.equals(syncToRepoConfig, that.syncToRepoConfig) &&
                 Objects.equals(srcRepoPluginConfig, that.srcRepoPluginConfig) &&
                 Objects
-                        .equals(transServerConfig, that.transServerConfig) &&
+                        .equals(transServerPluginConfig, that.transServerPluginConfig) &&
                 Objects.equals(srcRepoPluginName,
                         that.srcRepoPluginName) &&
                 Objects.equals(transServerPluginName,
@@ -84,7 +84,7 @@ public class SyncWorkConfig extends PersistModel {
         return Objects
                 .hash(id, name, description, syncToServerConfig,
                         syncToRepoConfig,
-                    srcRepoPluginConfig, transServerConfig,
+                    srcRepoPluginConfig, transServerPluginConfig,
                     srcRepoPluginName,
                     transServerPluginName, createdDate, disabled);
     }

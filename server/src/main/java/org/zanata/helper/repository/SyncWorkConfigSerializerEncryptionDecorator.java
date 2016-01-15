@@ -47,7 +47,7 @@ public class SyncWorkConfigSerializerEncryptionDecorator
         for (String field : fieldsNeedEncryption) {
             configOnDisk.getSrcRepoPluginConfig().computeIfPresent(field,
                     decryptFunc);
-            configOnDisk.getTransServerConfig().computeIfPresent(field,
+            configOnDisk.getTransServerPluginConfig().computeIfPresent(field,
                     decryptFunc);
         }
 
@@ -74,7 +74,7 @@ public class SyncWorkConfigSerializerEncryptionDecorator
         for (String field : fieldsNeedEncryption) {
             syncWorkConfig.getSrcRepoPluginConfig().computeIfPresent(field,
                     encryptFunc);
-            syncWorkConfig.getTransServerConfig().computeIfPresent(field,
+            syncWorkConfig.getTransServerPluginConfig().computeIfPresent(field,
                     encryptFunc);
         }
 

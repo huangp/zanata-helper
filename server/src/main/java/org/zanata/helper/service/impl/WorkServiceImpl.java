@@ -76,6 +76,11 @@ public class WorkServiceImpl implements WorkService {
         return getWorkSummary(id);
     }
 
+    @Override
+    public void updateOrPersist(SyncWorkConfig syncWorkConfig) {
+        syncWorkConfigRepository.persist(syncWorkConfig);
+    }
+
     private void checkWorkExist(Long id) throws WorkNotFoundException {
         if(!syncWorkConfigRepository.load(id).isPresent()) {
             throw new WorkNotFoundException(id.toString());

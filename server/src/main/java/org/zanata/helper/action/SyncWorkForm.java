@@ -21,6 +21,9 @@ public class SyncWorkForm implements Serializable {
     public final static String repoSettingsPrefix = "sourceSettingsConfig.";
     public final static String transSettingsPrefix = "transSettingsConfig.";
 
+    @Setter
+    private Long id;
+
     @Size(min = 5, max = 100)
     @NotEmpty
     @Setter
@@ -56,8 +59,8 @@ public class SyncWorkForm implements Serializable {
 
     /**
      * If specified, it will encrypt field listed in config properties whose
-     * value matches key in {@link SyncWorkForm#srcRepoConfig} and {@link
-     * SyncWorkForm#transServerConfig}
+     * value matches key in {@link SyncWorkForm#srcRepoPluginConfig} and {@link
+     * SyncWorkForm#transServerPluginConfig}
      */
     @Size(max = 16)
     @Setter
@@ -67,13 +70,13 @@ public class SyncWorkForm implements Serializable {
      * All field id must prefix with {@link SyncWorkForm#repoSettingsPrefix}
      */
     @Setter
-    private Map<String, String> srcRepoConfig = new HashMap<>();
+    private Map<String, String> srcRepoPluginConfig = new HashMap<>();
 
     /**
      * All field id must prefix with {@link SyncWorkForm#transSettingsPrefix}
      */
     @Setter
-    private Map<String, String> transServerConfig = new HashMap<>();
+    private Map<String, String> transServerPluginConfig = new HashMap<>();
 
     public static String getRepoSettingsPrefix() {
         return repoSettingsPrefix;

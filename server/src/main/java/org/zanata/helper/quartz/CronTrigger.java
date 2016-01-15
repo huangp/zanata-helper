@@ -128,12 +128,12 @@ public class CronTrigger {
                                     syncWorkConfig.getSrcRepoPluginConfig()));
 
             jobDetail.getJobDataMap()
-                    .put(TranslationServerExecutor.class.getSimpleName(),
-                            pluginsService
-                                    .getNewTransServerPlugin(
-                                            syncWorkConfig
-                                                    .getTransServerPluginName(),
-                                            syncWorkConfig.getTransServerConfig()));
+                .put(TranslationServerExecutor.class.getSimpleName(),
+                    pluginsService
+                        .getNewTransServerPlugin(
+                            syncWorkConfig
+                                .getTransServerPluginName(),
+                            syncWorkConfig.getTransServerPluginConfig()));
 
             if (scheduler.getListenerManager().getJobListeners().isEmpty()) {
                 scheduler.getListenerManager()

@@ -99,17 +99,10 @@
                 </h2>
               </div>
 
-              <h:panelGroup layout="block" styleClass="l--pad-all-half" id="configuration">
-                <h:form styleClass="l--push-bottom-0">
-                  //all configuration here
-                  <div class="l--push-top-half">
-                    <h:commandButton styleClass="button button--primary button--full"
-                      value="#{msg['jsf.work.update.button']}"
-                      action="#{workAction.saveChanges()}">
-                    </h:commandButton>
-                  </div>
-                </h:form>
-                <div class="l--push-top-1 txt--align-right">
+              <h:panelGroup layout="block" styleClass="l--pad-all-1" id="configuration">
+                <c:workForm actionClass="#{workAction}" id="work-form" styleClass="l--push-buttom-0"/>
+
+                <div class="l--push-top-1 txt--align-right g__item">
                   <button class="button--danger l--push-right-half loader" onclick="deleteWork();">
                     <span class="loader__label">#{msg['jsf.work.delete.button']}</span>
                   </button>

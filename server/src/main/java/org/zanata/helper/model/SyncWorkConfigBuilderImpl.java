@@ -2,10 +2,6 @@ package org.zanata.helper.model;
 
 import org.zanata.helper.action.SyncWorkForm;
 
-import lombok.NoArgsConstructor;
-
-import java.util.HashMap;
-import java.util.Map;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 
@@ -18,7 +14,7 @@ public class SyncWorkConfigBuilderImpl implements SyncWorkConfigBuilder {
     private SyncWorkIDGenerator idGenerator;
 
     @Override
-    public SyncWorkConfig build(SyncWorkForm syncWorkForm) {
+    public SyncWorkConfig buildObject(SyncWorkForm syncWorkForm) {
         JobConfig syncToServerConfig = new JobConfig(JobType.SERVER_SYNC,
                 syncWorkForm.getSyncToServerCron(),
                 syncWorkForm.getSyncToServerOption());
@@ -32,10 +28,37 @@ public class SyncWorkConfigBuilderImpl implements SyncWorkConfigBuilder {
                 syncWorkForm.getDescription(),
                 syncToServerConfig,
                 syncToRepoConfig,
-                syncWorkForm.getSrcRepoConfig(),
+                syncWorkForm.getSrcRepoPluginConfig(),
                 syncWorkForm.getSrcRepoPluginName(),
-                syncWorkForm.getTransServerConfig(),
+                syncWorkForm.getTransServerPluginConfig(),
                 syncWorkForm.getTransServerPluginName(),
                 syncWorkForm.getEncryptionKey(), false);
+    }
+
+    @Override
+    public SyncWorkForm buildForm(SyncWorkConfig syncWorkConfig) {
+
+        SyncWorkForm form = new SyncWorkForm();
+        form.setId(syncWorkConfig.getId());
+        form.setName(syncWorkConfig.getName());
+        form.setDescription(syncWorkConfig.getDescription());
+        form.setEncryptionKey(syncWorkConfig.getEncryptionKey());
+        form.setSrcRepoPluginName(syncWorkConfig.getSrcRepoPluginName());
+        form.setTransServerPluginName(syncWorkConfig.getTransServerPluginName());
+
+        form.setSrcRepoPluginConfig(syncWorkConfig.getSrcRepoPluginConfig());
+        form.setTransServerPluginConfig(
+            syncWorkConfig.getTransServerPluginConfig());
+
+        form.setSyncToRepoOption(
+            syncWorkConfig.getSyncToRepoConfig().getOption());
+        form.setSyncToServerOption(
+            syncWorkConfig.getSyncToServerConfig().getOption());
+
+        form.setSyncToRepoCron(syncWorkConfig.getSyncToRepoConfig().getCron());
+        form.setSyncToServerCron(
+            syncWorkConfig.getSyncToServerConfig().getCron());
+
+        return form;
     }
 }
