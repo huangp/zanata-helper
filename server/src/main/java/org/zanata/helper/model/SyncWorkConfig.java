@@ -34,6 +34,8 @@ public class SyncWorkConfig extends PersistModel {
 
     private String encryptionKey;
 
+    private boolean disabled = false;
+
     @Setter(AccessLevel.PROTECTED)
     private Date createdDate;
 
@@ -41,7 +43,7 @@ public class SyncWorkConfig extends PersistModel {
             JobConfig syncToServerConfig, JobConfig syncToRepoConfig,
             Map<String, String> srcRepoPluginConfig, String srcRepoPluginName,
             Map<String, String> transServerConfig,
-            String transServerPluginName, String encryptionKey) {
+            String transServerPluginName, String encryptionKey, boolean disabled) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -52,6 +54,7 @@ public class SyncWorkConfig extends PersistModel {
         this.transServerConfig = transServerConfig;
         this.transServerPluginName = transServerPluginName;
         this.encryptionKey = encryptionKey;
+        this.disabled = disabled;
     }
 
     @Override
@@ -72,7 +75,8 @@ public class SyncWorkConfig extends PersistModel {
                         that.srcRepoPluginName) &&
                 Objects.equals(transServerPluginName,
                         that.transServerPluginName) &&
-                Objects.equals(createdDate, that.createdDate);
+                Objects.equals(createdDate, that.createdDate) &&
+                Objects.equals(disabled, that.disabled);
     }
 
     @Override
@@ -82,7 +86,7 @@ public class SyncWorkConfig extends PersistModel {
                         syncToRepoConfig,
                     srcRepoPluginConfig, transServerConfig,
                     srcRepoPluginName,
-                    transServerPluginName, createdDate);
+                    transServerPluginName, createdDate, disabled);
     }
 
     public void setLastJobStatus(JobStatus status, JobType type) {
@@ -97,4 +101,7 @@ public class SyncWorkConfig extends PersistModel {
         }
     }
 
+    public void enableJob(boolean enable) {
+        this.disabled = !enable;
+    }
 }

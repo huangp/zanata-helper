@@ -36,6 +36,6 @@ public class SyncWorkConfigBuilderImpl implements SyncWorkConfigBuilder {
                 syncWorkForm.getSrcRepoPluginName(),
                 syncWorkForm.getTransServerConfig(),
                 syncWorkForm.getTransServerPluginName(),
-                syncWorkForm.getEncryptionKey());
+                syncWorkForm.getEncryptionKey(), false);
     }
 }

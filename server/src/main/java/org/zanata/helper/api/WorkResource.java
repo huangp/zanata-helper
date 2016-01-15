@@ -1,6 +1,7 @@
 package org.zanata.helper.api;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -34,4 +35,36 @@ public interface WorkResource {
     @POST
     @Consumes("application/json")
     public Response createWork(SyncWorkForm form);
+
+    /**
+     * Delete work permanently
+     *
+     * @param id - work id
+     */
+    @DELETE
+    @Consumes("application/json")
+    public Response deleteWork(
+        @QueryParam(value = "id") @DefaultValue("") String id);
+
+    /**
+     * Disable all jobs in work temporarily
+     *
+     * @param id - work id
+     */
+    @POST
+    @Consumes("application/json")
+    @Path("/disable")
+    public Response disableWork(
+        @QueryParam(value = "id") @DefaultValue("") String id);
+
+    /**
+     * Enable all jobs in work if disabled
+     *
+     * @param id - work id
+     */
+    @POST
+    @Consumes("application/json")
+    @Path("/enable")
+    public Response enableWork(
+        @QueryParam(value = "id") @DefaultValue("") String id);
 }

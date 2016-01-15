@@ -1,0 +1,146 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:a4j="http://richfaces.org/a4j"
+  xmlns:c="http://java.sun.com/jsf/composite/component"
+  template="/WEB-INF/includes/template.xhtml">
+
+  <ui:define name="content">
+    <div class="l__wrapper">
+      <div class="g--centered">
+        <div class="g__item w--1-2-m w--3-8-l w--1-2">
+          <p class="txt--meta l--push-all-0">
+            <a href="/home.xhtml">#{msg['jsf.home']}</a>
+          </p>
+          <h1 class="l--push-all-0">#{msg['jsf.newWork']}</h1>
+
+          <h:form id="workForm" styleClass="l--push-top-1">
+            <div class="g__item">
+              <c:textfield componentId="name" value="#{newWorkAction.form.name}"
+                styleClass="form__item"
+                label="#{msg['jsf.newWork.name']}" maxlength="100"
+                hasError="#{newWorkAction.hasError('name')}"
+                errorMessage="#{newWorkAction.getErrorMessage('name')}"/>
+
+              <c:textarea componentId="description" value="#{newWorkAction.form.description}"
+                styleClass="form__item"
+                label="#{msg['jsf.newWork.description']}"
+                hasError="#{newWorkAction.hasError('description')}"
+                errorMessage="#{newWorkAction.getErrorMessage('description')}"/>
+
+              <div class="l--push-top-1">
+                <h2 class="heading--secondary">
+                  #{msg['jsf.newWork.syncToServer.settings']}
+                </h2>
+                <c:textfield componentId="syncToServerCron" value="#{newWorkAction.form.syncToServerCron}"
+                  label="#{msg['jsf.newWork.cron.label']}"
+                  placeholder="#{msg['jsf.newWork.cron.placeholder']}"
+                  hasError="#{newWorkAction.hasError('syncToServerCron')}"
+                  errorMessage="#{newWorkAction.getErrorMessage('syncToServerCron')}"
+                  styleClass="form__item"/>
+                <div class="form__item">
+                  <label>#{msg['jsf.newWork.syncType']}</label>
+                  <h:selectOneMenu value="#{newWorkAction.form.syncToServerOption}">
+                    <f:selectItems value="#{newWorkAction.syncOptions}" var="option"
+                      itemLabel="#{option.label}" itemValue="#{option.key}" />
+                  </h:selectOneMenu>
+                </div>
+              </div>
+
+              <div class="l--push-top-1">
+                <h2 class="heading--secondary">
+                  #{msg['jsf.newWork.syncToRepo.settings']}
+                </h2>
+                <c:textfield componentId="syncToRepoCron" value="#{newWorkAction.form.syncToRepoCron}"
+                  label="#{msg['jsf.newWork.cron.label']}"
+                  placeholder="#{msg['jsf.newWork.cron.placeholder']}"
+                  hasError="#{newWorkAction.hasError('syncToRepoCron')}"
+                  errorMessage="#{newWorkAction.getErrorMessage('syncToRepoCron')}"
+                  styleClass="form__item"/>
+                <div class="form__item">
+                  <label>#{msg['jsf.newWork.syncType']}</label>
+                  <h:selectOneMenu value="#{newWorkAction.form.syncToRepoOption}">
+                    <f:selectItems value="#{newWorkAction.syncOptions}" var="option"
+                      itemLabel="#{option.label}" itemValue="#{option.key}" />
+                  </h:selectOneMenu>
+                </div>
+              </div>
+
+              <div class="l--push-top-1">
+                <h2 class="heading--secondary">
+                  #{msg['jsf.newWork.sourceRepoSettings']}
+                </h2>
+
+                <h:selectOneMenu value="#{newWorkAction.form.srcRepoPluginName}">
+                  <f:selectItems value="#{newWorkAction.repoExecutors}" var="plugin"
+                    itemLabel="#{plugin.getName()}" itemValue="#{plugin.getClass().getName()}" />
+                  <a4j:ajax event="change" render="selectedSrcPlugin"/>
+                </h:selectOneMenu>
+
+                <h:panelGroup layout="block" id="selectedSrcPlugin">
+                  <ui:fragment rendered="#{newWorkAction.selectedSrcPlugin ne null}">
+                    <div class="txt--meta l--push-v-quarter">#{newWorkAction.selectedSrcPlugin.getDescription()}</div>
+                    <hr class="l--push-top-quarter"/>
+                    <div class="form__item">
+                      <ui:repeat value="#{newWorkAction.selectedSrcPluginFields}" var="srcRepoField">
+                        <ui:param name="key" value="#{newWorkAction.form.getRepoSettingsPrefix()}#{srcRepoField.key}"/>
+                        <c:textfield componentId="#{key}"
+                          label="#{srcRepoField.label}" value="#{newWorkAction.form.srcRepoConfig[srcRepoField.key]}"
+                          styleClass="form__item" tooltip="#{srcRepoField.tooltip}"
+                          placeholder="#{srcRepoField.placeholder}"
+                          hasError="#{newWorkAction.hasError(key)}"
+                          errorMessage="#{newWorkAction.getErrorMessage(key)}">
+                        </c:textfield>
+                      </ui:repeat>
+                    </div>
+                  </ui:fragment>
+                </h:panelGroup>
+              </div>
+
+              <div class="l--push-top-1">
+                <h2 class="heading--secondary l--push-top-half">
+                  #{msg['jsf.newWork.transServer.settings']}
+                </h2>
+
+                <h:selectOneMenu value="#{newWorkAction.form.transServerPluginName}">
+                  <f:selectItems value="#{newWorkAction.transServerExecutors}" var="plugin"
+                    itemLabel="#{plugin.getName()}" itemValue="#{plugin.getClass().getName()}" />
+                  <a4j:ajax event="change" render="selectedServerPlugin"/>
+                </h:selectOneMenu>
+
+                <h:panelGroup layout="block" id="selectedServerPlugin">
+                  <ui:fragment rendered="#{newWorkAction.selectedServerPlugin ne null}">
+                    <div class="txt--meta l--push-v-quarter">#{newWorkAction.selectedServerPlugin.getDescription()}</div>
+                    <hr class="l--push-top-quarter"/>
+                    <div class="form__item">
+                      <ui:repeat value="#{newWorkAction.selectedServerPluginFields}" var="transPluginField">
+                        <ui:param name="key" value="#{newWorkAction.form.getTransSettingsPrefix()}#{transPluginField.key}"/>
+                        <c:textfield componentId="#{key}"
+                          label="#{transPluginField.label}" value="#{newWorkAction.form.transServerConfig[transPluginField.key]}"
+                          styleClass="form__item" tooltip="#{transPluginField.tooltip}"
+                          placeholder="#{transPluginField.placeholder}"
+                          hasError="#{newWorkAction.hasError(key)}"
+                          errorMessage="#{newWorkAction.getErrorMessage(key)}">>
+                        </c:textfield>
+                      </ui:repeat>
+                    </div>
+                  </ui:fragment>
+                </h:panelGroup>
+
+                <div class="form__item l--push-top-1">
+                  <h:commandButton styleClass="button button--primary button--full"
+                    value="#{msg['jsf.newWork.createWork.button']}"
+                    action="#{newWorkAction.submitNewWork()}">
+                  </h:commandButton>
+                </div>
+              </div>
+            </div>
+          </h:form>
+        </div>
+      </div>
+    </div>
+  </ui:define>
+</ui:composition>

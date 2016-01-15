@@ -213,6 +213,16 @@ public class CronTrigger {
         scheduler.deleteJob(jobKey);
     }
 
+    public void disableJob(Long id, JobType type) throws SchedulerException {
+        JobKey jobKey = type.toJobKey(id);
+        scheduler.pauseJob(jobKey);
+    }
+
+    public void enableJob(Long id, JobType type) throws SchedulerException {
+        JobKey jobKey = type.toJobKey(id);
+        scheduler.resumeJob(jobKey);
+    }
+
     public void reschedule(TriggerKey key, String cron, Long id, JobType type)
         throws SchedulerException {
         scheduler.rescheduleJob(key, buildTrigger(cron, id, type));

@@ -25,11 +25,13 @@ import org.zanata.helper.component.AppConfiguration;
 import org.zanata.helper.repository.SyncWorkConfigRepository;
 import org.zanata.helper.service.PluginsService;
 import org.zanata.helper.service.SchedulerService;
+import org.zanata.helper.util.WorkUtil;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -165,8 +167,8 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     public List<WorkSummary> getAllWorkSummary() throws SchedulerException {
         Collection<SyncWorkConfig> syncList = getAllWork();
-        return syncList.stream().map(this::convertToWorkSummary)
-            .collect(Collectors.toList());
+        return syncList.stream().map(WorkUtil::convertToWorkSummary)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -199,7 +201,17 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public void startJob(Long id, JobType type)
+    public void disableJob(Long id, JobType type) throws SchedulerException {
+        cronTrigger.disableJob(id, type);
+    }
+
+    @Override
+    public void enableJob(Long id, JobType type) throws SchedulerException {
+        cronTrigger.enableJob(id, type);
+    }
+
+    @Override
+    public void triggerJob(Long id, JobType type)
         throws JobNotFoundException, SchedulerException {
         Optional<SyncWorkConfig> workConfigOptional =
                 syncWorkConfigRepository.load(id);
@@ -222,7 +234,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     public WorkSummary getWorkSummary(String id) throws WorkNotFoundException {
         SyncWorkConfig syncWorkConfig = getWork(id);
-        return convertToWorkSummary(syncWorkConfig);
+        return WorkUtil.convertToWorkSummary(syncWorkConfig);
     }
 
     @Override
@@ -265,26 +277,4 @@ public class SchedulerServiceImpl implements SchedulerService {
         }
         return new JobSummary();
     }
-
-    private WorkSummary convertToWorkSummary(SyncWorkConfig syncWorkConfig) {
-        if (syncWorkConfig != null) {
-            return new WorkSummary(syncWorkConfig.getId(),
-                    syncWorkConfig.getName(),
-                    syncWorkConfig.getDescription(),
-                    new JobSummary("", syncWorkConfig.getName(),
-                            syncWorkConfig.getId().toString(),
-                            syncWorkConfig.getDescription(),
-                            JobType.REPO_SYNC,
-                            syncWorkConfig.getSyncToRepoConfig()
-                                    .getLastJobStatus()),
-                    new JobSummary("", syncWorkConfig.getName(),
-                            syncWorkConfig.getId().toString(),
-                            syncWorkConfig.getDescription(),
-                            JobType.SERVER_SYNC,
-                            syncWorkConfig.getSyncToServerConfig()
-                                    .getLastJobStatus()));
-        }
-        return new WorkSummary();
-    }
-
 }

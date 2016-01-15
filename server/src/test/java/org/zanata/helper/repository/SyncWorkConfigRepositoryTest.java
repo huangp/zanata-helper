@@ -40,7 +40,7 @@ public class SyncWorkConfigRepositoryTest {
                         SyncOption.TRANSLATIONS),
                 new HashMap<>(), "sourceRepoPluginName",
                 new HashMap<>(),
-                "translationServerExecutorName", null);
+                "translationServerExecutorName", null, false);
     }
 
     @Test

@@ -9,8 +9,9 @@ import org.zanata.helper.api.WorkResource;
 import org.zanata.helper.exception.WorkNotFoundException;
 import org.zanata.helper.model.SyncWorkConfig;
 import org.zanata.helper.model.SyncWorkConfigBuilder;
-import org.zanata.helper.model.SyncWorkConfigBuilderImpl;
+import org.zanata.helper.model.WorkSummary;
 import org.zanata.helper.service.SchedulerService;
+import org.zanata.helper.service.WorkService;
 import org.zanata.helper.validation.SyncWorkFormValidator;
 
 import javax.enterprise.context.RequestScoped;
@@ -32,6 +33,9 @@ public class WorkResourceImpl implements WorkResource {
 
     @Inject
     private SchedulerService schedulerServiceImpl;
+
+    @Inject
+    private WorkService workServiceImpl;
 
     @Inject
     private SyncWorkFormValidator formValidator;
@@ -76,6 +80,41 @@ public class WorkResourceImpl implements WorkResource {
         }
         // TODO create URI
         return Response.created(URI.create("")).entity(errors).build();
+    }
+
+    @Override
+    public Response deleteWork(String id) {
+        try {
+            workServiceImpl.deleteWork(new Long(id));
+        } catch (WorkNotFoundException e) {
+            log.error("No work found", e);
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.status(Response.Status.OK).build();
+    }
+
+    @Override
+    public Response disableWork(String id) {
+        WorkSummary summary;
+        try {
+            summary = workServiceImpl.disableWork(new Long(id));
+        } catch (WorkNotFoundException e) {
+            log.error("No work found", e);
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.status(Response.Status.OK).entity(summary).build();
+    }
+
+    @Override
+    public Response enableWork(String id) {
+        WorkSummary summary;
+        try {
+            summary = workServiceImpl.enableWork(new Long(id));
+        } catch (WorkNotFoundException e) {
+            log.error("No work found", e);
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.status(Response.Status.OK).entity(summary).build();
     }
 
     private Response getAllWork(String type) {

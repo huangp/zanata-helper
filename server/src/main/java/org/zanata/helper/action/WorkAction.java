@@ -1,8 +1,11 @@
 package org.zanata.helper.action;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import javax.annotation.PostConstruct;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -65,6 +68,24 @@ public class WorkAction implements Serializable {
 
     public boolean isSyncToServerRunning() {
         return isJobRunning(JobType.SERVER_SYNC);
+    }
+
+    public void deleteWork() throws IOException {
+        workResourceImpl.deleteWork(id);
+        FacesContext.getCurrentInstance().getExternalContext()
+            .redirect("/home.xhtml");
+    }
+
+    public void disableWork() {
+        workResourceImpl.disableWork(id);
+    }
+
+    public void enableWork() {
+        workResourceImpl.enableWork(id);
+    }
+
+    public void saveChanges() {
+
     }
 
     private boolean isJobRunning(JobType jobType) {

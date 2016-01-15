@@ -33,7 +33,11 @@ public interface SchedulerService {
     void deleteJob(Long id, JobType type)
         throws SchedulerException, JobNotFoundException;
 
-    void startJob(Long id, JobType type)
+    void disableJob(Long id, JobType type) throws SchedulerException;
+
+    void enableJob(Long id, JobType type) throws SchedulerException;
+
+    void triggerJob(Long id, JobType type)
         throws JobNotFoundException, SchedulerException;
 
     SyncWorkConfig getWork(String id) throws WorkNotFoundException;
