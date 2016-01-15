@@ -33,16 +33,6 @@ public class NewWorkAction extends HasFormAction {
     @Inject
     private Messages msg;
 
-    @PostConstruct
-    public void init() {
-        if(!getRepoExecutors().isEmpty()) {
-            selectedSrcPlugin = getRepoExecutors().get(0);
-        }
-        if(!getTransServerExecutors().isEmpty()) {
-            selectedServerPlugin = getTransServerExecutors().get(0);
-        }
-    }
-
     public String onSubmit() throws IOException {
         Response response = workResourceImpl.createWork(form);
         errors = (Map<String, String>) response.getEntity();

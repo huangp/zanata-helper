@@ -54,10 +54,6 @@ public class WorkAction extends HasFormAction {
 
     private SyncWorkConfig syncWorkConfig;
 
-    @PostConstruct
-    public void init() {
-    }
-
     public SyncWorkForm getForm() {
         if(form == null) {
             form = syncWorkConfigBuilderImpl.buildForm(getSyncWorkConfig());

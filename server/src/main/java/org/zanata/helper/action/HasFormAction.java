@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
@@ -44,6 +45,16 @@ public abstract class HasFormAction implements Serializable {
     abstract public String onSubmit() throws IOException;
 
     abstract public SyncWorkForm getForm();
+
+    @PostConstruct
+    public void init() {
+        if(!getRepoExecutors().isEmpty()) {
+            selectedSrcPlugin = getRepoExecutors().get(0);
+        }
+        if(!getTransServerExecutors().isEmpty()) {
+            selectedServerPlugin = getTransServerExecutors().get(0);
+        }
+    }
 
     public List<RepoExecutor> getRepoExecutors() {
         if (repoExecutors == null) {
