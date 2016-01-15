@@ -1,0 +1,44 @@
+plugins {
+    id 'java' // or 'groovy' Must be explicitly applied
+    id 'com.github.johnrengelman.shadow' version '1.2.2'
+}
+
+description = 'Jetty server module - Creates a UberJar consisting of all classes needed to start Jetty'
+group 'org.zanata.helper.jetty'
+
+configurations {
+    'shadow'
+}
+//
+//artifacts {
+//    shadow shadowJar.outputJar
+//}
+
+def jettyVersion = '9.3.6.v20151106'
+
+dependencies {
+    compile "javax.servlet:javax.servlet-api:3.1.0"
+    compile "org.eclipse.jetty:jetty-webapp:$jettyVersion"
+    compile "org.eclipse.jetty:jetty-annotations:$jettyVersion"
+    compile "org.eclipse.jetty:jetty-jndi:$jettyVersion"
+    compile "org.eclipse.jetty:jetty-plus:$jettyVersion"
+
+    compile 'org.glassfish.web:jsp-impl:2.1'
+    compile 'javax.el:el-api:2.2'
+    compile 'org.glassfish.web:javax.el:2.2.6'
+//    compile "org.eclipse.jetty.websocket:javax-websocket-server-impl:$jettyVersion"
+}
+
+shadowJar {
+    mergeServiceFiles()
+    exclude 'META-INF/MANIFEST.MF'
+    exclude 'META-INF/VERSION.txt'
+
+    artifacts {
+        shadow(tasks.shadowJar.archivePath) {
+            builtBy shadowJar
+        }
+    }
+}
+
+// gradle shadowJar //shadow the runtime configuration with project code into ./build/libs/
