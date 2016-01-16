@@ -37,10 +37,10 @@ public class NewWorkAction extends HasFormAction {
         Response response = workResourceImpl.createWork(form);
         errors = (Map<String, String>) response.getEntity();
         if (!errors.isEmpty()) {
-            return "/work/new.xhtml";
+            return "/work/new.jsf";
         }
         FacesContext.getCurrentInstance().getExternalContext()
-            .redirect("/home.xhtml");
+            .redirect("/home.jsf");
         return "";
     }
 

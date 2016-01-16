@@ -88,7 +88,7 @@ public class WorkAction extends HasFormAction {
     public void deleteWork() throws IOException {
         workResourceImpl.deleteWork(id);
         FacesContext.getCurrentInstance().getExternalContext()
-            .redirect("/home.xhtml");
+            .redirect("/home.jsf");
     }
 
     public void disableJob(String jobType) {
@@ -121,10 +121,10 @@ public class WorkAction extends HasFormAction {
         Response response = workResourceImpl.updateWork(form);
         errors = (Map<String, String>) response.getEntity();
         if (!errors.isEmpty()) {
-            return "/work/home.xhtml";
+            return "/work/home.jsf";
         }
         FacesContext.getCurrentInstance().getExternalContext()
-            .redirect("/home.xhtml");
+            .redirect("/home.jsf");
         return "";
     }
 }

@@ -8,7 +8,7 @@
 
   <!-- Welcome page -->
   <welcome-file-list>
-    <welcome-file>home.html</welcome-file>
+    <welcome-file>index.html</welcome-file>
   </welcome-file-list>
 
   <listener>
@@ -35,7 +35,7 @@
   <!-- Map these files with JSF -->
   <servlet-mapping>
     <servlet-name>Faces Servlet</servlet-name>
-    <url-pattern>*.xhtml</url-pattern>
+    <url-pattern>*.jsf</url-pattern>
   </servlet-mapping>
 
   <servlet>
@@ -75,4 +75,13 @@
     <param-name>org.richfaces.enableControlSkinning</param-name>
     <param-value>false</param-value>
   </context-param>
+
+  <security-constraint>
+    <display-name>Restrict raw XHTML Documents</display-name>
+    <web-resource-collection>
+      <web-resource-name>XHTML</web-resource-name>
+      <url-pattern>*.xhtml</url-pattern>
+    </web-resource-collection>
+    <auth-constraint />
+  </security-constraint>
 </web-app>

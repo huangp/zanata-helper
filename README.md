@@ -3,7 +3,7 @@
 
 - To run war: 
     - `gradle appRunWar`, `appRunWarDebug`
-    - [http://localhost:8081/home.xhtml](http://localhost:8081/home.xhtml)
+    - [http://localhost:8081/home.jsf](http://localhost:8081/home.jsf)
     - For more info, see [http://akhikhl.github.io/gretty-doc/Gretty-configuration.html]
 
 API URL:
