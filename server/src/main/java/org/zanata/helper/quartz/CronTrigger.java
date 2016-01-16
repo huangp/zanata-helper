@@ -30,12 +30,10 @@ import org.zanata.helper.model.JobStatusType;
 import org.zanata.helper.component.AppConfiguration;
 import org.zanata.helper.service.PluginsService;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -81,23 +79,33 @@ public class CronTrigger {
     }
 
     private JobDetail buildJobDetail(SyncWorkConfig syncWorkConfig, JobKey key,
-            Class jobClass, String cronExp) {
+            Class jobClass, String cronExp, boolean isEnabled) {
         JobBuilder builder = JobBuilder
                 .newJob(jobClass)
                 .withIdentity(key)
                 .withDescription(syncWorkConfig.toString());
 
-        if(StringUtils.isEmpty(cronExp)) {
+        if(StringUtils.isEmpty(cronExp) || !isEnabled) {
             builder.storeDurably();
         }
         return builder.build();
+    }
+
+    private boolean isJobEnabled(SyncWorkConfig syncWorkConfig, JobType jobType) {
+        if(jobType.equals(JobType.SERVER_SYNC)) {
+            return syncWorkConfig.isSyncToServerEnabled();
+        } else if(jobType.equals(JobType.REPO_SYNC)) {
+            return syncWorkConfig.isSyncToRepoEnabled();
+        }
+        return false;
     }
 
     private  <J extends SyncJob> Optional<TriggerKey> scheduleMonitor(
             SyncWorkConfig syncWorkConfig, Class<J> jobClass, JobType type)
             throws SchedulerException {
         JobKey jobKey = type.toJobKey(syncWorkConfig.getId());
-//        boolean isEnabled = true; TODO: check with jobType.isEnabled and cron
+        boolean isEnabled = isJobEnabled(syncWorkConfig, type);
+
         if (scheduler.checkExists(jobKey)) {
             return Optional.empty();
         }
@@ -113,7 +121,8 @@ public class CronTrigger {
             }
 
             JobDetail jobDetail =
-                    buildJobDetail(syncWorkConfig, jobKey, jobClass, cronExp);
+                buildJobDetail(syncWorkConfig, jobKey, jobClass, cronExp,
+                    isEnabled);
 
             jobDetail.getJobDataMap().put("value", syncWorkConfig);
             jobDetail.getJobDataMap()
@@ -141,9 +150,9 @@ public class CronTrigger {
                         .addTriggerListener(triggerListener);
             }
 
-            if(!StringUtils.isEmpty(cronExp)) {
-                Trigger trigger =
-                    buildTrigger(cronExp, syncWorkConfig.getId(), type);
+            if (!StringUtils.isEmpty(cronExp) && isEnabled) {
+                Trigger trigger = buildTrigger(cronExp, syncWorkConfig.getId(),
+                    type, isEnabled);
                 scheduler.scheduleJob(jobDetail, trigger);
                 return Optional.of(trigger.getKey());
             }
@@ -224,9 +233,10 @@ public class CronTrigger {
         scheduler.resumeJob(jobKey);
     }
 
-    public void reschedule(TriggerKey key, String cron, Long id, JobType type)
-        throws SchedulerException {
-        scheduler.rescheduleJob(key, buildTrigger(cron, id, type));
+    public void deleteAndReschedule(TriggerKey key, String cron, Long id,
+        JobType type, boolean isEnabled) throws SchedulerException {
+        deleteJob(id, type);
+        scheduler.rescheduleJob(key, buildTrigger(cron, id, type, isEnabled));
     }
 
     public void triggerJob(Long id, JobType type) throws SchedulerException {
@@ -235,11 +245,11 @@ public class CronTrigger {
     }
 
     private <J extends SyncJob> Trigger buildTrigger(String cronExp,
-        Long id, JobType type) {
+        Long id, JobType type, boolean isEnabled) {
         TriggerBuilder builder = TriggerBuilder
             .newTrigger()
             .withIdentity(type.toTriggerKey(id));
-        if (!StringUtils.isEmpty(cronExp)) {
+        if (!StringUtils.isEmpty(cronExp) && isEnabled) {
             builder.withSchedule(
                 CronScheduleBuilder.cronSchedule(cronExp));
         }

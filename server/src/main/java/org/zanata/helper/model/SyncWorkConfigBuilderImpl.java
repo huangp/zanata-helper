@@ -23,7 +23,10 @@ public class SyncWorkConfigBuilderImpl implements SyncWorkConfigBuilder {
                 syncWorkForm.getSyncToRepoCron(),
                 syncWorkForm.getSyncToRepoOption());
 
-        return new SyncWorkConfig(idGenerator.nextID(),
+        Long id = syncWorkForm.getId() == null ? idGenerator.nextID() :
+            syncWorkForm.getId();
+
+        return new SyncWorkConfig(id,
             syncWorkForm.getName(),
             syncWorkForm.getDescription(),
             syncToServerConfig,

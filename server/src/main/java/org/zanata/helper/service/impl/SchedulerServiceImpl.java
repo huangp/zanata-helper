@@ -8,7 +8,6 @@ import org.quartz.JobDetail;
 import org.quartz.SchedulerException;
 import org.quartz.UnableToInterruptJobException;
 
-import org.zanata.helper.events.ConfigurationChangeEvent;
 import org.zanata.helper.events.JobProgressEvent;
 import org.zanata.helper.events.JobRunStartsEvent;
 import org.zanata.helper.events.JobRunCompletedEvent;
@@ -85,23 +84,6 @@ public class SchedulerServiceImpl implements SchedulerService {
         }
 
         log.info("Initialised {} jobs.", syncWorkConfigs.size());
-    }
-
-    public void onApplicationEvent(@Observes ConfigurationChangeEvent event) {
-        Long id = event.getSyncWorkConfig().getId();
-        try {
-            cronTrigger.reschedule(
-                JobType.REPO_SYNC.toTriggerKey(id),
-                event.getSyncWorkConfig().getSyncToRepoConfig().getCron(),
-                event.getSyncWorkConfig().getId(), JobType.REPO_SYNC);
-
-            cronTrigger.reschedule(
-                JobType.SERVER_SYNC.toTriggerKey(id),
-                event.getSyncWorkConfig().getSyncToServerConfig().getCron(),
-                event.getSyncWorkConfig().getId(), JobType.SERVER_SYNC);
-        } catch (SchedulerException e) {
-            log.error("Error rescheduling job:" + e.getMessage());
-        }
     }
 
     // TODO: update job details
@@ -183,15 +165,17 @@ public class SchedulerServiceImpl implements SchedulerService {
     public void rescheduleWork(SyncWorkConfig syncWorkConfig)
         throws SchedulerException {
 
-        cronTrigger.reschedule(
+        cronTrigger.deleteAndReschedule(
             JobType.REPO_SYNC.toTriggerKey(syncWorkConfig.getId()),
             syncWorkConfig.getSyncToRepoConfig().getCron(),
-            syncWorkConfig.getId(), JobType.REPO_SYNC);
+            syncWorkConfig.getId(), JobType.REPO_SYNC,
+            syncWorkConfig.isSyncToRepoEnabled());
 
-        cronTrigger.reschedule(
+        cronTrigger.deleteAndReschedule(
             JobType.SERVER_SYNC.toTriggerKey(syncWorkConfig.getId()),
             syncWorkConfig.getSyncToServerConfig().getCron(),
-            syncWorkConfig.getId(), JobType.SERVER_SYNC);
+            syncWorkConfig.getId(), JobType.SERVER_SYNC,
+            syncWorkConfig.isSyncToServerEnabled());
     }
 
     @Override
