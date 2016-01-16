@@ -3,7 +3,6 @@ package org.zanata.helper.model;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import org.zanata.helper.util.DateSerializer;
 
@@ -29,11 +28,20 @@ public class JobStatus implements Serializable {
     @JsonSerialize(using = DateSerializer.class)
     private Date nextStartTime;
 
+    //This field is being ignored. See {@link SyncWorkConfigRepresenter}
+    private JobProgress currentProgress = null;
+
     public JobStatus(JobStatusType status, Date lastStartTime, Date lastEndTime,
             Date nextStartTime) {
         this.status = status;
         this.lastStartTime = lastStartTime;
         this.lastEndTime = lastEndTime;
         this.nextStartTime = nextStartTime;
+    }
+
+    public JobStatus(JobStatusType status, Date lastStartTime, Date lastEndTime,
+        Date nextStartTime, JobProgress currentProgress) {
+        this(status, lastStartTime, lastEndTime, nextStartTime);
+        this.currentProgress = currentProgress;
     }
 }

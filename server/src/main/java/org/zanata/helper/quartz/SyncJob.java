@@ -50,6 +50,11 @@ public abstract class SyncJob implements InterruptableJob {
         } catch (JobExecutionException e) {
             log.error("Error running sync job.", e);
         } finally {
+            try {
+                Thread.sleep(100000);                 //1000 milliseconds is one second.
+            } catch(InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
             // TODO: make this an option (whether or not to clean up the folder)
             cleanupDirectory(new File(basedir, syncWorkConfig.getId().toString()));
             if (!interrupted) {

@@ -21,7 +21,6 @@
 package org.zanata.helper.quartz;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
@@ -33,7 +32,6 @@ import org.quartz.TriggerListener;
 import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.model.JobType;
 import org.zanata.helper.model.SyncWorkConfig;
-import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 
@@ -104,37 +102,5 @@ public class JobConfigListener implements TriggerListener {
 
     private static SyncWorkConfig getJobConfigJob(JobExecutionContext context) {
         return (SyncWorkConfig) context.getJobDetail().getJobDataMap().get("value");
-    }
-
-    private static class RunningJobKey {
-        private final Long workId;
-        private final JobType jobType;
-
-        private RunningJobKey(Long workId, JobType jobType) {
-            this.workId = workId;
-            this.jobType = jobType;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            RunningJobKey that = (RunningJobKey) o;
-            return Objects.equals(workId, that.workId) &&
-                    jobType == that.jobType;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(workId, jobType);
-        }
-
-        @Override
-        public String toString() {
-            return MoreObjects.toStringHelper(this)
-                    .add("workId", workId)
-                    .add("jobType", jobType)
-                    .toString();
-        }
     }
 }

@@ -17,7 +17,7 @@
         <a4j:param name="val2" assignTo="#{type}"/>
       </a4j:jsFunction>
 
-      <a4j:poll id="running-jobs-poll" interval="1000000"
+      <a4j:poll id="running-jobs-poll" interval="10000"
         render="running-jobs-content" limitRender="true"/>
     </h:form>
 
@@ -30,7 +30,7 @@
               <p class="txt--meta l--pad-all-half">#{msg['jsp.noRunningJobs']}</p>
             </ui:fragment>
             <ui:fragment rendered="#{not empty indexAction.runningJobs}">
-              <ul class="list--panel" id="runningJobs">
+              <ul class="list--panel">
                 <ui:repeat value="#{indexAction.runningJobs}" var="job">
                   <li class="l--pad-all-quarter" id="running-#{job.key}">
                     <a href="/work/home.xhtml?id=#{job.workId}">
@@ -40,7 +40,7 @@
                           <span class="list__item__meta">#{job.description}</span>
                         </div>
                         <div class="list__item__actions">
-                          <button class="button--small button--danger loader" onclick="cancelJob('#{job.id}','#{job.type}')"
+                          <button class="button--small button--danger loader" onclick="cancelJob('#{job.workId}','#{job.type}')"
                             title="#{msg['jsf.job.cancel.button.title']}">
                             <span class="loader__label">
                               <i class="i i--cancel"></i>

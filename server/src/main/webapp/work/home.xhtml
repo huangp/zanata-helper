@@ -47,6 +47,9 @@
               limitRender="true" render="configuration">
               <a4j:param name="val1" assignTo="#{type}"/>
             </a4j:jsFunction>
+
+            <a4j:poll id="running-jobs-poll" interval="2000"
+              render="jobStatus" limitRender="true"/>
           </h:form>
 
           <div class="g__item w--1-m w--3-8-l w--1-4 l--push-bottom-half">
@@ -71,8 +74,9 @@
                         <span></span><span></span><span></span>
                       </span>
                     </div>
+                    <div class="txt--meta l--push-v-quarter">#{workAction.syncWorkConfig.syncToRepoConfig.status.currentProgress.completePercent}% #{workAction.syncWorkConfig.syncToRepoConfig.status.currentProgress.description}</div>
                   </ui:fragment>
-                <c:workstatus jobStatus="#{workAction.syncWorkConfig.syncToRepoConfig.lastJobStatus}"
+                <c:workstatus jobStatus="#{workAction.syncWorkConfig.syncToRepoConfig.status}"
                   type="REPO_SYNC" styleClass="l--pad-top-quarter" displayType="block"/>
               </div>
 
@@ -88,8 +92,9 @@
                         <span></span><span></span><span></span>
                       </span>
                     </div>
+                    <div class="txt--meta l--push-v-quarter">#{workAction.syncWorkConfig.syncToServerConfig.status.currentProgress.completePercent}% #{workAction.syncWorkConfig.syncToServerConfig.status.currentProgress.description}</div>
                   </ui:fragment>
-                <c:workstatus jobStatus="#{workAction.syncWorkConfig.syncToServerConfig.lastJobStatus}"
+                <c:workstatus jobStatus="#{workAction.syncWorkConfig.syncToServerConfig.status}"
                   type="SERVER_SYNC" styleClass="l--pad-top-quarter" displayType="block"/>
               </div>
             </h:panelGroup>

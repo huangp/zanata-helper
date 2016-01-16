@@ -2,6 +2,7 @@ package org.zanata.helper.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
@@ -9,9 +10,11 @@ import java.io.Serializable;
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
  */
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 public class JobProgress implements Serializable {
-    private int currentStep;
-    private int totalSteps;
+
+    private double completePercent;
     private String description;
+    private JobStatusType status;
 }

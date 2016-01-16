@@ -20,14 +20,16 @@ import org.zanata.helper.model.JobType;
 public interface JobResource {
 
     /**
-     * Get job last executed status
+     * Get job status
      *
      * @param id - work identifier
      * @param type - {@link JobType}
+     *
+     * @return - {@link org.zanata.helper.model.JobStatus}
      */
     @Path("/status")
     @GET
-    public Response getJobLastStatus(
+    public Response getJobStatus(
         @QueryParam(value = "id") @DefaultValue("") String id,
         @QueryParam(value = "type") @DefaultValue("")
         JobType type);
@@ -37,6 +39,8 @@ public interface JobResource {
      *
      * @param id - work identifier
      * @param type - {@link JobType}
+     *
+     * @return - http code
      */
     @Path("/cancel")
     @POST
@@ -49,6 +53,8 @@ public interface JobResource {
      *
      * @param id - work identifier
      * @param type - {@link JobType}
+     *
+     * @return - http code
      */
     @Path("/start")
     @POST
@@ -63,7 +69,8 @@ public interface JobResource {
      * @param type - required if id is present. {@link JobType}
      * @param status - {@link JobStatusType},  empty for all status
      *
-     * return List<JobSummary> or 1 object of List<JobSummary> if id and type is present.
+     * @return - List of {@link org.zanata.helper.model.JobSummary}
+     *  or List of 1 if id and type is present.
      *
      */
     @GET
@@ -76,6 +83,9 @@ public interface JobResource {
      * Disable job in work temporarily
      *
      * @param id - work id
+     * @param type - {@link JobType}
+     *
+     * @return - {@link org.zanata.helper.model.WorkSummary}
      */
     @POST
     @Consumes("application/json")
@@ -88,6 +98,9 @@ public interface JobResource {
      * Enable job in work if disabled
      *
      * @param id - work id
+     * @param type - {@link JobType}
+     *
+     * @return - {@link org.zanata.helper.model.WorkSummary}
      */
     @POST
     @Consumes("application/json")

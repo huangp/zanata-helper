@@ -22,7 +22,11 @@ public interface WorkResource {
 
     /**
      * @param id - id for work. If empty return list of work
-     * @param type - summary for WorkSummary, or empty(default) for SyncWorkConfig
+     * @param type - "summary" for {@link org.zanata.helper.model.WorkSummary},
+     *             or empty(default) for {@link org.zanata.helper.model.SyncWorkConfig}
+     *
+     * @return - {@link org.zanata.helper.model.WorkSummary} if type equals 'summary'
+     *           {@link org.zanata.helper.model.SyncWorkConfig} if type is empty
      */
     @GET
     public Response
@@ -32,16 +36,20 @@ public interface WorkResource {
     /**
      * Create work
      * @param form - {@link SyncWorkForm}
+     *
+     * @return - Map<String, String> of fieldKey, and error messages
      */
     @POST
     @Consumes("application/json")
     public Response createWork(SyncWorkForm form);
 
     /**
-     * Update work if {@link SyncWorkForm#id} is found,
+     * Update work if {@link SyncWorkForm#id} exists,
      * else trigger {@link #createWork}
      *
      * @param form - {@link SyncWorkForm}
+     *
+     * @return - Map<String, String> of fieldKey, and error messages
      */
     @PUT
     @Consumes("application/json")
@@ -51,6 +59,8 @@ public interface WorkResource {
      * Delete work permanently
      *
      * @param id - work id
+     *
+     * @return - http code
      */
     @DELETE
     @Consumes("application/json")

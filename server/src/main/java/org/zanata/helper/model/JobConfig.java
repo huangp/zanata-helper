@@ -23,7 +23,7 @@ public class JobConfig implements Serializable {
      */
     private String cron;
     private SyncOption option;
-    private JobStatus lastJobStatus;
+    private JobStatus status = JobStatus.EMPTY;
 
     public JobConfig(JobType type, String cron, SyncOption option) {
         this.type = type;
@@ -31,10 +31,9 @@ public class JobConfig implements Serializable {
         this.option = option;
     }
 
-    public void updateStatus(JobStatusType status, Date lastStartTime,
-            Date lastEndTime,
-            Date nextStartTime) {
-        lastJobStatus = new JobStatus(status, lastStartTime, lastEndTime,
-                nextStartTime);
+    public void updateStatus(JobStatusType statusType, Date lastStartTime,
+            Date lastEndTime, Date nextStartTime, JobProgress progress) {
+        status = new JobStatus(statusType, lastStartTime, lastEndTime,
+                nextStartTime, progress);
     }
 }

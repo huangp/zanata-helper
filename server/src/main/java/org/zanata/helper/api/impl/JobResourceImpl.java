@@ -40,7 +40,7 @@ public class JobResourceImpl implements JobResource {
     private WorkService workServiceImpl;
 
     @Override
-    public Response getJobLastStatus(
+    public Response getJobStatus(
         @QueryParam(value = "id") @DefaultValue("") String id,
         @QueryParam(value = "type") @DefaultValue("")
         JobType type) {
@@ -49,7 +49,7 @@ public class JobResourceImpl implements JobResource {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
             return Response.ok(schedulerServiceImpl
-                .getJobLastStatus(new Long(id), type)).build();
+                .getJobStatus(new Long(id), type)).build();
         } catch (SchedulerException e) {
             log.error("get job status error", e);
             return Response.serverError().build();
@@ -113,22 +113,27 @@ public class JobResourceImpl implements JobResource {
                 boolean filterByKey = !StringUtils.isEmpty(id) && type != null;
                 boolean filterByStatus = status != null;
 
-                for(JobSummary summary: jobs) {
+                for (JobSummary summary : jobs) {
                     if (filterByKey && filterByStatus) {
                         JobKey key = type.toJobKey(new Long(id));
                         if (summary.getKey().equals(key.toString())
-                                && status.equals(summary.getJobStatus())) {
+                                && summary.getJobStatus()
+                                        .getCurrentProgress() != null
+                                && status.equals(summary.getJobStatus()
+                                        .getCurrentProgress().getStatus())) {
                             filteredList.add(summary);
                             continue;
                         }
-                    } else if(filterByKey) {
+                    } else if (filterByKey) {
                         JobKey key = type.toJobKey(new Long(id));
                         if (summary.getKey().equals(key.toString())) {
                             filteredList.add(summary);
                             continue;
                         }
-                    } else if(filterByStatus) {
-                        if (status.equals(summary.getJobStatus())) {
+                    } else if (filterByStatus && summary.getJobStatus()
+                            .getCurrentProgress() != null) {
+                        if (status.equals(summary.getJobStatus()
+                                .getCurrentProgress().getStatus())) {
                             filteredList.add(summary);
                             continue;
                         }

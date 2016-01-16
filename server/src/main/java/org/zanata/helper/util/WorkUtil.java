@@ -20,16 +20,14 @@ public class WorkUtil {
                 syncWorkConfig.getId().toString(),
                 syncWorkConfig.getDescription(),
                 JobType.REPO_SYNC,
-                syncWorkConfig.getSyncToRepoConfig()
-                    .getLastJobStatus());
+                syncWorkConfig.getSyncToRepoConfig().getStatus());
 
         JobSummary syncToServerJob =
             new JobSummary("", syncWorkConfig.getName(),
                 syncWorkConfig.getId().toString(),
                 syncWorkConfig.getDescription(),
                 JobType.SERVER_SYNC,
-                syncWorkConfig.getSyncToServerConfig()
-                    .getLastJobStatus());
+                syncWorkConfig.getSyncToServerConfig().getStatus());
 
         return new WorkSummary(syncWorkConfig.getId(),
             syncWorkConfig.getName(),
