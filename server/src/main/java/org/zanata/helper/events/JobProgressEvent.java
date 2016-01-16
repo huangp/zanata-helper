@@ -2,6 +2,7 @@ package org.zanata.helper.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.zanata.helper.model.JobStatusType;
 import org.zanata.helper.model.JobType;
 import com.google.common.base.MoreObjects;
 
@@ -13,18 +14,18 @@ import com.google.common.base.MoreObjects;
 public class JobProgressEvent {
     private Long id;
     private JobType jobType;
-    private int currentStep;
-    private int totalSteps;
+    private double completePercent;
     private String description;
+    private JobStatusType jobStatusType;
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("id", id)
                 .add("jobType", jobType)
-                .add("currentStep", currentStep)
-                .add("totalSteps", totalSteps)
+                .add("completePercent", completePercent)
                 .add("description", description)
-                .toString();
+            .add("jobStatusType", jobStatusType)
+            .toString();
     }
 }

@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
+import org.zanata.helper.model.JobStatusType;
 import org.zanata.helper.model.JobType;
 
 /**
@@ -34,9 +35,7 @@ import org.zanata.helper.model.JobType;
  */
 public class RepoSyncJob extends SyncJob {
     private static final Logger log =
-            LoggerFactory.getLogger(RepoSyncJob.class);
-
-    private static final int syncToRepoTotalSteps = 5;
+        LoggerFactory.getLogger(RepoSyncJob.class);
 
     @Override
     protected JobType getJobType() {
@@ -45,10 +44,11 @@ public class RepoSyncJob extends SyncJob {
 
     @Override
     protected void doSync(RepoExecutor srcExecutor,
-            TranslationServerExecutor transServerExecutor)
-            throws JobExecutionException {
+        TranslationServerExecutor transServerExecutor)
+        throws JobExecutionException {
         if (srcExecutor == null || transServerExecutor == null) {
-            log.info("No plugin in job. Skipping. {}", syncWorkConfig.toString());
+            log.info("No plugin in job. Skipping. {}",
+                syncWorkConfig.toString());
             return;
         }
 
@@ -56,34 +56,36 @@ public class RepoSyncJob extends SyncJob {
             if (interrupted) {
                 return;
             }
-            updateProgress(syncWorkConfig.getId(), 1, syncToRepoTotalSteps,
-                    "Sync to repository starts");
+            updateProgress(syncWorkConfig.getId(), 0,
+                "Sync to repository starts", JobStatusType.RUNNING);
             File destDir = getDestDirectory(syncWorkConfig.getId().toString());
 
             if (interrupted) {
                 return;
             }
-            updateProgress(syncWorkConfig.getId(),
-                    2, syncToRepoTotalSteps, "Cloning repository to " + destDir);
+            updateProgress(syncWorkConfig.getId(), 20,
+                "Cloning repository to " + destDir, JobStatusType.RUNNING);
             srcExecutor.cloneRepo(destDir);
 
             if (interrupted) {
                 return;
             }
-            updateProgress(syncWorkConfig.getId(), 3, syncToRepoTotalSteps,
-                    "Pulling files from translation server from " + destDir);
-            transServerExecutor
-                    .pullFromServer(destDir, syncWorkConfig.getSyncToRepoConfig().getOption());
+            updateProgress(syncWorkConfig.getId(), 40,
+                "Pulling files from translation server from " + destDir,
+                JobStatusType.RUNNING);
+            transServerExecutor.pullFromServer(destDir,
+                syncWorkConfig.getSyncToRepoConfig().getOption());
 
             if (interrupted) {
                 return;
             }
-            updateProgress(syncWorkConfig.getId(), 4, syncToRepoTotalSteps,
-                    "Commits to repository from " + destDir);
-            srcExecutor.pushToRepo(destDir, syncWorkConfig.getSyncToRepoConfig().getOption());
+            updateProgress(syncWorkConfig.getId(), 60,
+                "Commits to repository from " + destDir, JobStatusType.RUNNING);
+            srcExecutor.pushToRepo(destDir,
+                syncWorkConfig.getSyncToRepoConfig().getOption());
 
-            updateProgress(syncWorkConfig.getId(), 5, syncToRepoTotalSteps,
-                    "Sync to repository completed");
+            updateProgress(syncWorkConfig.getId(), 80,
+                "Cleaning directory: " + destDir, JobStatusType.RUNNING);
         } catch (Exception e) {
             throw new JobExecutionException(e);
         }

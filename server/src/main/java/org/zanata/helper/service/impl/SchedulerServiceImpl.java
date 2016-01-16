@@ -9,11 +9,11 @@ import org.quartz.SchedulerException;
 import org.quartz.UnableToInterruptJobException;
 
 import org.zanata.helper.events.JobProgressEvent;
-import org.zanata.helper.events.JobRunStartsEvent;
 import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.events.JobRunUpdate;
 import org.zanata.helper.exception.JobNotFoundException;
 import org.zanata.helper.exception.WorkNotFoundException;
+import org.zanata.helper.model.JobStatusType;
 import org.zanata.helper.model.JobType;
 import org.zanata.helper.model.SyncWorkConfig;
 import org.zanata.helper.model.JobSummary;
@@ -86,31 +86,11 @@ public class SchedulerServiceImpl implements SchedulerService {
         log.info("Initialised {} jobs.", syncWorkConfigs.size());
     }
 
-    // TODO: update job details
+    // TODO: update status of config in memory or fire websocket
     public void onJobProgressUpdate(@Observes JobProgressEvent event) {
-        Optional<SyncWorkConfig> syncWorkConfigOpt =
-                syncWorkConfigRepository.load(event.getId());
-        if (syncWorkConfigOpt.isPresent()) {
-            SyncWorkConfig syncWorkConfig = syncWorkConfigOpt.get();
-            log.info(syncWorkConfig.getName() + ":" + event.getDescription());
-        }
+        log.info(event.toString());
     }
 
-    // TODO: fire websocket event
-    public void onJobStarts(@Observes JobRunStartsEvent event)
-        throws JobNotFoundException, SchedulerException {
-        Optional<SyncWorkConfig> syncWorkConfigOpt =
-                syncWorkConfigRepository.load(event.getId());
-        if (syncWorkConfigOpt.isPresent()) {
-            SyncWorkConfig syncWorkConfig = syncWorkConfigOpt.get();
-            syncWorkConfig.setLastJobStatus(getStatus(event.getId(), event),
-                event.getJobType());
-            log.debug("Job : " + syncWorkConfig.getName() + " starting.");
-            syncWorkConfigRepository.persist(syncWorkConfig);
-        }
-    }
-
-    // TODO: update database record, create history
     public void onJobCompleted(@Observes JobRunCompletedEvent event)
         throws JobNotFoundException, SchedulerException {
         Optional<SyncWorkConfig> syncWorkConfigOpt =

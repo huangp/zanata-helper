@@ -20,7 +20,7 @@ import org.zanata.helper.model.JobType;
 public interface JobResource {
 
     /**
-     * Get job last status
+     * Get job last executed status
      *
      * @param id - work identifier
      * @param type - {@link JobType}

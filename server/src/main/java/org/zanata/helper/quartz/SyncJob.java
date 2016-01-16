@@ -11,6 +11,7 @@ import org.quartz.UnableToInterruptJobException;
 import org.zanata.helper.events.JobProgressEvent;
 import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
+import org.zanata.helper.model.JobStatusType;
 import org.zanata.helper.model.JobType;
 import org.zanata.helper.model.SyncWorkConfig;
 
@@ -27,7 +28,6 @@ public abstract class SyncJob implements InterruptableJob {
     @Override
     public final void execute(JobExecutionContext context)
         throws JobExecutionException {
-
         try {
             syncWorkConfig =
                     (SyncWorkConfig) context.getJobDetail().getJobDataMap()
@@ -50,8 +50,12 @@ public abstract class SyncJob implements InterruptableJob {
         } catch (JobExecutionException e) {
             log.error("Error running sync job.", e);
         } finally {
-            // TODO make this an option (whether or not to clean up the folder)
+            // TODO: make this an option (whether or not to clean up the folder)
             cleanupDirectory(new File(basedir, syncWorkConfig.getId().toString()));
+            if (!interrupted) {
+                updateProgress(syncWorkConfig.getId(), 100, "Job completed",
+                    JobStatusType.COMPLETE);
+            }
         }
     }
 
@@ -65,18 +69,16 @@ public abstract class SyncJob implements InterruptableJob {
     public final void interrupt() throws UnableToInterruptJobException {
         interrupted = true;
         Thread.currentThread().interrupt();
-        updateProgress(syncWorkConfig.getId(), 0, 0, "interrupted");
+        updateProgress(syncWorkConfig.getId(), 0, "job interrupted",
+            JobStatusType.INTERRUPTED);
     }
 
-    protected final void updateProgress(Long id, int currentStep,
-        int totalSteps, String description) {
+    protected final void updateProgress(Long id, double completePercent,
+        String description, JobStatusType jobStatusType) {
         JobProgressEvent event =
-                new JobProgressEvent(id, getJobType(), currentStep, totalSteps,
-                        description);
-        log.info(">>>>>>>>>> {}", event);
-        BeanManagerProvider.getInstance().getBeanManager().fireEvent(
-                event
-        );
+            new JobProgressEvent(id, getJobType(), completePercent,
+                description, jobStatusType);
+        BeanManagerProvider.getInstance().getBeanManager().fireEvent(event);
     }
 
     protected final File getDestDirectory(String name) {

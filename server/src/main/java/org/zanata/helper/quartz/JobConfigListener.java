@@ -23,7 +23,6 @@ package org.zanata.helper.quartz;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
@@ -32,7 +31,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.Trigger;
 import org.quartz.TriggerListener;
 import org.zanata.helper.events.JobRunCompletedEvent;
-import org.zanata.helper.events.JobRunStartsEvent;
 import org.zanata.helper.model.JobType;
 import org.zanata.helper.model.SyncWorkConfig;
 import com.google.common.base.MoreObjects;
@@ -49,9 +47,6 @@ public class JobConfigListener implements TriggerListener {
     @Inject
     private Event<JobRunCompletedEvent> jobRunCompletedEvent;
 
-    @Inject
-    private Event<JobRunStartsEvent> jobRunStartsEvent;
-
     private static Map<RunningJobKey, AtomicInteger> runningJobs = Maps.newConcurrentMap();
 
     public String getName() {
@@ -66,10 +61,6 @@ public class JobConfigListener implements TriggerListener {
 
         runningJobs.putIfAbsent(key, new AtomicInteger(0));
         runningJobs.get(key).incrementAndGet();
-
-        jobRunStartsEvent.fire(
-            new JobRunStartsEvent(syncWorkConfig.getId(),
-                context.getFireTime(), jobType));
     }
 
     private static JobType getJobTypeFromContext(JobExecutionContext context) {
@@ -103,6 +94,7 @@ public class JobConfigListener implements TriggerListener {
 
         SyncWorkConfig syncWorkConfig = getJobConfigJob(context);
         runningJobs.remove(new RunningJobKey(syncWorkConfig.getId(), getJobTypeFromContext(context)));
+
         jobRunCompletedEvent.fire(
             new JobRunCompletedEvent(syncWorkConfig.getId(),
                 context.getJobRunTime(),

@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
+import org.zanata.helper.model.JobStatusType;
 import org.zanata.helper.model.JobType;
 
 /**
@@ -35,8 +36,6 @@ import org.zanata.helper.model.JobType;
 public class TransServerSyncJob extends SyncJob {
     private static final Logger log =
             LoggerFactory.getLogger(TransServerSyncJob.class);
-
-    private static final int syncToServerTotalSteps = 4;
 
     @Override
     protected JobType getJobType() {
@@ -55,29 +54,28 @@ public class TransServerSyncJob extends SyncJob {
             if (interrupted) {
                 return;
             }
-            updateProgress(syncWorkConfig.getId(), 1, syncToServerTotalSteps,
-                    "Sync to server starts");
+            updateProgress(syncWorkConfig.getId(), 0,
+                "Sync to server starts", JobStatusType.RUNNING);
             File destDir = getDestDirectory(syncWorkConfig.getId().toString());
 
             if (interrupted) {
                 return;
             }
-            updateProgress(syncWorkConfig.getId(),
-                    2, syncToServerTotalSteps,
-                    "Cloning repository to " + destDir);
+            updateProgress(syncWorkConfig.getId(), 25,
+                "Cloning repository to " + destDir, JobStatusType.RUNNING);
             repoExecutor.cloneRepo(destDir);
 
             if (interrupted) {
                 return;
             }
-            updateProgress(syncWorkConfig.getId(),
-                    3, syncToServerTotalSteps,
-                    "Pushing files to server from " + destDir);
+            updateProgress(syncWorkConfig.getId(), 50,
+                "Pushing files to server from " + destDir,
+                JobStatusType.RUNNING);
             transServerExecutor.pushToServer(destDir,
-                    syncWorkConfig.getSyncToServerConfig().getOption());
+                syncWorkConfig.getSyncToServerConfig().getOption());
 
-            updateProgress(syncWorkConfig.getId(), 4, syncToServerTotalSteps,
-                    "Sync to server completed");
+            updateProgress(syncWorkConfig.getId(), 75,
+                "Cleaning directory: " + destDir, JobStatusType.RUNNING);
         } catch (Exception e) {
             throw new JobExecutionException(e);
         }

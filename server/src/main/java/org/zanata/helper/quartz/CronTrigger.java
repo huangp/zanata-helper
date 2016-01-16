@@ -174,7 +174,6 @@ public class CronTrigger {
             if (!triggers.isEmpty()) {
                 Trigger trigger = triggers.get(0);
                 Date endTime = event.getCompletedTime();
-
                 Trigger.TriggerState state =
                         scheduler.getTriggerState(trigger.getKey());
 
