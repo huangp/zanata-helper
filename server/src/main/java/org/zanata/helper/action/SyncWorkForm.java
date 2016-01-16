@@ -78,15 +78,17 @@ public class SyncWorkForm implements Serializable {
     @Setter
     private Map<String, String> transServerPluginConfig = new HashMap<>();
 
+    @Setter
+    private boolean syncToServerEnabled = true;
+
+    @Setter
+    private boolean syncToRepoEnabled = true;
+
     public static String getRepoSettingsPrefix() {
         return repoSettingsPrefix;
     }
 
     public static String getTransSettingsPrefix() {
         return transSettingsPrefix;
-    }
-
-    public String getEncryptionKey() {
-        return encryptionKey;
     }
 }

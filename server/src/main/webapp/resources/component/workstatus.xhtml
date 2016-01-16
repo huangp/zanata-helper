@@ -47,7 +47,13 @@
         #{msg['jsf.work.field.syncToServer.title']}
       </h:panelGroup>
       <span class="txt--meta bx--inline-block #{cc.attrs.displayType eq 'block' ? '' : 'l--push-left-quarter'}">
-        <i class="i i--clock"></i> <span>#{cc.attrs.jobStatus.lastEndTime}</span>
+        <i class="i i--clock bx--inline-block"></i>
+        <h:panelGroup rendered="#{cc.attrs.jobStatus.lastEndTime ne null}" styleClass="l--push-left-quarter bx--inline-block">
+          #{cc.attrs.jobStatus.lastEndTime}
+        </h:panelGroup>
+        <h:panelGroup rendered="#{cc.attrs.jobStatus.lastEndTime eq null}" styleClass="l--push-left-quarter bx--inline-block">
+          #{msg['jsf.job.status.none']}
+        </h:panelGroup>
       </span>
     </div>
   </composite:implementation>

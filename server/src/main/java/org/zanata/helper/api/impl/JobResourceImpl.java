@@ -10,10 +10,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zanata.helper.api.JobResource;
 import org.zanata.helper.exception.JobNotFoundException;
+import org.zanata.helper.exception.WorkNotFoundException;
 import org.zanata.helper.model.JobStatusType;
 import org.zanata.helper.model.JobSummary;
 import org.zanata.helper.model.JobType;
+import org.zanata.helper.model.WorkSummary;
 import org.zanata.helper.service.SchedulerService;
+import org.zanata.helper.service.WorkService;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -32,6 +35,9 @@ public class JobResourceImpl implements JobResource {
 
     @Inject
     private SchedulerService schedulerServiceImpl;
+
+    @Inject
+    private WorkService workServiceImpl;
 
     @Override
     public Response getJobLastStatus(
@@ -134,5 +140,29 @@ public class JobResourceImpl implements JobResource {
             log.error("fail getting running jobs", e);
             return Response.serverError().build();
         }
+    }
+
+    @Override
+    public Response disableJob(String id, JobType type) {
+        WorkSummary summary;
+        try {
+            summary = workServiceImpl.disableJob(type, new Long(id));
+        } catch (WorkNotFoundException e) {
+            log.error("No work found", e);
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.status(Response.Status.OK).entity(summary).build();
+    }
+
+    @Override
+    public Response enableJob(String id, JobType type) {
+        WorkSummary summary;
+        try {
+            summary = workServiceImpl.enableJob(type, new Long(id));
+        } catch (WorkNotFoundException e) {
+            log.error("No work found", e);
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.status(Response.Status.OK).entity(summary).build();
     }
 }

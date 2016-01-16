@@ -56,26 +56,4 @@ public interface WorkResource {
     @Consumes("application/json")
     public Response deleteWork(
         @QueryParam(value = "id") @DefaultValue("") String id);
-
-    /**
-     * Disable all jobs in work temporarily
-     *
-     * @param id - work id
-     */
-    @POST
-    @Consumes("application/json")
-    @Path("/disable")
-    public Response disableWork(
-        @QueryParam(value = "id") @DefaultValue("") String id);
-
-    /**
-     * Enable all jobs in work if disabled
-     *
-     * @param id - work id
-     */
-    @POST
-    @Consumes("application/json")
-    @Path("/enable")
-    public Response enableWork(
-        @QueryParam(value = "id") @DefaultValue("") String id);
 }

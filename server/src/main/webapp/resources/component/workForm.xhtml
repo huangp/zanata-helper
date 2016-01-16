@@ -40,7 +40,8 @@
 
         <div class="l--push-top-1">
           <h2 class="heading--secondary">
-            #{msg['jsf.work.field.syncToServer.settings']}
+            <h:selectBooleanCheckbox styleClass="txt--mini" id="enableSyncToServer"
+              value="#{cc.attrs.actionClass.form.syncToServerEnabled}" onchange="enableSection(jQuery(this))"/> #{msg['jsf.work.field.syncToServer.settings']}
           </h2>
           <c:textfield componentId="syncToServerCron"
             value="#{cc.attrs.actionClass.form.syncToServerCron}"
@@ -61,7 +62,8 @@
 
         <div class="l--push-top-1">
           <h2 class="heading--secondary">
-            #{msg['jsf.world.field.syncToRepo.settings']}
+            <h:selectBooleanCheckbox styleClass="txt--mini" id="enableSyncToRepo"
+              value="#{cc.attrs.actionClass.form.syncToRepoEnabled}" onchange="enableSection(jQuery(this))"/> #{msg['jsf.world.field.syncToRepo.settings']}
           </h2>
           <c:textfield componentId="syncToRepoCron"
             value="#{cc.attrs.actionClass.form.syncToRepoCron}"

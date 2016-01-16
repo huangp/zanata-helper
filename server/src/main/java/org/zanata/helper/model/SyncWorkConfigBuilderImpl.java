@@ -24,15 +24,17 @@ public class SyncWorkConfigBuilderImpl implements SyncWorkConfigBuilder {
                 syncWorkForm.getSyncToRepoOption());
 
         return new SyncWorkConfig(idGenerator.nextID(),
-                syncWorkForm.getName(),
-                syncWorkForm.getDescription(),
-                syncToServerConfig,
-                syncToRepoConfig,
-                syncWorkForm.getSrcRepoPluginConfig(),
-                syncWorkForm.getSrcRepoPluginName(),
-                syncWorkForm.getTransServerPluginConfig(),
-                syncWorkForm.getTransServerPluginName(),
-                syncWorkForm.getEncryptionKey(), false);
+            syncWorkForm.getName(),
+            syncWorkForm.getDescription(),
+            syncToServerConfig,
+            syncToRepoConfig,
+            syncWorkForm.getSrcRepoPluginConfig(),
+            syncWorkForm.getSrcRepoPluginName(),
+            syncWorkForm.getTransServerPluginConfig(),
+            syncWorkForm.getTransServerPluginName(),
+            syncWorkForm.getEncryptionKey(),
+            syncWorkForm.isSyncToRepoEnabled(),
+            syncWorkForm.isSyncToServerEnabled());
     }
 
     @Override
@@ -58,7 +60,8 @@ public class SyncWorkConfigBuilderImpl implements SyncWorkConfigBuilder {
         form.setSyncToRepoCron(syncWorkConfig.getSyncToRepoConfig().getCron());
         form.setSyncToServerCron(
             syncWorkConfig.getSyncToServerConfig().getCron());
-
+        form.setSyncToRepoEnabled(syncWorkConfig.isSyncToRepoEnabled());
+        form.setSyncToServerEnabled(syncWorkConfig.isSyncToServerEnabled());
         return form;
     }
 }

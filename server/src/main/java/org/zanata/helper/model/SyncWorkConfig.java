@@ -34,7 +34,9 @@ public class SyncWorkConfig extends PersistModel {
 
     private String encryptionKey;
 
-    private boolean disabled = false;
+    private boolean syncToServerEnabled = true;
+
+    private boolean syncToRepoEnabled = true;
 
     @Setter(AccessLevel.PROTECTED)
     private Date createdDate;
@@ -43,7 +45,8 @@ public class SyncWorkConfig extends PersistModel {
             JobConfig syncToServerConfig, JobConfig syncToRepoConfig,
             Map<String, String> srcRepoPluginConfig, String srcRepoPluginName,
             Map<String, String> transServerPluginConfig,
-            String transServerPluginName, String encryptionKey, boolean disabled) {
+            String transServerPluginName, String encryptionKey,
+            boolean syncToServerEnabled,  boolean syncToRepoEnabled) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -54,7 +57,8 @@ public class SyncWorkConfig extends PersistModel {
         this.transServerPluginConfig = transServerPluginConfig;
         this.transServerPluginName = transServerPluginName;
         this.encryptionKey = encryptionKey;
-        this.disabled = disabled;
+        this.syncToServerEnabled = syncToServerEnabled;
+        this.syncToRepoEnabled = syncToRepoEnabled;
     }
 
     @Override
@@ -63,30 +67,28 @@ public class SyncWorkConfig extends PersistModel {
         if (o == null || getClass() != o.getClass()) return false;
         SyncWorkConfig that = (SyncWorkConfig) o;
         return Objects.equals(id, that.id) &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(description, that.description) &&
-                Objects
-                        .equals(syncToServerConfig, that.syncToServerConfig) &&
-                Objects.equals(syncToRepoConfig, that.syncToRepoConfig) &&
-                Objects.equals(srcRepoPluginConfig, that.srcRepoPluginConfig) &&
-                Objects
-                        .equals(transServerPluginConfig, that.transServerPluginConfig) &&
-                Objects.equals(srcRepoPluginName,
-                        that.srcRepoPluginName) &&
-                Objects.equals(transServerPluginName,
-                        that.transServerPluginName) &&
-                Objects.equals(createdDate, that.createdDate) &&
-                Objects.equals(disabled, that.disabled);
+            Objects.equals(name, that.name) &&
+            Objects.equals(description, that.description) &&
+            Objects.equals(syncToServerConfig, that.syncToServerConfig) &&
+            Objects.equals(syncToRepoConfig, that.syncToRepoConfig) &&
+            Objects.equals(srcRepoPluginConfig, that.srcRepoPluginConfig) &&
+            Objects.equals(transServerPluginConfig,
+                that.transServerPluginConfig) &&
+            Objects.equals(srcRepoPluginName, that.srcRepoPluginName) &&
+            Objects.equals(transServerPluginName, that.transServerPluginName) &&
+            Objects.equals(createdDate, that.createdDate) &&
+            Objects.equals(syncToServerEnabled, that.syncToServerEnabled) &&
+            Objects.equals(syncToRepoEnabled, that.syncToRepoEnabled);
     }
 
     @Override
     public int hashCode() {
         return Objects
-                .hash(id, name, description, syncToServerConfig,
-                        syncToRepoConfig,
-                    srcRepoPluginConfig, transServerPluginConfig,
-                    srcRepoPluginName,
-                    transServerPluginName, createdDate, disabled);
+            .hash(id, name, description, syncToServerConfig,
+                syncToRepoConfig, srcRepoPluginConfig,
+                transServerPluginConfig, srcRepoPluginName,
+                transServerPluginName, createdDate, syncToServerEnabled,
+                syncToRepoEnabled);
     }
 
     public void setLastJobStatus(JobStatus status, JobType type) {
@@ -101,7 +103,11 @@ public class SyncWorkConfig extends PersistModel {
         }
     }
 
-    public void enableJob(boolean enable) {
-        this.disabled = !enable;
+    public void enableJob(JobType jobType, boolean enable) {
+        if(jobType.equals(JobType.REPO_SYNC)) {
+            syncToRepoEnabled = enable;
+        } else if(jobType.equals(JobType.SERVER_SYNC)) {
+            syncToServerEnabled = enable;
+        }
     }
 }

@@ -91,12 +91,12 @@ public class WorkAction extends HasFormAction {
             .redirect("/home.xhtml");
     }
 
-    public void disableWork() {
-        workResourceImpl.disableWork(id);
+    public void disableJob(String jobType) {
+        jobResource.disableJob(id, JobType.valueOf(jobType));
     }
 
-    public void enableWork() {
-        workResourceImpl.enableWork(id);
+    public void enableJob(String jobType) {
+        jobResource.enableJob(id, JobType.valueOf(jobType));
     }
 
     private boolean isJobRunning(JobType jobType) {

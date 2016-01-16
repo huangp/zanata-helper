@@ -45,14 +45,15 @@ public class WorkServiceImpl implements WorkService {
     }
 
     @Override
-    public WorkSummary disableWork(Long id) throws WorkNotFoundException {
+    public WorkSummary disableJob(JobType jobType, Long id)
+        throws WorkNotFoundException {
         checkWorkExist(id);
         try {
             schedulerServiceImpl.disableJob(id, JobType.REPO_SYNC);
             schedulerServiceImpl.disableJob(id, JobType.SERVER_SYNC);
 
             SyncWorkConfig config = syncWorkConfigRepository.load(id).get();
-            config.enableJob(false);
+            config.enableJob(jobType, false);
             syncWorkConfigRepository.persist(config);
         } catch (SchedulerException e) {
             log.debug("No job found for work", e);
@@ -61,14 +62,14 @@ public class WorkServiceImpl implements WorkService {
     }
 
     @Override
-    public WorkSummary enableWork(Long id) throws WorkNotFoundException {
+    public WorkSummary enableJob(JobType jobType, Long id) throws WorkNotFoundException {
         checkWorkExist(id);
         try {
             schedulerServiceImpl.enableJob(id, JobType.REPO_SYNC);
             schedulerServiceImpl.enableJob(id, JobType.SERVER_SYNC);
 
             SyncWorkConfig config = syncWorkConfigRepository.load(id).get();
-            config.enableJob(true);
+            config.enableJob(jobType, true);
             syncWorkConfigRepository.persist(config);
         } catch (SchedulerException e) {
             log.debug("No job found for work", e);

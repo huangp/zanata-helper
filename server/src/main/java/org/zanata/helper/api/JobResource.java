@@ -1,5 +1,6 @@
 package org.zanata.helper.api;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -70,4 +71,28 @@ public interface JobResource {
         @QueryParam(value = "id") @DefaultValue("") String id,
         @QueryParam(value = "type") @DefaultValue("") JobType type,
         @QueryParam(value = "status") @DefaultValue("") JobStatusType status);
+
+    /**
+     * Disable job in work temporarily
+     *
+     * @param id - work id
+     */
+    @POST
+    @Consumes("application/json")
+    @Path("/disable")
+    public Response disableJob(
+        @QueryParam(value = "id") @DefaultValue("") String id,
+        @QueryParam(value = "type") @DefaultValue("") JobType type);
+
+    /**
+     * Enable job in work if disabled
+     *
+     * @param id - work id
+     */
+    @POST
+    @Consumes("application/json")
+    @Path("/enable")
+    public Response enableJob(
+        @QueryParam(value = "id") @DefaultValue("") String id,
+        @QueryParam(value = "type") @DefaultValue("") JobType type);
 }

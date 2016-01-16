@@ -97,6 +97,7 @@ public class CronTrigger {
             SyncWorkConfig syncWorkConfig, Class<J> jobClass, JobType type)
             throws SchedulerException {
         JobKey jobKey = type.toJobKey(syncWorkConfig.getId());
+//        boolean isEnabled = true; TODO: check with jobType.isEnabled and cron
         if (scheduler.checkExists(jobKey)) {
             return Optional.empty();
         }
