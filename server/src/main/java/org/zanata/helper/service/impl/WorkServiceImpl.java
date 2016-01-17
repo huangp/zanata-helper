@@ -45,39 +45,6 @@ public class WorkServiceImpl implements WorkService {
     }
 
     @Override
-    public WorkSummary disableJob(JobType jobType, Long id)
-        throws WorkNotFoundException {
-        checkWorkExist(id);
-        try {
-            schedulerServiceImpl.disableJob(id, JobType.REPO_SYNC);
-            schedulerServiceImpl.disableJob(id, JobType.SERVER_SYNC);
-
-            SyncWorkConfig config = syncWorkConfigRepository.load(id).get();
-            config.enableJob(jobType, false);
-            syncWorkConfigRepository.persist(config);
-        } catch (SchedulerException e) {
-            log.debug("No job found for work", e);
-        }
-        return getWorkSummary(id);
-    }
-
-    @Override
-    public WorkSummary enableJob(JobType jobType, Long id) throws WorkNotFoundException {
-        checkWorkExist(id);
-        try {
-            schedulerServiceImpl.enableJob(id, JobType.REPO_SYNC);
-            schedulerServiceImpl.enableJob(id, JobType.SERVER_SYNC);
-
-            SyncWorkConfig config = syncWorkConfigRepository.load(id).get();
-            config.enableJob(jobType, true);
-            syncWorkConfigRepository.persist(config);
-        } catch (SchedulerException e) {
-            log.debug("No job found for work", e);
-        }
-        return getWorkSummary(id);
-    }
-
-    @Override
     public void updateOrPersist(SyncWorkConfig syncWorkConfig) {
         syncWorkConfigRepository.persist(syncWorkConfig);
     }
@@ -86,10 +53,5 @@ public class WorkServiceImpl implements WorkService {
         if(!syncWorkConfigRepository.load(id).isPresent()) {
             throw new WorkNotFoundException(id.toString());
         };
-    }
-
-    private WorkSummary getWorkSummary(Long id) {
-        SyncWorkConfig config = syncWorkConfigRepository.load(id).get();
-        return WorkUtil.convertToWorkSummary(config);
     }
 }

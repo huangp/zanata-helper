@@ -37,6 +37,7 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,7 +123,7 @@ public class SyncWorkConfigRepository {
                 String current =
                         FileUtils.readFileToString(latestConfigFile, UTF_8);
                 if (current.endsWith(incomingYaml)) {
-                    log.info("config has not changed");
+                    log.info("SyncWorkConfig has not changed");
                     return;
                 }
                 // back up current work config
@@ -134,7 +135,7 @@ public class SyncWorkConfigRepository {
             // write new work config
             FileUtils.write(latestConfigFile, incomingYaml, UTF_8);
             cache.invalidate(syncWorkConfig.getId());
-
+            log.info("SyncWorkConfig saved." + syncWorkConfig.getName());
         } catch (InterruptedException | IOException e) {
             throw Throwables.propagate(e);
         } finally {
@@ -147,6 +148,7 @@ public class SyncWorkConfigRepository {
         try {
             FileUtils.deleteDirectory(workConfigFolder);
             cache.invalidate(id);
+            log.info("SyncWorkConfig deleted." + id);
             return true;
         } catch (IOException e) {
             log.error("failed to delete the job config folder: {}",

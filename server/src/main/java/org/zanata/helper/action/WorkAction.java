@@ -3,8 +3,6 @@ package org.zanata.helper.action;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedProperty;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
@@ -91,12 +89,8 @@ public class WorkAction extends HasFormAction {
             .redirect("/home.jsf");
     }
 
-    public void disableJob(String jobType) {
-        jobResource.disableJob(id, JobType.valueOf(jobType));
-    }
-
-    public void enableJob(String jobType) {
-        jobResource.enableJob(id, JobType.valueOf(jobType));
+    public void cancelRunningJob(String jobType) {
+        jobResource.cancelRunningJob(id, JobType.valueOf(jobType));
     }
 
     private boolean isJobRunning(JobType jobType) {

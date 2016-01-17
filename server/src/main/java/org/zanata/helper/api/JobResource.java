@@ -78,34 +78,4 @@ public interface JobResource {
         @QueryParam(value = "id") @DefaultValue("") String id,
         @QueryParam(value = "type") @DefaultValue("") JobType type,
         @QueryParam(value = "status") @DefaultValue("") JobStatusType status);
-
-    /**
-     * Disable job in work temporarily
-     *
-     * @param id - work id
-     * @param type - {@link JobType}
-     *
-     * @return - {@link org.zanata.helper.model.WorkSummary}
-     */
-    @POST
-    @Consumes("application/json")
-    @Path("/disable")
-    public Response disableJob(
-        @QueryParam(value = "id") @DefaultValue("") String id,
-        @QueryParam(value = "type") @DefaultValue("") JobType type);
-
-    /**
-     * Enable job in work if disabled
-     *
-     * @param id - work id
-     * @param type - {@link JobType}
-     *
-     * @return - {@link org.zanata.helper.model.WorkSummary}
-     */
-    @POST
-    @Consumes("application/json")
-    @Path("/enable")
-    public Response enableJob(
-        @QueryParam(value = "id") @DefaultValue("") String id,
-        @QueryParam(value = "type") @DefaultValue("") JobType type);
 }

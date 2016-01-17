@@ -13,6 +13,22 @@
   </f:metadata>
 
   <ui:define name="content">
+    <script type="text/javascript">
+      jQuery(document).ready(function() {
+        jQuery('#button-delete-work').click(function (event) {
+          if(confirmDelete()) {
+            deleteWork();
+          } else {
+            event.stopPropagation();
+          }
+        });
+      });
+
+      function confirmDelete() {
+        return confirm("#{msg['jsf.work.delete.confirmation']}")
+      }
+    </script>
+
     <div class="l__wrapper">
       <div class="g">
         <ui:fragment rendered="#{workAction.syncWorkConfig eq null}">
@@ -38,17 +54,13 @@
             <a4j:jsFunction name="deleteWork" action="#{workAction.deleteWork()}"
               limitRender="true" render="configuration"/>
 
-            <a4j:jsFunction name="disableJob" action="#{workAction.disableJob(type)}"
-              limitRender="true" render="configuration">
+            <a4j:jsFunction name="cancelJob"
+              action="#{workAction.cancelRunningJob(type)}" limitRender="true"
+              render="jobStatus">
               <a4j:param name="val1" assignTo="#{type}"/>
             </a4j:jsFunction>
 
-            <a4j:jsFunction name="enableJob" action="#{workAction.enableJob(type)}"
-              limitRender="true" render="configuration">
-              <a4j:param name="val1" assignTo="#{type}"/>
-            </a4j:jsFunction>
-
-            <a4j:poll id="running-jobs-poll" interval="2000"
+            <a4j:poll id="running-jobs-poll" interval="15000"
               render="jobStatus" limitRender="true"/>
           </h:form>
 
@@ -69,7 +81,11 @@
                     </button>
                   </ui:fragment>
                   <ui:fragment rendered="#{workAction.isSyncToRepoRunning()}">
-                    <div class="loader--mini is-active">
+                    <button class="button--small button--danger loader" onclick="cancelJob('REPO_SYNC')"
+                      title="#{msg['jsf.job.cancel.button.title']}">
+                      <span class="loader__label"><i class="i i--cancel"></i></span>
+                    </button>
+                    <div class="bx--inline-block  loader--mini is-active">
                       <span class="loader__spinner">
                         <span></span><span></span><span></span>
                       </span>
@@ -87,7 +103,11 @@
                     </button>
                   </ui:fragment>
                   <ui:fragment rendered="#{workAction.isSyncToServerRunning()}">
-                    <div class="loader--mini is-active">
+                    <button class="button--small button--danger loader" onclick="cancelJob('SERVER_SYNC')"
+                      title="#{msg['jsf.job.cancel.button.title']}">
+                      <span class="loader__label"><i class="i i--cancel"></i></span>
+                    </button>
+                    <div class="bx--inline-block loader--mini is-active">
                       <span class="loader__spinner">
                         <span></span><span></span><span></span>
                       </span>
@@ -112,23 +132,9 @@
                 <c:workForm actionClass="#{workAction}" id="work-form" styleClass="l--push-buttom-0"/>
 
                 <div class="l--push-top-1 txt--align-right g__item">
-                  <button class="button--danger l--push-right-half loader" onclick="deleteWork();">
+                  <button class="button--danger l--push-right-half loader" id="button-delete-work" >
                     <span class="loader__label">#{msg['jsf.work.delete.button']}</span>
                   </button>
-
-                  <ui:remove>
-                  <ui:fragment rendered="#{not workAction.syncWorkConfig.disabled}">
-                    <button class="button--warning loader" onclick="disableJob();">
-                      <span class="loader__label">#{msg['jsf.work.disable.button']}</span>
-                    </button>
-                  </ui:fragment>
-                  <ui:fragment rendered="#{workAction.syncWorkConfig.disabled}">
-                    <button class="button--success loader" onclick="enableJob();">
-                      <span class="loader__label">#{msg['jsf.work.enable.button']}</span>
-                    </button>
-                  </ui:fragment>
-                  </ui:remove>
-
                 </div>
               </h:panelGroup>
             </div>

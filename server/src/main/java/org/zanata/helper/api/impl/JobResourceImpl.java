@@ -146,28 +146,4 @@ public class JobResourceImpl implements JobResource {
             return Response.serverError().build();
         }
     }
-
-    @Override
-    public Response disableJob(String id, JobType type) {
-        WorkSummary summary;
-        try {
-            summary = workServiceImpl.disableJob(type, new Long(id));
-        } catch (WorkNotFoundException e) {
-            log.error("No work found", e);
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        return Response.status(Response.Status.OK).entity(summary).build();
-    }
-
-    @Override
-    public Response enableJob(String id, JobType type) {
-        WorkSummary summary;
-        try {
-            summary = workServiceImpl.enableJob(type, new Long(id));
-        } catch (WorkNotFoundException e) {
-            log.error("No work found", e);
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        return Response.status(Response.Status.OK).entity(summary).build();
-    }
 }
