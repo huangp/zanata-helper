@@ -21,9 +21,7 @@
 package org.zanata.helper.repository;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -37,7 +35,6 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +57,8 @@ public class SyncWorkConfigRepository {
             LoggerFactory.getLogger(SyncWorkConfigRepository.class);
 
     private static final String historyFileFormat = "archive-%s.yaml";
+
+    private final static String LATEST_CONFIG_FILE = "current.yaml";
 
     private final Cache<Long, Optional<SyncWorkConfig>> cache = CacheBuilder
             .newBuilder()
@@ -162,11 +161,11 @@ public class SyncWorkConfigRepository {
     }
 
     private File latestWorkConfig(long id) {
-        return new File(workConfigFolder(id), "current.yaml");
+        return new File(workConfigFolder(id), LATEST_CONFIG_FILE);
     }
 
     private static File latestWorkConfig(File jobConfigFolder) {
-        return new File(jobConfigFolder, "current.yaml");
+        return new File(jobConfigFolder, LATEST_CONFIG_FILE);
     }
 
 
