@@ -28,6 +28,8 @@ public class AppConfiguration implements Serializable {
 
     private File configDir;
     private File repoDir;
+
+
     private List<String> fieldsNeedEncryption;
 
     @Getter
