@@ -71,7 +71,7 @@ public class RepoSyncJob extends SyncJob {
                 return;
             }
             updateProgress(syncWorkConfig.getId(), 40,
-                "Pulling files from translation server from " + destDir,
+                "Pulling files from translation server to " + destDir,
                 JobStatusType.RUNNING);
             transServerExecutor.pullFromServer(destDir,
                 syncWorkConfig.getSyncToRepoConfig().getOption());
