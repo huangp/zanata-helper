@@ -55,7 +55,6 @@ public class CronTrigger {
     @Inject
     private JobConfigListener triggerListener;
 
-
     @PostConstruct
     public void start() throws SchedulerException {
         scheduler = StdSchedulerFactory.getDefaultScheduler();

@@ -10,6 +10,9 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.zanata.helper.component.AppConfiguration;
 import org.zanata.helper.i18n.Messages;
@@ -17,6 +20,7 @@ import org.zanata.helper.i18n.Messages;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.zanata.helper.repository.SystemSettingsRepository;
 
 import static javax.faces.application.FacesMessage.SEVERITY_INFO;
 
@@ -32,6 +36,9 @@ public class AdminAction implements Serializable {
     private AppConfiguration appConfiguration;
 
     @Inject
+    private SystemSettingsRepository systemSettingsRepository;
+
+    @Inject
     private Messages msg;
 
     @Getter
@@ -43,18 +50,26 @@ public class AdminAction implements Serializable {
     @Setter
     private boolean deleteJobDir;
 
+    @Getter
+    @Setter
+    private String fieldsNeedEncryption;
+
     private Map<String, String> errors = new HashMap<>();
 
     @PostConstruct
     public void init() {
         storageDir = appConfiguration.getStorageDirectory();
         deleteJobDir = appConfiguration.isDeleteJobDir();
+        fieldsNeedEncryption =
+            StringUtils.join(appConfiguration.getFieldsNeedEncryption(), ',');
     }
 
-
     public String saveChanges() {
-        appConfiguration.updateStorageDir(storageDir);
-        appConfiguration.setDeleteJobDir(deleteJobDir);
+        appConfiguration.updateSettings(storageDir, deleteJobDir, ImmutableList
+            .copyOf(Splitter.on(",").omitEmptyStrings().trimResults()
+                .split(fieldsNeedEncryption)));
+
+        systemSettingsRepository.persist(appConfiguration.getSystemSettings());
         FacesMessage message = new FacesMessage(SEVERITY_INFO,
                 msg.get("jsf.admin.settings.saved.message"), "");
         FacesContext.getCurrentInstance().addMessage(null, message);
