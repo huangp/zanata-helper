@@ -3,6 +3,7 @@ package org.zanata.helper.component;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Properties;
@@ -15,17 +16,23 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
 @Dependent
-public class AppConfiguration {
+public class AppConfiguration implements Serializable {
     private final static String CONFIG_DIR = "configuration";
-    private final static String repoDirectory = "repository";
-    private final File configDir;
-    private final File repoDir;
+    private final static String REPO_DIR = "repository";
+
+    private File configDir;
+    private File repoDir;
     private List<String> fieldsNeedEncryption;
+
+    @Getter
+    @Setter
+    private boolean deleteJobDir;
 
     public AppConfiguration() {
         ClassLoader contextClassLoader =
@@ -39,18 +46,15 @@ public class AppConfiguration {
             buildInfo = properties.getProperty("build.info");
             buildVersion = properties.getProperty("build.version");
             properties.load(config);
-            storageDirectory = properties.getProperty("store.directory");
+
             String fields =
                     properties.getProperty("fields.need.encryption", "");
             fieldsNeedEncryption = ImmutableList.copyOf(Splitter.on(",").omitEmptyStrings().trimResults()
                    .split(fields));
 
-            configDir = Paths.get(buildConfigDirectory()).toFile();
-            checkDirectory("configuration", configDir);
+            deleteJobDir = Boolean.valueOf(properties.getProperty("delete.job.dir"));
 
-            repoDir = Paths.get(buildRepoDirectory()).toFile();
-            checkDirectory("repo", repoDir);
-
+            updateStorageDir(properties.getProperty("store.directory"));
         } catch (IOException e) {
             throw Throwables.propagate(e);
         }
@@ -60,6 +64,16 @@ public class AppConfiguration {
     public AppConfiguration(File configDir, File repoDir) {
         this.configDir = configDir;
         this.repoDir = repoDir;
+    }
+
+    public void updateStorageDir(String newDir) {
+        this.storageDirectory = newDir;
+
+        configDir = Paths.get(buildConfigDirectory()).toFile();
+        checkDirectory(CONFIG_DIR, configDir);
+
+        repoDir = Paths.get(buildRepoDirectory()).toFile();
+        checkDirectory(REPO_DIR, repoDir);
     }
 
     private static void checkDirectory(String nameOfDirectory, File directory) {
@@ -83,11 +97,11 @@ public class AppConfiguration {
     @Getter
     private String buildInfo;
 
-    //TODO: make this configurable
     /**
      * Must have read write access
      * i.e /tmp/zanataHelperRoot
      */
+    @Getter
     private String storageDirectory;
 
     private String buildConfigDirectory() {
@@ -97,7 +111,7 @@ public class AppConfiguration {
 
     private String buildRepoDirectory() {
         return removeTrailingSlash(storageDirectory) + File.separatorChar
-                + repoDirectory;
+                + REPO_DIR;
     }
 
     public File getConfigDirectory() {

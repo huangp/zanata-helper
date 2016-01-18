@@ -4,14 +4,21 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import org.zanata.helper.component.AppConfiguration;
+import org.zanata.helper.i18n.Messages;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+
+import static javax.faces.application.FacesMessage.SEVERITY_INFO;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
@@ -20,6 +27,12 @@ import lombok.extern.slf4j.Slf4j;
 @ViewScoped
 @Slf4j
 public class AdminAction implements Serializable {
+
+    @Inject
+    private AppConfiguration appConfiguration;
+
+    @Inject
+    private Messages msg;
 
     @Getter
     @Setter
@@ -30,25 +43,22 @@ public class AdminAction implements Serializable {
     @Setter
     private boolean deleteJobDir;
 
-    @Getter
-    @Setter
-    private boolean enableEncryption;
-
     private Map<String, String> errors = new HashMap<>();
 
     @PostConstruct
     public void init() {
-        //populate all fields
+        storageDir = appConfiguration.getStorageDirectory();
+        deleteJobDir = appConfiguration.isDeleteJobDir();
     }
 
 
     public String saveChanges() {
-        validateFields();
+        appConfiguration.updateStorageDir(storageDir);
+        appConfiguration.setDeleteJobDir(deleteJobDir);
+        FacesMessage message = new FacesMessage(SEVERITY_INFO,
+                msg.get("jsf.admin.settings.saved.message"), "");
+        FacesContext.getCurrentInstance().addMessage(null, message);
         return "/admin/settings.jsf";
-    }
-
-    private void validateFields() {
-
     }
 
     public boolean hasError(String fieldName) {

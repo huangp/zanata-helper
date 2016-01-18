@@ -37,13 +37,6 @@
               </div>
 
               <div class="form__item l--push-top-1">
-                <h2 class="heading--secondary">#{msg['jsf.admin.settings.security']}</h2>
-                <h:selectBooleanCheckbox value="#{adminAction.enableEncryption}"/>
-                <label class="l--push-left-quarter l--push-bottom-0">#{msg['jsf.admin.settings.encryption']}</label>
-                <div class="txt--meta">#{msg['jsf.admin.settings.encryption.description']}</div>
-              </div>
-
-              <div class="form__item l--push-top-1">
                 <h:commandButton styleClass="button button--primary button--full"
                   value="#{msg['jsf.admin.settings.button.save']}"
                   action="#{adminAction.saveChanges()}">

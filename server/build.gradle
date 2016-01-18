@@ -73,6 +73,7 @@ processResources {
         version: version,
         build: versioning.info.full,
         storeDirectory: '/tmp',
-        fieldsNeedEncryption: 'apiKey'
+        fieldsNeedEncryption: 'apiKey',
+        deleteJobDir: 'true'
     ])
 }

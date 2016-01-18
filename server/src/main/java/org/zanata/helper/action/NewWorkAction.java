@@ -1,6 +1,7 @@
 package org.zanata.helper.action;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
@@ -15,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.Map;
+
+import static javax.faces.application.FacesMessage.SEVERITY_INFO;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
@@ -39,8 +42,11 @@ public class NewWorkAction extends HasFormAction {
         if (!errors.isEmpty()) {
             return "/work/new.jsf";
         }
-        FacesContext.getCurrentInstance().getExternalContext()
-            .redirect("/home.jsf");
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        FacesMessage message = new FacesMessage(SEVERITY_INFO,
+            msg.get("jsf.newWork.created.message"), "");
+        facesContext.addMessage(null, message);
+        facesContext.getExternalContext().redirect("/home.jsf");
         return "";
     }
 
