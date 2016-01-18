@@ -83,7 +83,7 @@ public class SyncWorkConfigRepository {
 
     @PostConstruct
     public void postConstruct() {
-        configDirectory = appConfiguration.getConfigDirectory();
+        configDirectory = appConfiguration.getConfigDir();
     }
 
     public Optional<SyncWorkConfig> load(long id) {

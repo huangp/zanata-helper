@@ -42,7 +42,7 @@
 <composite:implementation>
   <div
     class="#{cc.attrs.hasError ? 'form__item--error' : ''} #{cc.attrs.styleClass}" title="#{cc.attrs.tooltip}" id="#{cc.attrs.componentId}">
-    <label for="input" style="#{cc.attrs.labelStyle}"><h:outputText value="#{cc.attrs.label}" escape="false"/></label>
+    <h:outputLabel for="input" styleClass="#{cc.attrs.labelStyle}"><h:outputText value="#{cc.attrs.label}" escape="false"/></h:outputLabel>
 
     <h:inputText maxlength="#{cc.attrs.maxlength}" pt:placeholder="#{cc.attrs.placeholder}" id="input"
       styleClass="l--push-bottom-quarter" value="#{cc.attrs.value}"/>
@@ -50,6 +50,8 @@
     <ui:fragment rendered="#{cc.attrs.hasError}">
       <span class="l--pad-all-quarter message--danger">#{cc.attrs.errorMessage}</span>
     </ui:fragment>
+
+    <composite:insertChildren/>
   </div>
 </composite:implementation>
 </html>

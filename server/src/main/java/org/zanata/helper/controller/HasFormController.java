@@ -1,4 +1,4 @@
-package org.zanata.helper.action;
+package org.zanata.helper.controller;
 
 import lombok.Getter;
 import org.zanata.helper.common.model.Field;
@@ -20,7 +20,7 @@ import javax.annotation.PostConstruct;
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
  */
-public abstract class HasFormAction implements Serializable {
+public abstract class HasFormController implements Serializable {
     @Getter
     protected Map<String, String> errors = new HashMap<>();
 

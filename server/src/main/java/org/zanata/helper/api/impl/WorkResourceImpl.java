@@ -4,7 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zanata.helper.action.SyncWorkForm;
+import org.zanata.helper.controller.SyncWorkForm;
 import org.zanata.helper.api.WorkResource;
 import org.zanata.helper.exception.WorkNotFoundException;
 import org.zanata.helper.model.SyncWorkConfig;

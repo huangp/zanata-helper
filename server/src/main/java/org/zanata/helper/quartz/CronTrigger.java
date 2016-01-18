@@ -126,7 +126,7 @@ public class CronTrigger {
             jobDetail.getJobDataMap().put("value", syncWorkConfig);
             jobDetail.getJobDataMap()
                     .put("basedir", type.baseWorkDir(
-                            appConfiguration.getRepoDirectory()));
+                            appConfiguration.getRepoDir()));
 
             jobDetail.getJobDataMap().put("jobType", type);
 

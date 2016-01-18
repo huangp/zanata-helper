@@ -9,7 +9,7 @@
   template="/WEB-INF/includes/template.xhtml">
 
   <f:metadata>
-    <f:viewParam name="id" value="#{workAction.id}" />
+    <f:viewParam name="id" value="#{workController.id}" />
   </f:metadata>
 
   <ui:define name="content">
@@ -31,31 +31,31 @@
 
     <div class="l__wrapper">
       <div class="g">
-        <ui:fragment rendered="#{workAction.syncWorkConfig eq null}">
+        <ui:fragment rendered="#{workController.syncWorkConfig eq null}">
           <div class="g__item g__item g--centered ">
             <div class="l--pad-all-half panel">
-              #{msg.format('jsp.noWorkFound', workAction.id)}
+              #{msg.format('jsp.noWorkFound', workController.id)}
             </div>
           </div>
         </ui:fragment>
 
 
-        <ui:fragment rendered="#{workAction.syncWorkConfig ne null}">
+        <ui:fragment rendered="#{workController.syncWorkConfig ne null}">
           <h:form styleClass="l--push-bottom-0">
 
             <a4j:jsFunction name="triggerSyncToRepoJob" render="jobStatus"
-              action="#{workAction.triggerSyncToRepoJob()}" limitRender="true">
+              action="#{workController.triggerSyncToRepoJob()}" limitRender="true">
             </a4j:jsFunction>
 
             <a4j:jsFunction name="triggerSyncToServerJob" render="jobStatus"
-              action="#{workAction.triggerSyncToServerJob()}" limitRender="true">
+              action="#{workController.triggerSyncToServerJob()}" limitRender="true">
             </a4j:jsFunction>
 
-            <a4j:jsFunction name="deleteWork" action="#{workAction.deleteWork()}"
+            <a4j:jsFunction name="deleteWork" action="#{workController.deleteWork()}"
               limitRender="true" render="configuration"/>
 
             <a4j:jsFunction name="cancelJob"
-              action="#{workAction.cancelRunningJob(type)}" limitRender="true"
+              action="#{workController.cancelRunningJob(type)}" limitRender="true"
               render="jobStatus">
               <a4j:param name="val1" assignTo="#{type}"/>
             </a4j:jsFunction>
@@ -69,18 +69,18 @@
               <a href="/home.jsf">#{msg['jsf.home']}</a>
             </p>
 
-            <h1>#{workAction.syncWorkConfig.name}</h1>
+            <h1>#{workController.syncWorkConfig.name}</h1>
             <p class="txt--understated">
-              #{workAction.syncWorkConfig.description}
+              #{workController.syncWorkConfig.description}
             </p>
             <h:panelGroup layout="block" id="jobStatus">
               <div class="l--pad-all-quarter panel">
-                  <ui:fragment rendered="#{not workAction.isSyncToRepoRunning()}">
+                  <ui:fragment rendered="#{not workController.isSyncToRepoRunning()}">
                     <button class="button--small button--warning button loader" onclick="triggerSyncToRepoJob();return false">
                       <span class="loader__label">#{msg['jsf.work.runJobNow']}</span>
                     </button>
                   </ui:fragment>
-                  <ui:fragment rendered="#{workAction.isSyncToRepoRunning()}">
+                  <ui:fragment rendered="#{workController.isSyncToRepoRunning()}">
                     <button class="button--small button--danger loader" onclick="cancelJob('REPO_SYNC')"
                       title="#{msg['jsf.job.cancel.button.title']}">
                       <span class="loader__label"><i class="i i--cancel"></i></span>
@@ -90,19 +90,19 @@
                         <span></span><span></span><span></span>
                       </span>
                     </div>
-                    <div class="txt--meta l--push-v-quarter">#{workAction.syncWorkConfig.syncToRepoConfig.status.currentProgress.completePercent}% #{workAction.syncWorkConfig.syncToRepoConfig.status.currentProgress.description}</div>
+                    <div class="txt--meta l--push-v-quarter">#{workController.syncWorkConfig.syncToRepoConfig.status.currentProgress.completePercent}% #{workController.syncWorkConfig.syncToRepoConfig.status.currentProgress.description}</div>
                   </ui:fragment>
-                <c:workstatus jobStatus="#{workAction.syncWorkConfig.syncToRepoConfig.status}"
+                <c:workstatus jobStatus="#{workController.syncWorkConfig.syncToRepoConfig.status}"
                   type="REPO_SYNC" styleClass="l--pad-top-quarter" displayType="block"/>
               </div>
 
               <div class="l--pad-all-quarter l--push-top-half panel">
-                  <ui:fragment rendered="#{not workAction.isSyncToServerRunning()}">
+                  <ui:fragment rendered="#{not workController.isSyncToServerRunning()}">
                     <button class="button--small button--warning button loader" onclick="triggerSyncToServerJob();return false">
                       <span class="loader__label">#{msg['jsf.work.runJobNow']}</span>
                     </button>
                   </ui:fragment>
-                  <ui:fragment rendered="#{workAction.isSyncToServerRunning()}">
+                  <ui:fragment rendered="#{workController.isSyncToServerRunning()}">
                     <button class="button--small button--danger loader" onclick="cancelJob('SERVER_SYNC')"
                       title="#{msg['jsf.job.cancel.button.title']}">
                       <span class="loader__label"><i class="i i--cancel"></i></span>
@@ -112,9 +112,9 @@
                         <span></span><span></span><span></span>
                       </span>
                     </div>
-                    <div class="txt--meta l--push-v-quarter">#{workAction.syncWorkConfig.syncToServerConfig.status.currentProgress.completePercent}% #{workAction.syncWorkConfig.syncToServerConfig.status.currentProgress.description}</div>
+                    <div class="txt--meta l--push-v-quarter">#{workController.syncWorkConfig.syncToServerConfig.status.currentProgress.completePercent}% #{workController.syncWorkConfig.syncToServerConfig.status.currentProgress.description}</div>
                   </ui:fragment>
-                <c:workstatus jobStatus="#{workAction.syncWorkConfig.syncToServerConfig.status}"
+                <c:workstatus jobStatus="#{workController.syncWorkConfig.syncToServerConfig.status}"
                   type="SERVER_SYNC" styleClass="l--pad-top-quarter" displayType="block"/>
               </div>
             </h:panelGroup>
@@ -129,7 +129,7 @@
               </div>
 
               <h:panelGroup layout="block" styleClass="l--pad-all-1" id="configuration">
-                <c:workForm actionClass="#{workAction}" id="work-form" styleClass="l--push-buttom-0"/>
+                <c:workForm actionClass="#{workController}" id="work-form" styleClass="l--push-buttom-0"/>
 
                 <div class="l--push-top-1 txt--align-right g__item">
                   <button class="button--danger l--push-right-half loader" id="button-delete-work" >

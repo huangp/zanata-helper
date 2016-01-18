@@ -1,4 +1,4 @@
-package org.zanata.helper.action;
+package org.zanata.helper.controller;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -20,23 +20,19 @@ import org.zanata.helper.i18n.Messages;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.zanata.helper.repository.SystemSettingsRepository;
 
 import static javax.faces.application.FacesMessage.SEVERITY_INFO;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
-@Named("adminAction")
+@Named("adminController")
 @ViewScoped
 @Slf4j
-public class AdminAction implements Serializable {
+public class AdminController implements Serializable {
 
     @Inject
     private AppConfiguration appConfiguration;
-
-    @Inject
-    private SystemSettingsRepository systemSettingsRepository;
 
     @Inject
     private Messages msg;
@@ -58,22 +54,27 @@ public class AdminAction implements Serializable {
 
     @PostConstruct
     public void init() {
-        storageDir = appConfiguration.getStorageDirectory();
+        storageDir = appConfiguration.getStorageDir();
         deleteJobDir = appConfiguration.isDeleteJobDir();
         fieldsNeedEncryption =
             StringUtils.join(appConfiguration.getFieldsNeedEncryption(), ',');
     }
 
     public String saveChanges() {
+        validate();
         appConfiguration.updateSettings(storageDir, deleteJobDir, ImmutableList
             .copyOf(Splitter.on(",").omitEmptyStrings().trimResults()
                 .split(fieldsNeedEncryption)));
 
-        systemSettingsRepository.persist(appConfiguration.getSystemSettings());
+        appConfiguration.saveCurrentSettings();
         FacesMessage message = new FacesMessage(SEVERITY_INFO,
                 msg.get("jsf.admin.settings.saved.message"), "");
         FacesContext.getCurrentInstance().addMessage(null, message);
         return "/admin/settings.jsf";
+    }
+
+    private void validate() {
+        //validate fields
     }
 
     public boolean hasError(String fieldName) {

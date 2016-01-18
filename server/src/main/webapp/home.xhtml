@@ -11,7 +11,7 @@
   <ui:define name="content">
     <h:form styleClass="l--push-buttom-0">
       <a4j:jsFunction name="cancelJob"
-        action="#{indexAction.cancelRunningJob(id, type)}" limitRender="true"
+        action="#{indexController.cancelRunningJob(id, type)}" limitRender="true"
         render="running-jobs-content">
         <a4j:param name="val1" assignTo="#{id}"/>
         <a4j:param name="val2" assignTo="#{type}"/>
@@ -26,12 +26,12 @@
         <div class="g__item w--1-m w--3-8-l w--1-4 l--push-bottom-half">
           <h1>#{msg['Application.name']}</h1>
           <h:panelGroup layout="block" styleClass="l--push-top-quarter panel" id="running-jobs-content">
-            <ui:fragment rendered="#{empty indexAction.runningJobs}">
+            <ui:fragment rendered="#{empty indexController.runningJobs}">
               <p class="txt--meta l--pad-all-half">#{msg['jsp.noRunningJobs']}</p>
             </ui:fragment>
-            <ui:fragment rendered="#{not empty indexAction.runningJobs}">
+            <ui:fragment rendered="#{not empty indexController.runningJobs}">
               <ul class="list--panel">
-                <ui:repeat value="#{indexAction.runningJobs}" var="job">
+                <ui:repeat value="#{indexController.runningJobs}" var="job">
                   <li class="l--pad-all-quarter" id="running-#{job.key}">
                     <a href="/work/home.jsf?id=#{job.workId}">
                       <div class="list__item__content">
@@ -79,15 +79,15 @@
               </h2>
             </div>
 
-            <ui:fragment rendered="#{empty indexAction.allWork}">
+            <ui:fragment rendered="#{empty indexController.allWork}">
               <div class="l--pad-all-half">
                 <p class="txt--meta">#{msg['jsp.noWorks']}</p>
                 <a href="/work/new.jsf" class="button button--primary">#{msg['jsf.newWork']}</a>
               </div>
             </ui:fragment>
-            <ui:fragment rendered="#{not empty indexAction.allWork}">
+            <ui:fragment rendered="#{not empty indexController.allWork}">
               <ul class="list--panel">
-                <ui:repeat value="#{indexAction.allWork}" var="work">
+                <ui:repeat value="#{indexController.allWork}" var="work">
                   <li class="l--pad-all-quarter">
                     <a href="/work/home.jsf?id=#{work.id}">
                       <div class="list__item__content">

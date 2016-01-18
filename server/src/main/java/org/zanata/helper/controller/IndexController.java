@@ -1,4 +1,4 @@
-package org.zanata.helper.action;
+package org.zanata.helper.controller;
 
 import java.io.Serializable;
 import java.util.List;
@@ -21,10 +21,10 @@ import org.zanata.helper.model.WorkSummary;
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
-@Named("indexAction")
+@Named("indexController")
 @ViewScoped
 @Slf4j
-public class IndexAction implements Serializable {
+public class IndexController implements Serializable {
 
     @Inject
     private WorkResource workResourceImpl;

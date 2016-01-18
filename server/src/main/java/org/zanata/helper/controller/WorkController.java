@@ -1,4 +1,4 @@
-package org.zanata.helper.action;
+package org.zanata.helper.controller;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,10 +26,10 @@ import org.zanata.helper.service.PluginsService;
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
-@Named("workAction")
+@Named("workController")
 @Slf4j
 @ViewScoped
-public class WorkAction extends HasFormAction {
+public class WorkController extends HasFormController {
 
     @Inject
     private WorkResource workResourceImpl;

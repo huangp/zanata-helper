@@ -1,6 +1,6 @@
 package org.zanata.helper.model;
 
-import org.zanata.helper.action.SyncWorkForm;
+import org.zanata.helper.controller.SyncWorkForm;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;

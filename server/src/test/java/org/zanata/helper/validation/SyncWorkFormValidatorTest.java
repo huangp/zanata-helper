@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.zanata.helper.action.SyncWorkForm;
+import org.zanata.helper.controller.SyncWorkForm;
 import org.zanata.helper.service.PluginsService;
 
 public class SyncWorkFormValidatorTest {

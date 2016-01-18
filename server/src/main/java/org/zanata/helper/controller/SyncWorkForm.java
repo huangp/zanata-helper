@@ -1,4 +1,4 @@
-package org.zanata.helper.action;
+package org.zanata.helper.controller;
 
 import java.io.Serializable;
 import java.util.HashMap;

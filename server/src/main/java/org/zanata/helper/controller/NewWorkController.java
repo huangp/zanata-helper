@@ -1,6 +1,5 @@
-package org.zanata.helper.action;
+package org.zanata.helper.controller;
 
-import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
@@ -24,8 +23,8 @@ import static javax.faces.application.FacesMessage.SEVERITY_INFO;
  */
 @ViewScoped
 @Slf4j
-@Named("newWorkAction")
-public class NewWorkAction extends HasFormAction {
+@Named("newWorkController")
+public class NewWorkController extends HasFormController {
 
     @Inject
     private PluginsService pluginsServiceImpl;

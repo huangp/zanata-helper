@@ -23,23 +23,38 @@
                 <h2 class="heading--secondary">
                   #{msg['jsf.admin.settings.storage']}
                 </h2>
-                <c:textfield componentId="storageDir" value="#{adminAction.storageDir}"
+                <c:textfield componentId="storageDir" value="#{adminController.storageDir}"
                   styleClass="form__item"
                   label="#{msg['jsf.admin.settings.storageDir']}"
-                  hasError="#{adminAction.hasError('storageDir')}"
-                  errorMessage="#{adminAction.getErrorMessage('storageDir')}"/>
+                  hasError="#{adminController.hasError('storageDir')}"
+                  errorMessage="#{adminController.getErrorMessage('storageDir')}">
+                  <div class="txt--meta">#{msg['jsf.admin.settings.storageDir.description']}</div>
+                </c:textfield>
 
                 <div class="form__item">
-                  <h:selectBooleanCheckbox value="#{adminAction.deleteJobDir}"/>
+                  <h:selectBooleanCheckbox value="#{adminController.deleteJobDir}"/>
                   <label class="l--push-left-quarter l--push-bottom-0">#{msg['jsf.admin.settings.storage.deleteJobDir']}</label>
                   <div class="txt--meta">#{msg['jsf.admin.settings.storage.deleteJobDir.description']}</div>
                 </div>
               </div>
 
+              <div class="l--push-top-1">
+                <h2 class="heading--secondary">
+                  #{msg['jsf.admin.settings.security']}
+                </h2>
+                <c:textfield componentId="encryptionFields" value="#{adminController.fieldsNeedEncryption}"
+                  styleClass="form__item"
+                  label="#{msg['jsf.admin.settings.encryption']}"
+                  hasError="#{adminController.hasError('encryptionFields')}"
+                  errorMessage="#{adminController.getErrorMessage('encryptionFields')}">
+                  <div class="txt--meta">#{msg['jsf.admin.settings.encryption.description']}</div>
+                </c:textfield>
+              </div>
+
               <div class="form__item l--push-top-1">
                 <h:commandButton styleClass="button button--primary button--full"
                   value="#{msg['jsf.admin.settings.button.save']}"
-                  action="#{adminAction.saveChanges()}">
+                  action="#{adminController.saveChanges()}">
                 </h:commandButton>
               </div>
             </div>

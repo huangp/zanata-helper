@@ -1,47 +1,63 @@
 package org.zanata.helper.component;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
-import javax.enterprise.context.Dependent;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
+import javax.enterprise.context.ApplicationScoped;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.introspector.BeanAccess;
+import org.zanata.helper.model.SystemSettings;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
-import org.zanata.helper.model.SystemSettings;
+
+import static org.apache.commons.io.Charsets.UTF_8;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
-@Dependent
+@ApplicationScoped
 @Slf4j
 public class AppConfiguration implements Serializable {
     private final static String CONFIG_DIR = "configuration";
     private final static String REPO_DIR = "repository";
+    private static final String SETTING_FILE = "settings.yaml";
+    private final static Yaml YAML = new Yaml();
 
-//    @Inject
-//    private SystemSettingsRepository systemSettingsRepository;
+    private ReentrantLock lock = new ReentrantLock();
 
     @Getter
     private SystemSettings systemSettings;
-
-    private File configDir;
-    private File repoDir;
 
     @Getter
     private String buildVersion;
 
     @Getter
     private String buildInfo;
+
+    @Getter
+    private File configDir;
+
+    @Getter
+    private File repoDir;
 
     public AppConfiguration() {
         ClassLoader contextClassLoader =
@@ -56,34 +72,22 @@ public class AppConfiguration implements Serializable {
             buildVersion = properties.getProperty("build.version");
             properties.load(config);
 
-            String fields =
-                properties.getProperty("fields.need.encryption", "");
-            List<String> fieldsNeedEncryption = ImmutableList.copyOf(
-                Splitter.on(",").omitEmptyStrings().trimResults().split(fields));
-            boolean deleteJobDir = Boolean.valueOf(
-                properties.getProperty("delete.job.dir"));
-            String storageDir = properties.getProperty("store.directory");
-
-            systemSettings = new SystemSettings(storageDir, deleteJobDir,
-                fieldsNeedEncryption);
-            updateStorageDir();
+            Optional<SystemSettings> systemSettings = loadSettingsFromYaml();
+            if(systemSettings.isPresent()) {
+                this.systemSettings = systemSettings.get();
+            } else {
+                String fields =
+                    properties.getProperty("fields.need.encryption", "");
+                List<String> fieldsNeedEncryption = ImmutableList.copyOf(
+                    Splitter.on(",").omitEmptyStrings().trimResults().split(fields));
+                boolean deleteJobDir = Boolean.valueOf(
+                    properties.getProperty("delete.job.dir"));
+                String storageDir = properties.getProperty("store.directory");
+                updateSettings(storageDir, deleteJobDir, fieldsNeedEncryption);
+            }
         } catch (IOException e) {
             throw Throwables.propagate(e);
         }
-    }
-
-    /**
-     * Load default settings from config.properties file
-     */
-    public void init() {
-//        Optional<SystemSettings> settings =
-//            systemSettingsRepository.loadFromDisk();
-//
-//        if (settings.isPresent()) {
-//            log.info("Loading settings from storage");
-//            this.systemSettings = settings.get();
-//            updateStorageDir();
-//        }
     }
 
     @VisibleForTesting
@@ -92,19 +96,58 @@ public class AppConfiguration implements Serializable {
         this.repoDir = repoDir;
     }
 
+    public void updateSettings(String newStorageDir, boolean deleteJobDir,
+        List<String> fieldsNeedEncryption) {
+        systemSettings =
+            new SystemSettings(newStorageDir, deleteJobDir, fieldsNeedEncryption);
+        updateStorageDir();
+    }
+
+    /**
+     * Save current settings.
+     * Use {@link #updateSettings} to update current settings.
+     */
+    public void saveCurrentSettings() {
+        try {
+            lock.tryLock(5, TimeUnit.SECONDS);
+            String incomingYaml = toYaml(systemSettings);
+
+            File configFile = new File(configDir, SETTING_FILE);
+            FileUtils.write(configFile, incomingYaml, UTF_8);
+            log.info("System settings saved.");
+        } catch (InterruptedException | IOException e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
+    private Optional<SystemSettings> loadSettingsFromYaml() {
+        File config = new File(configDir, SETTING_FILE);
+        return Optional.ofNullable(fromYaml(config));
+    }
+
+    private SystemSettings fromYaml(File file) {
+        try (InputStream inputStream = new FileInputStream(file)) {
+            YAML.setBeanAccess(BeanAccess.FIELD);
+            SystemSettings settings = (SystemSettings) YAML.load(inputStream);
+            return settings;
+        } catch (IOException e) {
+            log.warn("No settings file found, " + SETTING_FILE);
+        } finally {
+            return null;
+        }
+    }
+
+    private String toYaml(SystemSettings systemSettings) {
+        YAML.setBeanAccess(BeanAccess.FIELD);
+        return YAML.dump(systemSettings);
+    }
+
     private void updateStorageDir() {
         configDir = Paths.get(buildConfigDirectory()).toFile();
         checkDirectory(CONFIG_DIR, configDir);
 
         repoDir = Paths.get(buildRepoDirectory()).toFile();
         checkDirectory(REPO_DIR, repoDir);
-    }
-
-    public void updateSettings(String newDir, boolean deleteJobDir,
-        List<String> fieldsNeedEncryption) {
-        systemSettings =
-            new SystemSettings(newDir, deleteJobDir, fieldsNeedEncryption);
-        updateStorageDir();
     }
 
     private static void checkDirectory(String nameOfDirectory, File directory) {
@@ -132,14 +175,6 @@ public class AppConfiguration implements Serializable {
                 + REPO_DIR;
     }
 
-    public File getConfigDirectory() {
-        return configDir;
-    }
-
-    public File getRepoDirectory() {
-        return repoDir;
-    }
-
     private static String removeTrailingSlash(String string) {
         return StringUtils.chomp(string, "" + File.separatorChar);
     }
@@ -148,7 +183,7 @@ public class AppConfiguration implements Serializable {
         return systemSettings.getFieldsNeedEncryption();
     }
 
-    public String getStorageDirectory() {
+    public String getStorageDir() {
         return systemSettings.getStorageDir();
     }
 

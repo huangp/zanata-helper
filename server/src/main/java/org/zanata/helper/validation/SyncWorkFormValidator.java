@@ -30,8 +30,7 @@ import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
 import org.apache.commons.lang.StringUtils;
-import org.zanata.helper.action.SyncWorkForm;
-import org.zanata.helper.common.Messages;
+import org.zanata.helper.controller.SyncWorkForm;
 import org.zanata.helper.common.model.Field;
 import org.zanata.helper.common.plugin.Plugin;
 import org.zanata.helper.common.plugin.RepoExecutor;

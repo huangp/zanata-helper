@@ -61,7 +61,6 @@ public class SchedulerServiceImpl implements SchedulerService {
     private Map<RunningJobKey, JobProgress> progressMap =
         Collections.synchronizedMap(Maps.newHashMap());
 
-    // TODO: database connection, thread count, scheduler, queue, event
     public void onStartUp(@Observes @Initialized ServletContext servletContext) {
         log.info("=====================================================");
         log.info("=====================================================");
@@ -70,9 +69,9 @@ public class SchedulerServiceImpl implements SchedulerService {
                 appConfiguration.getBuildVersion(),
                 appConfiguration.getBuildInfo());
         log.info("== repo directory:    {}",
-                appConfiguration.getRepoDirectory());
+                appConfiguration.getRepoDir());
         log.info("== config directory:  {}",
-                appConfiguration.getConfigDirectory());
+                appConfiguration.getConfigDir());
         log.info("== fields to encrypt: {}",
                 appConfiguration.getFieldsNeedEncryption());
         log.info("=====================================================");
