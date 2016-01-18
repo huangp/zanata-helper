@@ -77,6 +77,7 @@ public class TransServerSyncJob extends SyncJob {
             updateProgress(syncWorkConfig.getId(), 75,
                 "Cleaning directory: " + destDir, JobStatusType.RUNNING);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new JobExecutionException(e);
         }
     }
