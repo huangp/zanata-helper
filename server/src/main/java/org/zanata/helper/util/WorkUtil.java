@@ -11,7 +11,7 @@ import org.zanata.helper.model.WorkSummary;
  */
 public class WorkUtil {
 
-    public static final WorkSummary convertToWorkSummary(
+    public static final WorkSummary toWorkSummary(
         SyncWorkConfig syncWorkConfig, JobStatus syncToRepoJobStatus, JobStatus syncToServerJobStatus) {
         if(syncWorkConfig == null) {
             return new WorkSummary();

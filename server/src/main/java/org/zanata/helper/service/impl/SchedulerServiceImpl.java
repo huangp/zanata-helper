@@ -150,7 +150,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     public List<WorkSummary> getAllWorkSummary() throws SchedulerException {
         List<WorkSummary> results = getAllWork().stream()
-            .map(config -> WorkUtil.convertToWorkSummary(config,
+            .map(config -> WorkUtil.toWorkSummary(config,
                 getLatestJobStatus(config.getId(), JobType.REPO_SYNC),
                 getLatestJobStatus(config.getId(), JobType.SERVER_SYNC)))
             .collect(Collectors.toList());
@@ -237,7 +237,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     public WorkSummary getWorkSummary(String id) throws WorkNotFoundException {
         SyncWorkConfig syncWorkConfig = getWork(id);
-        return WorkUtil.convertToWorkSummary(syncWorkConfig,
+        return WorkUtil.toWorkSummary(syncWorkConfig,
                 getLatestJobStatus(syncWorkConfig.getId(), JobType.REPO_SYNC),
                 getLatestJobStatus(syncWorkConfig.getId(),
                         JobType.SERVER_SYNC));
