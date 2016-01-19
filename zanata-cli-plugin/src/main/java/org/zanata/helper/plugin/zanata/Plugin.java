@@ -3,9 +3,9 @@ package org.zanata.helper.plugin.zanata;
 import org.zanata.client.commands.pull.PullOptionsImpl;
 import org.zanata.client.commands.push.PushOptionsImpl;
 import org.zanata.helper.common.annotation.TranslationServerPlugin;
+import org.zanata.helper.common.model.FieldType;
 import org.zanata.helper.common.model.SyncOption;
 import org.zanata.helper.common.model.Field;
-import org.zanata.helper.common.annotation.RepoPlugin;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.common.validator.StringValidator;
 import org.zanata.helper.common.validator.UrlValidator;
@@ -21,7 +21,7 @@ import java.util.Map;
 @TranslationServerPlugin
 public class Plugin extends TranslationServerExecutor {
 
-    private final String name = "Zanata plugin";
+    private final String name = "Zanata Server plugin";
     private final String description = Messages.getString("plugin.description");
     private final ZanataSyncServiceImpl zanataSyncService;
 
@@ -42,17 +42,17 @@ public class Plugin extends TranslationServerExecutor {
     public void initFields() {
         Field urlField = new Field("url", Messages.getString("field.url.label"),
                 "https://translate.zanata.org/zanata/iteration/view/zanata-server/master",
-                null, new UrlValidator());
+                null, new UrlValidator(), FieldType.TEXT);
         Field usernameField =
                 new Field("username",
                         Messages.getString("field.username.label"),
                         "", Messages.getString("field.username.tooltip"),
-                        new StringValidator(1, null, true));
+                        new StringValidator(1, null, true), FieldType.TEXT);
         Field apiKeyField =
                 new Field("apiKey", Messages.getString("field.apiKey.label"),
                         "",
                         Messages.getString("field.apiKey.tooltip"),
-                        new StringValidator(1, null, true));
+                        new StringValidator(1, null, true), FieldType.TEXT);
 
         fields.put(urlField.getKey(), urlField);
         fields.put(usernameField.getKey(), usernameField);

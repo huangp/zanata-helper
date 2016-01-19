@@ -1,6 +1,7 @@
 package org.zanata.helper.plugin.git;
 
 import org.eclipse.jgit.util.StringUtils;
+import org.zanata.helper.common.model.FieldType;
 import org.zanata.helper.common.model.SyncOption;
 import org.zanata.helper.common.model.UsernamePasswordCredential;
 import org.zanata.helper.common.exception.RepoSyncException;
@@ -36,20 +37,20 @@ public class Plugin extends RepoExecutor {
     public void initFields() {
         Field urlField = new Field("url", Messages.getString("field.url.label"),
                 "https://github.com/zanata/zanata-server.git", null,
-                new UrlValidator());
+                new UrlValidator(), FieldType.TEXT);
         Field branchField =
                 new Field("branch", Messages.getString("field.branch.label"),
-                        "master", Messages.getString("field.branch.tooltip"));
+                        "master", Messages.getString("field.branch.tooltip"), FieldType.TEXT);
         Field usernameField =
                 new Field("username",
                         Messages.getString("field.username.label"),
                         "", Messages.getString("field.username.tooltip"),
-                        new StringValidator(1, null, true));
+                        new StringValidator(1, null, true), FieldType.TEXT);
         Field apiKeyField =
                 new Field("apiKey", Messages.getString("field.apiKey.label"),
                         "",
                         Messages.getString("field.apiKey.tooltip"),
-                        new StringValidator(1, null, true));
+                        new StringValidator(1, null, true), FieldType.TEXT);
 
         fields.put(urlField.getKey(), urlField);
         fields.put(branchField.getKey(), branchField);

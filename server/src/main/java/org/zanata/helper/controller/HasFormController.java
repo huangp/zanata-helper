@@ -2,6 +2,7 @@ package org.zanata.helper.controller;
 
 import lombok.Getter;
 import org.zanata.helper.common.model.Field;
+import org.zanata.helper.common.model.FieldType;
 import org.zanata.helper.common.model.SyncOption;
 import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
@@ -90,14 +91,16 @@ public abstract class HasFormController implements Serializable {
         if (syncOptions == null) {
             syncOptions = new ArrayList<>();
             syncOptions.add(new Field(SyncOption.SOURCE.name(),
-                getMessage().get("jsf.work.syncType.sourceOnly.explanation"),
-                "", ""));
+                    getMessage()
+                            .get("jsf.work.syncType.sourceOnly.explanation"),
+                    "", "", FieldType.TEXT));
             syncOptions
-                .add(new Field(SyncOption.TRANSLATIONS.name(), getMessage()
-                    .get("jsf.work.syncType.translationsOnly.explanation"),
-                    "", ""));
+                    .add(new Field(SyncOption.TRANSLATIONS.name(), getMessage()
+                            .get("jsf.work.syncType.translationsOnly.explanation"),
+                            "", "", FieldType.TEXT));
             syncOptions.add(new Field(SyncOption.BOTH.name(), getMessage()
-                .get("jsf.work.syncType.both.explanation"), "", ""));
+                    .get("jsf.work.syncType.both.explanation"), "", "",
+                    FieldType.TEXT));
         }
         return syncOptions;
     }

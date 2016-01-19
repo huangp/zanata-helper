@@ -11,26 +11,30 @@ import java.io.Serializable;
  */
 @Getter
 public class Field implements Serializable {
-    private String key;
-    private String label;
+    private final String key;
+    private final String label;
 
     @Setter
     private String value;
 
-    private String placeholder;
-    private String tooltip;
-    private Validator validator;
+    private final FieldType type;
 
-    public Field(String key, String label, String placeholder, String tooltip) {
-        this(key, label, placeholder, tooltip, null);
+    private final String placeholder;
+    private final String tooltip;
+    private final Validator validator;
+
+    public Field(String key, String label, String placeholder, String tooltip,
+            FieldType type) {
+        this(key, label, placeholder, tooltip, null, type);
     }
 
     public Field(String key, String label, String placeholder, String tooltip,
-        Validator validator) {
+        Validator validator, FieldType type) {
         this.key = key;
         this.label = label;
         this.placeholder = placeholder;
         this.tooltip = tooltip;
         this.validator = validator;
+        this.type = type;
     }
 }

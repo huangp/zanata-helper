@@ -104,14 +104,22 @@
                   var="srcRepoField">
                   <ui:param name="key"
                     value="#{cc.attrs.actionClass.form.getRepoSettingsPrefix()}#{srcRepoField.key}"/>
-                  <c:textfield componentId="#{key}"
-                    label="#{srcRepoField.label}"
-                    value="#{cc.attrs.actionClass.form.srcRepoPluginConfig[srcRepoField.key]}"
-                    styleClass="form__item" tooltip="#{srcRepoField.tooltip}"
-                    placeholder="#{srcRepoField.placeholder}"
-                    hasError="#{cc.attrs.actionClass.hasError(key)}"
-                    errorMessage="#{cc.attrs.actionClass.getErrorMessage(key)}">
-                  </c:textfield>
+                  <ui:fragment rendered="#{srcRepoField.type eq 'TEXT'}">
+                    <c:textfield componentId="#{key}"
+                      label="#{srcRepoField.label}"
+                      value="#{cc.attrs.actionClass.form.srcRepoPluginConfig[srcRepoField.key]}"
+                      styleClass="form__item" tooltip="#{srcRepoField.tooltip}"
+                      placeholder="#{srcRepoField.placeholder}"
+                      hasError="#{cc.attrs.actionClass.hasError(key)}"
+                      errorMessage="#{cc.attrs.actionClass.getErrorMessage(key)}">
+                    </c:textfield>
+                  </ui:fragment>
+                  <ui:fragment rendered="#{srcRepoField.type eq 'CHECKBOX'}">
+                    <c:checkbox componentId="#{key}" styleClass="form__item"
+                      value="#{cc.attrs.actionClass.form.srcRepoPluginConfig[srcRepoField.key]}"
+                      label="#{srcRepoField.label}"
+                      tooltip="#{srcRepoField.tooltip}"/>
+                  </ui:fragment>
                 </ui:repeat>
               </div>
             </ui:fragment>
@@ -141,14 +149,22 @@
                   var="transPluginField">
                   <ui:param name="key"
                     value="#{cc.attrs.actionClass.form.getTransSettingsPrefix()}#{transPluginField.key}"/>
-                  <c:textfield componentId="#{key}"
-                    label="#{transPluginField.label}"
-                    value="#{cc.attrs.actionClass.form.transServerPluginConfig[transPluginField.key]}"
-                    styleClass="form__item" tooltip="#{transPluginField.tooltip}"
-                    placeholder="#{transPluginField.placeholder}"
-                    hasError="#{cc.attrs.actionClass.hasError(key)}"
-                    errorMessage="#{cc.attrs.actionClass.getErrorMessage(key)}">>
-                  </c:textfield>
+                  <ui:fragment rendered="#{srcRepoField.type eq 'TEXT'}">
+                    <c:textfield componentId="#{key}"
+                      label="#{transPluginField.label}"
+                      value="#{cc.attrs.actionClass.form.transServerPluginConfig[transPluginField.key]}"
+                      styleClass="form__item" tooltip="#{transPluginField.tooltip}"
+                      placeholder="#{transPluginField.placeholder}"
+                      hasError="#{cc.attrs.actionClass.hasError(key)}"
+                      errorMessage="#{cc.attrs.actionClass.getErrorMessage(key)}">>
+                    </c:textfield>
+                  </ui:fragment>
+                  <ui:fragment rendered="#{transPluginField.type eq 'CHECKBOX'}">
+                    <c:checkbox componentId="#{key}" styleClass="form__item"
+                      value="#{cc.attrs.actionClass.form.transServerPluginConfig[transPluginField.key]}"
+                      label="#{transPluginField.label}"
+                      tooltip="#{transPluginField.tooltip}"/>
+                  </ui:fragment>
                 </ui:repeat>
               </div>
             </ui:fragment>
