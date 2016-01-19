@@ -91,37 +91,11 @@ public class SyncWorkConfig extends PersistModel {
                 syncToRepoEnabled);
     }
 
-    public void setJobStatus(JobStatus status, JobType type, JobProgress progress) {
-        if (type.equals(JobType.REPO_SYNC)) {
-            this.syncToRepoConfig
-                .updateStatus(status.getStatus(), status.getLastStartTime(),
-                        status.getLastEndTime(), status.getNextStartTime(), progress);
-        } else if (type.equals(JobType.SERVER_SYNC)) {
-            this.syncToServerConfig
-                .updateStatus(status.getStatus(), status.getLastStartTime(),
-                        status.getLastEndTime(), status.getNextStartTime(), progress);
-        }
-    }
-
     public void enableJob(JobType jobType, boolean enable) {
         if(jobType.equals(JobType.REPO_SYNC)) {
             syncToRepoEnabled = enable;
         } else if(jobType.equals(JobType.SERVER_SYNC)) {
             syncToServerEnabled = enable;
         }
-    }
-
-    public void setSyncToRepoJobProgress(JobProgress progress) {
-        JobStatus jobStatus = this.getSyncToRepoConfig().getStatus();
-        this.syncToRepoConfig
-            .updateStatus(jobStatus.getStatus(), jobStatus.getLastStartTime(),
-                jobStatus.getLastEndTime(), jobStatus.getNextStartTime(), progress);
-    }
-
-    public void setSyncToServerJobProgress(JobProgress progress) {
-        JobStatus jobStatus = this.getSyncToServerConfig().getStatus();
-        this.syncToServerConfig
-            .updateStatus(jobStatus.getStatus(), jobStatus.getLastStartTime(),
-                jobStatus.getLastEndTime(), jobStatus.getNextStartTime(), progress);
     }
 }

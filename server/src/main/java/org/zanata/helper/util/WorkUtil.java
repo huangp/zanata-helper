@@ -1,5 +1,6 @@
 package org.zanata.helper.util;
 
+import org.zanata.helper.model.JobStatus;
 import org.zanata.helper.model.JobSummary;
 import org.zanata.helper.model.JobType;
 import org.zanata.helper.model.SyncWorkConfig;
@@ -11,7 +12,7 @@ import org.zanata.helper.model.WorkSummary;
 public class WorkUtil {
 
     public static final WorkSummary convertToWorkSummary(
-        SyncWorkConfig syncWorkConfig) {
+        SyncWorkConfig syncWorkConfig, JobStatus syncToRepoJobStatus, JobStatus syncToServerJobStatus) {
         if(syncWorkConfig == null) {
             return new WorkSummary();
         }
@@ -20,14 +21,14 @@ public class WorkUtil {
                 syncWorkConfig.getId().toString(),
                 syncWorkConfig.getDescription(),
                 JobType.REPO_SYNC,
-                syncWorkConfig.getSyncToRepoConfig().getStatus());
+                syncToRepoJobStatus);
 
         JobSummary syncToServerJob =
             new JobSummary("", syncWorkConfig.getName(),
                 syncWorkConfig.getId().toString(),
                 syncWorkConfig.getDescription(),
                 JobType.SERVER_SYNC,
-                syncWorkConfig.getSyncToServerConfig().getStatus());
+                syncToServerJobStatus);
 
         return new WorkSummary(syncWorkConfig.getId(),
             syncWorkConfig.getName(),

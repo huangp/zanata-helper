@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response;
 import org.zanata.helper.api.JobResource;
 import org.zanata.helper.api.WorkResource;
 import org.zanata.helper.i18n.Messages;
+import org.zanata.helper.model.JobStatus;
 import org.zanata.helper.model.JobStatusType;
 import org.zanata.helper.model.JobSummary;
 import org.zanata.helper.model.JobType;
@@ -77,6 +78,16 @@ public class WorkController extends HasFormController {
 
     public boolean isSyncToRepoRunning() {
         return isJobRunning(JobType.REPO_SYNC);
+    }
+
+    public JobStatus getRepoSyncStatus() {
+        Response response = jobResource.getJobStatus(id, JobType.REPO_SYNC);
+        return (JobStatus)response.getEntity();
+    }
+
+    public JobStatus getServerSyncStatus() {
+        Response response = jobResource.getJobStatus(id, JobType.SERVER_SYNC);
+        return (JobStatus)response.getEntity();
     }
 
     public boolean isSyncToServerRunning() {

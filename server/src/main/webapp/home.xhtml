@@ -96,8 +96,8 @@
                           <span class="list__item__meta">#{work.description}</span>
                         </div>
                         <div class="list__item__actions txt--meta">
-                          <c:workstatus jobStatus="#{work.syncToRepoJob.jobStatus}" type="REPO_SYNC"/>
-                          <c:workstatus jobStatus="#{work.syncToTransServerJob.jobStatus}" type="SERVER_SYNC"/>
+                          <c:workstatus jobStatus="#{work.syncToRepoJob.lastJobStatus}" type="REPO_SYNC"/>
+                          <c:workstatus jobStatus="#{work.syncToTransServerJob.lastJobStatus}" type="SERVER_SYNC"/>
                         </div>
                       </div>
                     </a>

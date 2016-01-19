@@ -16,7 +16,7 @@ import org.zanata.helper.model.WorkSummary;
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
  */
 public interface SchedulerService {
-    JobStatus getJobStatus(Long id, JobType type)
+    JobStatus getLatestJobStatus(Long id, JobType type)
         throws SchedulerException, JobNotFoundException;
 
     List<JobSummary> getJobs() throws SchedulerException;

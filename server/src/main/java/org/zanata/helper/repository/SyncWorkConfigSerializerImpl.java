@@ -37,7 +37,7 @@ import com.google.common.base.Throwables;
  */
 @Dependent
 public class SyncWorkConfigSerializerImpl implements SyncWorkConfigSerializer {
-    private final static Yaml YAML = new Yaml(new SyncWorkConfigRepresenter());
+    private final static Yaml YAML = new Yaml();
 
     @Override
     public SyncWorkConfig fromYaml(File file) {

@@ -90,9 +90,9 @@
                         <span></span><span></span><span></span>
                       </span>
                     </div>
-                    <div class="txt--meta l--push-v-quarter">#{workController.syncWorkConfig.syncToRepoConfig.status.currentProgress.completePercent}% #{workController.syncWorkConfig.syncToRepoConfig.status.currentProgress.description}</div>
+                    <div class="txt--meta l--push-v-quarter">#{workController.getRepoSyncStatus().currentProgress.completePercent}% #{workController.getRepoSyncStatus().currentProgress.description}</div>
                   </ui:fragment>
-                <c:workstatus jobStatus="#{workController.syncWorkConfig.syncToRepoConfig.status}"
+                <c:workstatus jobStatus="#{workController.getRepoSyncStatus()}"
                   type="REPO_SYNC" styleClass="l--pad-top-quarter" displayType="block"/>
               </div>
 
@@ -112,9 +112,9 @@
                         <span></span><span></span><span></span>
                       </span>
                     </div>
-                    <div class="txt--meta l--push-v-quarter">#{workController.syncWorkConfig.syncToServerConfig.status.currentProgress.completePercent}% #{workController.syncWorkConfig.syncToServerConfig.status.currentProgress.description}</div>
+                    <div class="txt--meta l--push-v-quarter">#{workController.getServerSyncStatus().currentProgress.completePercent}% #{workController.getServerSyncStatus().currentProgress.description}</div>
                   </ui:fragment>
-                <c:workstatus jobStatus="#{workController.syncWorkConfig.syncToServerConfig.status}"
+                <c:workstatus jobStatus="#{workController.getServerSyncStatus()}"
                   type="SERVER_SYNC" styleClass="l--pad-top-quarter" displayType="block"/>
               </div>
             </h:panelGroup>

@@ -149,14 +149,14 @@
                   var="transPluginField">
                   <ui:param name="key"
                     value="#{cc.attrs.actionClass.form.getTransSettingsPrefix()}#{transPluginField.key}"/>
-                  <ui:fragment rendered="#{srcRepoField.type eq 'TEXT'}">
+                  <ui:fragment rendered="#{transPluginField.type eq 'TEXT'}">
                     <c:textfield componentId="#{key}"
                       label="#{transPluginField.label}"
                       value="#{cc.attrs.actionClass.form.transServerPluginConfig[transPluginField.key]}"
                       styleClass="form__item" tooltip="#{transPluginField.tooltip}"
                       placeholder="#{transPluginField.placeholder}"
                       hasError="#{cc.attrs.actionClass.hasError(key)}"
-                      errorMessage="#{cc.attrs.actionClass.getErrorMessage(key)}">>
+                      errorMessage="#{cc.attrs.actionClass.getErrorMessage(key)}">
                     </c:textfield>
                   </ui:fragment>
                   <ui:fragment rendered="#{transPluginField.type eq 'CHECKBOX'}">

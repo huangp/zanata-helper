@@ -15,7 +15,7 @@ import org.zanata.helper.events.JobRunUpdate;
 import org.zanata.helper.exception.JobNotFoundException;
 import org.zanata.helper.exception.WorkNotFoundException;
 import org.zanata.helper.model.JobProgress;
-import org.zanata.helper.model.JobStatusType;
+import org.zanata.helper.model.JobStatusList;
 import org.zanata.helper.model.JobType;
 import org.zanata.helper.model.SyncWorkConfig;
 import org.zanata.helper.model.JobSummary;
@@ -24,6 +24,7 @@ import org.zanata.helper.model.WorkSummary;
 import org.zanata.helper.quartz.CronTrigger;
 import org.zanata.helper.component.AppConfiguration;
 import org.zanata.helper.quartz.RunningJobKey;
+import org.zanata.helper.repository.JobStatusRepository;
 import org.zanata.helper.repository.SyncWorkConfigRepository;
 import org.zanata.helper.service.PluginsService;
 import org.zanata.helper.service.SchedulerService;
@@ -33,7 +34,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +54,9 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     @Inject
     private SyncWorkConfigRepository syncWorkConfigRepository;
+
+    @Inject
+    private JobStatusRepository jobStatusRepository;
 
     @Inject
     private CronTrigger cronTrigger;
@@ -111,28 +114,30 @@ public class SchedulerServiceImpl implements SchedulerService {
             log.debug(
                 "Job: " + event.getJobType() + "-" + syncWorkConfig.getName() +
                     " is completed.");
-            syncWorkConfig.setJobStatus(getStatus(event.getId(), event),
-                event.getJobType(), new JobProgress(100, "completed",
-                    JobStatusType.COMPLETE));
-            syncWorkConfigRepository.persist(syncWorkConfig);
+
+            JobStatus jobStatus = getStatus(event.getId(), event);
+            jobStatusRepository.saveJobStatus(syncWorkConfig,
+                    event.getJobType(), jobStatus);
         }
     }
 
     @Override
-    public JobStatus getJobStatus(Long id, JobType type) throws JobNotFoundException {
+    public JobStatus getLatestJobStatus(Long id, JobType type) {
         Optional<SyncWorkConfig> syncWorkConfigOpt =
                 syncWorkConfigRepository.load(id);
         if (syncWorkConfigOpt.isPresent()) {
             SyncWorkConfig syncWorkConfig = syncWorkConfigOpt.get();
-            setJobProgress(syncWorkConfig, type);
 
-            if(type.equals(JobType.REPO_SYNC)) {
-                return syncWorkConfig.getSyncToRepoConfig().getStatus();
-            } else {
-                return syncWorkConfig.getSyncToServerConfig().getStatus();
+            JobStatusList statusList =
+                    jobStatusRepository.getJobStatusList(syncWorkConfig, type);
+
+            if (statusList != null && !statusList.isEmpty()) {
+                JobStatus jobStatus = statusList.get(0);
+                setJobProgress(jobStatus, id, type);
+                return jobStatus;
             }
         }
-        throw new JobNotFoundException(id.toString());
+        return JobStatus.EMPTY;
     }
 
     @Override
@@ -144,12 +149,11 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     @Override
     public List<WorkSummary> getAllWorkSummary() throws SchedulerException {
-        List<WorkSummary> results = new ArrayList<>();
-        for (SyncWorkConfig config : getAllWork()) {
-            setJobProgress(config, JobType.REPO_SYNC);
-            setJobProgress(config, JobType.SERVER_SYNC);
-            results.add(WorkUtil.convertToWorkSummary(config));
-        }
+        List<WorkSummary> results = getAllWork().stream()
+            .map(config -> WorkUtil.convertToWorkSummary(config,
+                getLatestJobStatus(config.getId(), JobType.REPO_SYNC),
+                getLatestJobStatus(config.getId(), JobType.SERVER_SYNC)))
+            .collect(Collectors.toList());
         return results;
     }
 
@@ -227,25 +231,21 @@ public class SchedulerServiceImpl implements SchedulerService {
         if(!syncWorkConfig.isPresent()) {
             throw new WorkNotFoundException(id);
         }
-        setJobProgress(syncWorkConfig.get(), JobType.SERVER_SYNC);
-        setJobProgress(syncWorkConfig.get(), JobType.REPO_SYNC);
         return syncWorkConfig.get();
     }
 
     @Override
     public WorkSummary getWorkSummary(String id) throws WorkNotFoundException {
         SyncWorkConfig syncWorkConfig = getWork(id);
-        return WorkUtil.convertToWorkSummary(syncWorkConfig);
+        return WorkUtil.convertToWorkSummary(syncWorkConfig,
+                getLatestJobStatus(syncWorkConfig.getId(), JobType.REPO_SYNC),
+                getLatestJobStatus(syncWorkConfig.getId(),
+                        JobType.SERVER_SYNC));
     }
 
     @Override
     public List<SyncWorkConfig> getAllWork() throws SchedulerException {
-        List<SyncWorkConfig> allWork = syncWorkConfigRepository.getAllWorks();
-        for(SyncWorkConfig config: allWork) {
-            setJobProgress(config, JobType.SERVER_SYNC);
-            setJobProgress(config, JobType.REPO_SYNC);
-        }
-        return allWork;
+        return syncWorkConfigRepository.getAllWorks();
     }
 
     private JobStatus getStatus(Long id, JobRunUpdate event)
@@ -266,14 +266,9 @@ public class SchedulerServiceImpl implements SchedulerService {
                     syncWorkConfigRepository
                             .load(new Long(jobDetail.getKey().getGroup())).get();
             JobType type = JobType.valueOf(jobDetail.getKey().getName());
-            setJobProgress(syncWorkConfig, type);
 
-            JobStatus status;
-            if(type.equals(JobType.REPO_SYNC)) {
-                status = syncWorkConfig.getSyncToRepoConfig().getStatus();
-            } else {
-                status = syncWorkConfig.getSyncToServerConfig().getStatus();
-            }
+            JobStatus status = getLatestJobStatus(syncWorkConfig.getId(), type);
+            setJobProgress(status, syncWorkConfig.getId(), type);
 
             return new JobSummary(jobDetail.getKey().toString(),
                     syncWorkConfig.getId().toString(), syncWorkConfig.getName(),
@@ -282,12 +277,8 @@ public class SchedulerServiceImpl implements SchedulerService {
         return new JobSummary();
     }
 
-    private void setJobProgress(SyncWorkConfig syncWorkConfig, JobType jobType) {
-        RunningJobKey key = new RunningJobKey(syncWorkConfig.getId(), jobType);
-        if(jobType.equals(JobType.REPO_SYNC)) {
-            syncWorkConfig.setSyncToRepoJobProgress(progressMap.get(key));
-        } else {
-            syncWorkConfig.setSyncToServerJobProgress(progressMap.get(key));
-        }
+    private void setJobProgress(JobStatus jobStatus, long id, JobType jobType) {
+        RunningJobKey key = new RunningJobKey(id, jobType);
+        jobStatus.updateCurrentProgress(progressMap.get(key));
     }
 }

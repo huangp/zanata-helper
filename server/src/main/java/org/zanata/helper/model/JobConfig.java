@@ -1,7 +1,6 @@
 package org.zanata.helper.model;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import org.zanata.helper.common.model.SyncOption;
 
@@ -23,17 +22,10 @@ public class JobConfig implements Serializable {
      */
     private String cron;
     private SyncOption option;
-    private JobStatus status = JobStatus.EMPTY;
 
     public JobConfig(JobType type, String cron, SyncOption option) {
         this.type = type;
         this.cron = cron;
         this.option = option;
-    }
-
-    public void updateStatus(JobStatusType statusType, Date lastStartTime,
-            Date lastEndTime, Date nextStartTime, JobProgress progress) {
-        status = new JobStatus(statusType, lastStartTime, lastEndTime,
-                nextStartTime, progress);
     }
 }

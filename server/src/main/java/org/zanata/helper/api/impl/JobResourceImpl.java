@@ -10,11 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zanata.helper.api.JobResource;
 import org.zanata.helper.exception.JobNotFoundException;
-import org.zanata.helper.exception.WorkNotFoundException;
+import org.zanata.helper.model.JobProgress;
+import org.zanata.helper.model.JobStatus;
 import org.zanata.helper.model.JobStatusType;
 import org.zanata.helper.model.JobSummary;
 import org.zanata.helper.model.JobType;
-import org.zanata.helper.model.WorkSummary;
 import org.zanata.helper.service.SchedulerService;
 import org.zanata.helper.service.WorkService;
 
@@ -49,7 +49,7 @@ public class JobResourceImpl implements JobResource {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
             return Response.ok(schedulerServiceImpl
-                .getJobStatus(new Long(id), type)).build();
+                .getLatestJobStatus(new Long(id), type)).build();
         } catch (SchedulerException e) {
             log.error("get job status error", e);
             return Response.serverError().build();
@@ -103,24 +103,27 @@ public class JobResourceImpl implements JobResource {
         @QueryParam(value = "id") @DefaultValue("") String id,
         @QueryParam(value = "type") @DefaultValue("") JobType type,
         @QueryParam(value = "status") @DefaultValue("") JobStatusType status) {
+
+        boolean filterByKey = !StringUtils.isEmpty(id) && type != null;
+
+        if((!StringUtils.isEmpty(id) || type != null) && !filterByKey) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
         try {
             List<JobSummary> jobs = schedulerServiceImpl.getJobs();
             if(status == null && StringUtils.isEmpty(id) && type == null) {
                 return Response.ok(jobs).build();
             } else {
                 List<JobSummary> filteredList = new ArrayList<>();
-
-                boolean filterByKey = !StringUtils.isEmpty(id) && type != null;
                 boolean filterByStatus = status != null;
 
                 for (JobSummary summary : jobs) {
                     if (filterByKey && filterByStatus) {
                         JobKey key = type.toJobKey(new Long(id));
                         if (summary.getKey().equals(key.toString())
-                                && summary.getJobStatus()
-                                        .getCurrentProgress() != null
-                                && status.equals(summary.getJobStatus()
-                                        .getCurrentProgress().getStatus())) {
+                                && isMatchStatus(summary.getLastJobStatus(),
+                                        status)) {
                             filteredList.add(summary);
                             continue;
                         }
@@ -130,13 +133,10 @@ public class JobResourceImpl implements JobResource {
                             filteredList.add(summary);
                             continue;
                         }
-                    } else if (filterByStatus && summary.getJobStatus()
-                            .getCurrentProgress() != null) {
-                        if (status.equals(summary.getJobStatus()
-                                .getCurrentProgress().getStatus())) {
-                            filteredList.add(summary);
-                            continue;
-                        }
+                    } else if (filterByStatus && isMatchStatus(
+                            summary.getLastJobStatus(), status)) {
+                        filteredList.add(summary);
+                        continue;
                     }
                 }
                 return Response.ok(filteredList).build();
@@ -145,5 +145,15 @@ public class JobResourceImpl implements JobResource {
             log.error("fail getting running jobs", e);
             return Response.serverError().build();
         }
+    }
+
+    private boolean isMatchStatus(JobStatus jobStatus, JobStatusType status) {
+        if(status.equals(JobStatusType.RUNNING)) {
+            JobProgress currentProgress = jobStatus.getCurrentProgress();
+            if(currentProgress != null && currentProgress.getStatus().equals(status)) {
+                return true;
+            } 
+        }
+        return jobStatus.getStatus().equals(status);
     }
 }

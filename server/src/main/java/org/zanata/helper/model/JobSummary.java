@@ -18,5 +18,5 @@ public class JobSummary implements Serializable {
     private String name;
     private String description;
     private JobType type;
-    private JobStatus jobStatus;
+    private JobStatus lastJobStatus;
 }
