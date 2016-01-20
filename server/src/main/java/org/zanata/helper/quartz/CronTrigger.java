@@ -67,14 +67,12 @@ public class CronTrigger {
 
     public Optional<TriggerKey> scheduleMonitorForRepoSync(SyncWorkConfig syncWorkConfig)
             throws SchedulerException {
-        return scheduleMonitor(syncWorkConfig, RepoSyncJob.class,
-            JobType.REPO_SYNC);
+        return scheduleMonitor(syncWorkConfig, JobType.REPO_SYNC);
     }
 
     public Optional<TriggerKey> scheduleMonitorForServerSync(SyncWorkConfig syncWorkConfig)
             throws SchedulerException {
-        return scheduleMonitor(syncWorkConfig, TransServerSyncJob.class,
-            JobType.SERVER_SYNC);
+        return scheduleMonitor(syncWorkConfig, JobType.SERVER_SYNC);
     }
 
     private JobDetail buildJobDetail(SyncWorkConfig syncWorkConfig, JobKey key,
@@ -99,9 +97,9 @@ public class CronTrigger {
         return false;
     }
 
-    private  <J extends SyncJob> Optional<TriggerKey> scheduleMonitor(
-            SyncWorkConfig syncWorkConfig, Class<J> jobClass, JobType type)
-            throws SchedulerException {
+    private <J extends SyncJob> Optional<TriggerKey> scheduleMonitor(
+            SyncWorkConfig syncWorkConfig, JobType type)
+                    throws SchedulerException {
         JobKey jobKey = type.toJobKey(syncWorkConfig.getId());
         boolean isEnabled = isJobEnabled(syncWorkConfig, type);
 
@@ -110,13 +108,16 @@ public class CronTrigger {
         }
         try {
             String cronExp;
-            if (jobClass.equals(RepoSyncJob.class)) {
+            Class jobClass;
+            if (type.equals(JobType.REPO_SYNC)) {
                 cronExp = syncWorkConfig.getSyncToRepoConfig().getCron();
-            } else if (jobClass.equals(TransServerSyncJob.class)) {
+                jobClass = RepoSyncJob.class;
+            } else if (type.equals(JobType.SERVER_SYNC)) {
                 cronExp = syncWorkConfig.getSyncToServerConfig().getCron();
+                jobClass = TransServerSyncJob.class;
             } else {
                 throw new IllegalStateException(
-                    "can not determine what job to run for " + jobClass);
+                    "can not determine what job to run for " + type);
             }
 
             JobDetail jobDetail =
@@ -231,10 +232,10 @@ public class CronTrigger {
         scheduler.resumeJob(jobKey);
     }
 
-    public void deleteAndReschedule(TriggerKey key, String cron, Long id,
-        JobType type, boolean isEnabled) throws SchedulerException {
-        deleteJob(id, type);
-        scheduler.rescheduleJob(key, buildTrigger(cron, id, type, isEnabled));
+    public void deleteAndReschedule(SyncWorkConfig syncWorkConfig, JobType type)
+            throws SchedulerException {
+        deleteJob(syncWorkConfig.getId(), type);
+        scheduleMonitor(syncWorkConfig, type);
     }
 
     public void triggerJob(Long id, JobType type) throws SchedulerException {

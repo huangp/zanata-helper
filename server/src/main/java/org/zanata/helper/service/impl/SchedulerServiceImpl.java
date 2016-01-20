@@ -168,17 +168,8 @@ public class SchedulerServiceImpl implements SchedulerService {
     public void rescheduleWork(SyncWorkConfig syncWorkConfig)
         throws SchedulerException {
 
-        cronTrigger.deleteAndReschedule(
-            JobType.REPO_SYNC.toTriggerKey(syncWorkConfig.getId()),
-            syncWorkConfig.getSyncToRepoConfig().getCron(),
-            syncWorkConfig.getId(), JobType.REPO_SYNC,
-            syncWorkConfig.isSyncToRepoEnabled());
-
-        cronTrigger.deleteAndReschedule(
-            JobType.SERVER_SYNC.toTriggerKey(syncWorkConfig.getId()),
-            syncWorkConfig.getSyncToServerConfig().getCron(),
-            syncWorkConfig.getId(), JobType.SERVER_SYNC,
-            syncWorkConfig.isSyncToServerEnabled());
+        cronTrigger.deleteAndReschedule(syncWorkConfig, JobType.REPO_SYNC);
+        cronTrigger.deleteAndReschedule(syncWorkConfig, JobType.SERVER_SYNC);
     }
 
     @Override
