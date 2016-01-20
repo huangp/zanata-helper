@@ -185,9 +185,11 @@ public class GitSyncService implements RepoSyncService<String> {
             throws RepoSyncException {
         try {
             Git git = Git.open(baseDir);
+            System.out.println("alex========================" + baseDir);
             StatusCommand statusCommand = git.status();
             Status status = statusCommand.call();
             Set<String> uncommittedChanges = status.getUncommittedChanges();
+            uncommittedChanges.addAll(status.getUntracked());
             if (!uncommittedChanges.isEmpty()) {
                 log.info("uncommitted files in git repo: {}", uncommittedChanges);
                 AddCommand addCommand = git.add();
