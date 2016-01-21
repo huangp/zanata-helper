@@ -6,12 +6,9 @@ import org.zanata.helper.exception.JobNotFoundException;
 import org.zanata.helper.exception.WorkNotFoundException;
 import org.zanata.helper.model.JobType;
 import org.zanata.helper.model.SyncWorkConfig;
-import org.zanata.helper.model.WorkSummary;
 import org.zanata.helper.repository.Repository;
-import org.zanata.helper.repository.SyncWorkConfigRepository;
 import org.zanata.helper.service.SchedulerService;
 import org.zanata.helper.service.WorkService;
-import org.zanata.helper.util.WorkUtil;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;

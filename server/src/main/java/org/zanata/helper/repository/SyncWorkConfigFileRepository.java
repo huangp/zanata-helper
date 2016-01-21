@@ -52,9 +52,9 @@ import static org.apache.commons.io.Charsets.UTF_8;
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
  */
 @ApplicationScoped
-public class SyncWorkConfigRepository implements Repository<SyncWorkConfig, Long> {
+public class SyncWorkConfigFileRepository implements Repository<SyncWorkConfig, Long> {
     private static final Logger log =
-            LoggerFactory.getLogger(SyncWorkConfigRepository.class);
+            LoggerFactory.getLogger(SyncWorkConfigFileRepository.class);
 
     private static final String historyFileFormat = "archive-%s.yaml";
 
@@ -76,13 +76,13 @@ public class SyncWorkConfigRepository implements Repository<SyncWorkConfig, Long
     private AtomicLong latestId = new AtomicLong(0);
 
     @VisibleForTesting
-    protected SyncWorkConfigRepository(File configDirectory,
+    protected SyncWorkConfigFileRepository(File configDirectory,
             SyncWorkConfigSerializer serializer) {
         this.configDirectory = configDirectory;
         this.serializer = serializer;
     }
 
-    public SyncWorkConfigRepository() {
+    public SyncWorkConfigFileRepository() {
     }
 
     @PostConstruct
@@ -212,7 +212,7 @@ public class SyncWorkConfigRepository implements Repository<SyncWorkConfig, Long
     public List<SyncWorkConfig> getAllWorks() {
         List<SyncWorkConfig> allWorkConfig =
                 Arrays.stream(configDirectory.listFiles(File::isDirectory))
-                        .map(SyncWorkConfigRepository::latestWorkConfig)
+                        .map(SyncWorkConfigFileRepository::latestWorkConfig)
                         .filter(file -> file.exists() && file.canRead())
                         .map(serializer::fromYaml)
                         .collect(Collectors.toList());

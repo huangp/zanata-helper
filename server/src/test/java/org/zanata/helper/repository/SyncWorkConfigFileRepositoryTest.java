@@ -14,11 +14,11 @@ import org.zanata.helper.model.JobType;
 import org.zanata.helper.model.SyncWorkConfig;
 import org.zanata.helper.model.JobConfig;
 
-public class SyncWorkConfigRepositoryTest {
+public class SyncWorkConfigFileRepositoryTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    private SyncWorkConfigRepository syncWorkConfigRepository;
+    private SyncWorkConfigFileRepository syncWorkConfigFileRepository;
     private File configDir;
     private SyncWorkConfigSerializer serializer =
             new SyncWorkConfigSerializerImpl();
@@ -27,7 +27,7 @@ public class SyncWorkConfigRepositoryTest {
     public void setUp() throws Exception {
         File storeDir = temporaryFolder.newFolder();
         configDir = new File(storeDir, "config");
-        syncWorkConfigRepository = new SyncWorkConfigRepository(configDir,
+        syncWorkConfigFileRepository = new SyncWorkConfigFileRepository(configDir,
                 serializer);
 
     }
@@ -45,9 +45,9 @@ public class SyncWorkConfigRepositoryTest {
 
     @Test
     public void testLoad() throws Exception {
-        syncWorkConfigRepository.persist(makeJobConfig(1L, "name"));
+        syncWorkConfigFileRepository.persist(makeJobConfig(1L, "name"));
 
-        Optional<SyncWorkConfig> configOpt = syncWorkConfigRepository.load(1L);
+        Optional<SyncWorkConfig> configOpt = syncWorkConfigFileRepository.load(1L);
 
         Assertions.assertThat(configOpt.isPresent()).isTrue();
 
@@ -59,7 +59,7 @@ public class SyncWorkConfigRepositoryTest {
     public void canPersistForTheFirstTime() throws Exception {
         SyncWorkConfig syncWorkConfig = makeJobConfig(1L, "name");
 
-        syncWorkConfigRepository.persist(syncWorkConfig);
+        syncWorkConfigFileRepository.persist(syncWorkConfig);
 
         File jobConfigFolder = asSubFile(configDir, "1");
         Assertions.assertThat(configDir.listFiles(File::isDirectory))
@@ -79,9 +79,9 @@ public class SyncWorkConfigRepositoryTest {
     public void canPersistSameFileMultipleTimes() {
         SyncWorkConfig syncWorkConfig = makeJobConfig(1L, "name");
 
-        syncWorkConfigRepository.persist(syncWorkConfig);
-        syncWorkConfigRepository.persist(syncWorkConfig);
-        syncWorkConfigRepository.persist(syncWorkConfig);
+        syncWorkConfigFileRepository.persist(syncWorkConfig);
+        syncWorkConfigFileRepository.persist(syncWorkConfig);
+        syncWorkConfigFileRepository.persist(syncWorkConfig);
 
         File jobConfigFolder = asSubFile(configDir, "1");
         File yamlFile = asSubFile(jobConfigFolder, "current.yaml");
@@ -98,9 +98,9 @@ public class SyncWorkConfigRepositoryTest {
         SyncWorkConfig syncWorkConfig2 = makeJobConfig(1L, "name2");
         SyncWorkConfig syncWorkConfig3 = makeJobConfig(1L, "name3");
 
-        syncWorkConfigRepository.persist(syncWorkConfig1);
-        syncWorkConfigRepository.persist(syncWorkConfig2);
-        syncWorkConfigRepository.persist(syncWorkConfig3);
+        syncWorkConfigFileRepository.persist(syncWorkConfig1);
+        syncWorkConfigFileRepository.persist(syncWorkConfig2);
+        syncWorkConfigFileRepository.persist(syncWorkConfig3);
 
         File jobConfigFolder = asSubFile(configDir, "1");
         File latestFile = asSubFile(jobConfigFolder, "current.yaml");
