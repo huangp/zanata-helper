@@ -1,9 +1,6 @@
 package org.zanata.helper.repository;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -23,12 +20,15 @@ public class SyncWorkConfigRepositoryTest {
 
     private SyncWorkConfigRepository syncWorkConfigRepository;
     private File configDir;
+    private SyncWorkConfigSerializer serializer =
+            new SyncWorkConfigSerializerImpl();
 
     @Before
     public void setUp() throws Exception {
         File storeDir = temporaryFolder.newFolder();
         configDir = new File(storeDir, "config");
-        syncWorkConfigRepository = new SyncWorkConfigRepository(configDir);
+        syncWorkConfigRepository = new SyncWorkConfigRepository(configDir,
+                serializer);
 
     }
 

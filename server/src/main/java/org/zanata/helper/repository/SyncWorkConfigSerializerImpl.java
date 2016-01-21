@@ -56,4 +56,10 @@ public class SyncWorkConfigSerializerImpl implements SyncWorkConfigSerializer {
         YAML.setBeanAccess(BeanAccess.FIELD);
         return YAML.dump(syncWorkConfig);
     }
+
+    @Override
+    public SyncWorkConfig fromYaml(String yaml) {
+        YAML.setBeanAccess(BeanAccess.FIELD);
+        return (SyncWorkConfig) YAML.load(yaml);
+    }
 }

@@ -10,6 +10,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.apache.commons.io.FileUtils;
+import org.zanata.helper.annotation.ConfigurationDir;
 import org.zanata.helper.component.AppConfiguration;
 import org.zanata.helper.model.JobStatus;
 import org.zanata.helper.model.JobStatusList;
@@ -33,24 +34,16 @@ import static org.apache.commons.io.Charsets.UTF_8;
 public class JobStatusRepository {
 
     @Inject
-    private SyncWorkConfigRepository syncWorkConfigRepository;
-
-    @Inject
     private SyncWorkConfigSerializer serializer;
 
-    @Inject
-    protected AppConfiguration appConfiguration;
 
     private final static String SEPARATOR = ":";
 
+    @Inject
+    @ConfigurationDir
     private File configDirectory;
 
     private ReentrantLock lock = new ReentrantLock();
-
-    @PostConstruct
-    public void postConstruct() {
-        configDirectory = appConfiguration.getConfigDir();
-    }
 
     public JobStatusList getJobStatusList(SyncWorkConfig config, JobType type) {
         Optional<JobStatusList> list = loadFromDisk(config, type);

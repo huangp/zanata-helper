@@ -4,6 +4,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.deltaspike.cdise.api.ContextControl;
 import org.apache.deltaspike.core.api.lifecycle.Initialized;
 import org.quartz.JobDetail;
 import org.quartz.SchedulerException;
@@ -25,15 +26,20 @@ import org.zanata.helper.quartz.CronTrigger;
 import org.zanata.helper.component.AppConfiguration;
 import org.zanata.helper.quartz.RunningJobKey;
 import org.zanata.helper.repository.JobStatusRepository;
+import org.zanata.helper.repository.Repository;
 import org.zanata.helper.repository.SyncWorkConfigRepository;
 import org.zanata.helper.service.PluginsService;
 import org.zanata.helper.service.SchedulerService;
 import org.zanata.helper.util.WorkUtil;
 
+import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.RequestScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import javax.naming.InitialContext;
 import javax.servlet.ServletContext;
+import javax.sql.DataSource;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -53,13 +59,16 @@ public class SchedulerServiceImpl implements SchedulerService {
     private PluginsService pluginsServiceImpl;
 
     @Inject
-    private SyncWorkConfigRepository syncWorkConfigRepository;
+    private Repository<SyncWorkConfig, Long> syncWorkConfigRepository;
 
     @Inject
     private JobStatusRepository jobStatusRepository;
 
     @Inject
     private CronTrigger cronTrigger;
+
+    @Inject
+    private ContextControl contextControl;
 
     private Map<RunningJobKey, JobProgress> progressMap =
         Collections.synchronizedMap(Maps.newHashMap());
@@ -84,16 +93,26 @@ public class SchedulerServiceImpl implements SchedulerService {
 
         log.info("Initialising jobs...");
 
-        List<SyncWorkConfig> syncWorkConfigs = syncWorkConfigRepository.getAllWorks();
         try {
+            contextControl.startContext(RequestScoped.class);
+            List<SyncWorkConfig> syncWorkConfigs = syncWorkConfigRepository.getAllWorks();
             for (SyncWorkConfig syncWorkConfig : syncWorkConfigs) {
                 scheduleWork(syncWorkConfig);
             }
+            log.info("Initialised {} jobs.", syncWorkConfigs.size());
         } catch (SchedulerException e) {
             throw Throwables.propagate(e);
+        } finally {
+            contextControl.stopContext(RequestScoped.class);
         }
 
-        log.info("Initialised {} jobs.", syncWorkConfigs.size());
+    }
+
+    @PreDestroy
+    public void preDestroy() {
+        log.warn("=======================================");
+        log.warn("======= application shutting down =====");
+        log.warn("=======================================");
     }
 
     // TODO: fire websocket

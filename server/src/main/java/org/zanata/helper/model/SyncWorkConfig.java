@@ -17,6 +17,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class SyncWorkConfig extends PersistModel {
 
+    @Setter
     private Long id;
     private String name;
     private String description;
@@ -66,19 +67,23 @@ public class SyncWorkConfig extends PersistModel {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SyncWorkConfig that = (SyncWorkConfig) o;
+        return equalsExceptCreatedDate(that) &&
+                Objects.equals(createdDate, that.createdDate);
+    }
+
+    public boolean equalsExceptCreatedDate(SyncWorkConfig that) {
         return Objects.equals(id, that.id) &&
-            Objects.equals(name, that.name) &&
-            Objects.equals(description, that.description) &&
-            Objects.equals(syncToServerConfig, that.syncToServerConfig) &&
-            Objects.equals(syncToRepoConfig, that.syncToRepoConfig) &&
-            Objects.equals(srcRepoPluginConfig, that.srcRepoPluginConfig) &&
-            Objects.equals(transServerPluginConfig,
-                that.transServerPluginConfig) &&
-            Objects.equals(srcRepoPluginName, that.srcRepoPluginName) &&
-            Objects.equals(transServerPluginName, that.transServerPluginName) &&
-            Objects.equals(createdDate, that.createdDate) &&
-            Objects.equals(syncToServerEnabled, that.syncToServerEnabled) &&
-            Objects.equals(syncToRepoEnabled, that.syncToRepoEnabled);
+                Objects.equals(name, that.name) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(syncToServerConfig, that.syncToServerConfig) &&
+                Objects.equals(syncToRepoConfig, that.syncToRepoConfig) &&
+                Objects.equals(srcRepoPluginConfig, that.srcRepoPluginConfig) &&
+                Objects.equals(transServerPluginConfig,
+                        that.transServerPluginConfig) &&
+                Objects.equals(srcRepoPluginName, that.srcRepoPluginName) &&
+                Objects.equals(transServerPluginName, that.transServerPluginName) &&
+                Objects.equals(syncToServerEnabled, that.syncToServerEnabled) &&
+                Objects.equals(syncToRepoEnabled, that.syncToRepoEnabled);
     }
 
     @Override

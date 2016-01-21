@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
@@ -38,9 +39,8 @@ import javax.inject.Inject;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zanata.helper.component.AppConfiguration;
+import org.zanata.helper.annotation.ConfigurationDir;
 import org.zanata.helper.model.SyncWorkConfig;
-import org.zanata.helper.model.SyncWorkIDGenerator;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 import com.google.common.cache.Cache;
@@ -52,30 +52,34 @@ import static org.apache.commons.io.Charsets.UTF_8;
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
  */
 @ApplicationScoped
-public class SyncWorkConfigRepository {
+public class SyncWorkConfigRepository implements Repository<SyncWorkConfig, Long> {
     private static final Logger log =
             LoggerFactory.getLogger(SyncWorkConfigRepository.class);
 
     private static final String historyFileFormat = "archive-%s.yaml";
 
-    private final static String LATEST_CONFIG_FILE = "current.yaml";
+    private static final String LATEST_CONFIG_FILE = "current.yaml";
 
     private final Cache<Long, Optional<SyncWorkConfig>> cache = CacheBuilder
             .newBuilder()
             .build();
+
+    @Inject
+    @ConfigurationDir
     private File configDirectory;
 
     private ReentrantLock lock = new ReentrantLock();
 
     @Inject
-    protected AppConfiguration appConfiguration;
-
-    @Inject
     private SyncWorkConfigSerializer serializer;
 
+    private AtomicLong latestId = new AtomicLong(0);
+
     @VisibleForTesting
-    protected SyncWorkConfigRepository(File configDirectory) {
+    protected SyncWorkConfigRepository(File configDirectory,
+            SyncWorkConfigSerializer serializer) {
         this.configDirectory = configDirectory;
+        this.serializer = serializer;
     }
 
     public SyncWorkConfigRepository() {
@@ -83,10 +87,15 @@ public class SyncWorkConfigRepository {
 
     @PostConstruct
     public void postConstruct() {
-        configDirectory = appConfiguration.getConfigDir();
+        latestId = new AtomicLong(largestStoredWorkId());
     }
 
-    public Optional<SyncWorkConfig> load(long id) {
+    private long nextID() {
+        return latestId.incrementAndGet();
+    }
+
+    @Override
+    public Optional<SyncWorkConfig> load(Long id) {
         try {
             return cache.get(id, () -> loadFromDisk(id));
         } catch (ExecutionException e) {
@@ -107,21 +116,24 @@ public class SyncWorkConfigRepository {
         return Optional.empty();
     }
 
+    @Override
     public void persist(SyncWorkConfig syncWorkConfig) {
         try {
             lock.tryLock(5, TimeUnit.SECONDS);
 
+            Long id = syncWorkConfig.getId();
+            if (id == null) {
+                syncWorkConfig.setId(nextID());
+            }
             File workConfigFolder = workConfigFolder(syncWorkConfig.getId());
             File latestConfigFile = latestWorkConfig(syncWorkConfig.getId());
 
-            syncWorkConfig.onPersist();
-            String incomingYaml = serializer.toYaml(syncWorkConfig);
 
             boolean made = workConfigFolder.mkdirs();
             if (!made && latestConfigFile.exists()) {
-                String current =
-                        FileUtils.readFileToString(latestConfigFile, UTF_8);
-                if (current.endsWith(incomingYaml)) {
+                SyncWorkConfig current =
+                        serializer.fromYaml(latestConfigFile);
+                if (current.equalsExceptCreatedDate(syncWorkConfig)) {
                     log.info("SyncWorkConfig has not changed");
                     return;
                 }
@@ -132,6 +144,8 @@ public class SyncWorkConfigRepository {
                                         new Date().getTime())));
             }
             // write new work config
+            syncWorkConfig.onPersist();
+            String incomingYaml = serializer.toYaml(syncWorkConfig);
             FileUtils.write(latestConfigFile, incomingYaml, UTF_8);
             cache.invalidate(syncWorkConfig.getId());
             log.info("SyncWorkConfig saved." + syncWorkConfig.getName());
@@ -142,7 +156,8 @@ public class SyncWorkConfigRepository {
         }
     }
 
-    public boolean delete(long id) {
+    @Override
+    public boolean delete(Long id) {
         File workConfigFolder = workConfigFolder(id);
         try {
             FileUtils.deleteDirectory(workConfigFolder);
@@ -169,7 +184,8 @@ public class SyncWorkConfigRepository {
     }
 
 
-    public List<SyncWorkConfig> getHistory(long id) {
+    @Override
+    public List<SyncWorkConfig> getHistory(Long id) {
         throw new UnsupportedOperationException("implement me");
     }
 
@@ -178,9 +194,8 @@ public class SyncWorkConfigRepository {
      * will be the largest work id.
      *
      * @return largest work id or 0 if there is no work yet
-     * @see SyncWorkIDGenerator
      */
-    public long largestStoredWorkId() {
+    private long largestStoredWorkId() {
         File[] jobConfigFolders = configDirectory.listFiles(File::isDirectory);
         Optional<String> largestJob =
                 Arrays.stream(jobConfigFolders)
@@ -193,6 +208,7 @@ public class SyncWorkConfigRepository {
         return 0;
     }
 
+    @Override
     public List<SyncWorkConfig> getAllWorks() {
         List<SyncWorkConfig> allWorkConfig =
                 Arrays.stream(configDirectory.listFiles(File::isDirectory))

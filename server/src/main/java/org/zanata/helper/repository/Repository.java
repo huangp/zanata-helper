@@ -18,31 +18,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.zanata.helper.model;
+package org.zanata.helper.repository;
 
-import java.util.concurrent.atomic.AtomicLong;
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import java.util.List;
+import java.util.Optional;
 
-import org.zanata.helper.repository.SyncWorkConfigRepository;
+public interface Repository<T, K> {
 
-/**
- * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
- */
-@ApplicationScoped
-public class SyncWorkIDGenerator {
-    private AtomicLong latestId;
+    Optional<T> load(K id);
 
-    @Inject
-    private SyncWorkConfigRepository syncWorkConfigRepository;
+    void persist(T T);
 
-    public long nextID() {
-        return latestId.incrementAndGet();
-    }
+    boolean delete(K id);
 
-    @PostConstruct
-    public void postConstruct() {
-        latestId = new AtomicLong(syncWorkConfigRepository.largestStoredWorkId());
-    }
+    List<T> getHistory(K id);
+
+    List<T> getAllWorks();
 }

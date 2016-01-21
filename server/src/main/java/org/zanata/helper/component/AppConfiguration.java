@@ -13,6 +13,8 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
+import javax.enterprise.inject.Produces;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,6 +22,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
+import org.zanata.helper.annotation.ConfigurationDir;
 import org.zanata.helper.model.SystemSettings;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -190,4 +193,13 @@ public class AppConfiguration implements Serializable {
     public boolean isDeleteJobDir() {
         return systemSettings.isDeleteJobDir();
     }
+
+
+    @Produces
+    @Dependent
+    @ConfigurationDir
+    protected File getConfigurationDir() {
+        return configDir;
+    }
+
 }

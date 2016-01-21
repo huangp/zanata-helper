@@ -1,6 +1,7 @@
 package org.zanata.helper.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import org.zanata.helper.common.model.SyncOption;
 
@@ -27,5 +28,20 @@ public class JobConfig implements Serializable {
         this.type = type;
         this.cron = cron;
         this.option = option;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        JobConfig jobConfig = (JobConfig) o;
+        return type == jobConfig.type &&
+                Objects.equals(cron, jobConfig.cron) &&
+                option == jobConfig.option;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, cron, option);
     }
 }

@@ -1,0 +1,94 @@
+description = 'handle database (derbey) related thing'
+group 'org.zanata.sync.db'
+
+def jooqDestDir = "${buildDir}/jooq-generated-src"
+
+// =========== jooq code gen ==============
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'org.jooq:jooq-codegen:3.7.2'
+        classpath 'org.jooq:jooq-meta:3.7.2'
+        classpath 'com.h2database:h2:1.4.190'
+    }
+}
+
+apply plugin: 'java'
+
+dependencies {
+    // database
+    compile 'com.h2database:h2:1.4.190'
+
+    // jooq
+    compile 'org.jooq:jooq:3.7.2'
+}
+
+def driverClass = 'org.h2.Driver'
+def dbFile = "$buildDir/zanata-sync"
+def dbUrl = "jdbc:h2:$dbFile"
+// =========== jooq code gen ==============
+
+// Run the code generator
+// ----------------------
+task jooqCodeGen << {
+
+    ant.sql(classpath: configurations.compile.asPath,
+        driver: driverClass,
+        encoding: 'UTF-8',
+        url: dbUrl,
+        userid: '',
+        password: '',
+        onerror: 'continue',
+        src: 'src/main/resources/baseline.sql')
+
+    // Use your favourite XML builder to construct the code generation configuration file
+    // ----------------------------------------------------------------------------------
+    def writer = new StringWriter()
+    def xml = new groovy.xml.MarkupBuilder(writer)
+        .configuration('xmlns': 'http://www.jooq.org/xsd/jooq-codegen-3.7.0.xsd') {
+        jdbc() {
+            driver(driverClass)
+            url(dbUrl)
+            user('')
+            password('')
+        }
+        generator() {
+            database() {
+            }
+
+            // Watch out for this caveat when using MarkupBuilder with "reserved names"
+            // - https://github.com/jOOQ/jOOQ/issues/4797
+            // - http://stackoverflow.com/a/11389034/521799
+            // - https://groups.google.com/forum/#!topic/jooq-user/wi4S9rRxk4A
+            /*
+            generate([:]) {
+                pojos true
+                daos true
+            }
+            */
+            target() {
+                packageName('org.zanata.sync.db')
+                directory(jooqDestDir)
+            }
+        }
+    }
+    org.jooq.util.GenerationTool tool = new org.jooq.util.GenerationTool()
+    tool.run(
+        javax.xml.bind.JAXB.unmarshal(new StringReader(writer.toString()), org.jooq.util.jaxb.Configuration.class)
+    )
+}
+
+//jooqCodeGen.dependsOn clean
+
+// so that we can check whether code is up to date and skip the task
+jooqCodeGen.inputs.file dbFile
+jooqCodeGen.outputs.dir jooqDestDir
+
+compileJava {
+    dependsOn 'jooqCodeGen'
+    source jooqDestDir
+}

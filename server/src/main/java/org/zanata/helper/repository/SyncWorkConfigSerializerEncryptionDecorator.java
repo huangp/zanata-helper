@@ -28,14 +28,18 @@ public class SyncWorkConfigSerializerEncryptionDecorator
 
     @Override
     public SyncWorkConfig fromYaml(File file) {
+        return readYamlAndDecryptIfNeeded(delegate.fromYaml(file));
+    }
+
+    private SyncWorkConfig readYamlAndDecryptIfNeeded(
+            SyncWorkConfig directConvert) {
         List<String> fieldsNeedEncryption =
                 appConfiguration.getFieldsNeedEncryption();
-        SyncWorkConfig configOnDisk = delegate.fromYaml(file);
-        String encryptionKey = configOnDisk.getEncryptionKey();
+        String encryptionKey = directConvert.getEncryptionKey();
 
         if (fieldsNeedEncryption.isEmpty() ||
                 Strings.isNullOrEmpty(encryptionKey)) {
-            return configOnDisk;
+            return directConvert;
         }
 
         // start the decryption
@@ -45,13 +49,13 @@ public class SyncWorkConfigSerializerEncryptionDecorator
         BiFunction<String, String, String> decryptFunc =
                 (key, value) -> encryptionUtil.decrypt(value);
         for (String field : fieldsNeedEncryption) {
-            configOnDisk.getSrcRepoPluginConfig().computeIfPresent(field,
+            directConvert.getSrcRepoPluginConfig().computeIfPresent(field,
                     decryptFunc);
-            configOnDisk.getTransServerPluginConfig().computeIfPresent(field,
+            directConvert.getTransServerPluginConfig().computeIfPresent(field,
                     decryptFunc);
         }
 
-        return configOnDisk;
+        return directConvert;
     }
 
     @Override
@@ -79,6 +83,11 @@ public class SyncWorkConfigSerializerEncryptionDecorator
         }
 
         return delegate.toYaml(syncWorkConfig);
+    }
+
+    @Override
+    public SyncWorkConfig fromYaml(String yaml) {
+        return readYamlAndDecryptIfNeeded(delegate.fromYaml(yaml));
     }
 
 }

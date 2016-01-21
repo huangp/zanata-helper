@@ -11,8 +11,6 @@ import javax.inject.Inject;
  */
 @RequestScoped
 public class SyncWorkConfigBuilderImpl implements SyncWorkConfigBuilder {
-    @Inject
-    private SyncWorkIDGenerator idGenerator;
 
     @Override
     public SyncWorkConfig buildObject(SyncWorkForm syncWorkForm) {
@@ -24,10 +22,7 @@ public class SyncWorkConfigBuilderImpl implements SyncWorkConfigBuilder {
                 syncWorkForm.getSyncToRepoCron().getExpression(),
                 syncWorkForm.getSyncToRepoOption());
 
-        Long id = syncWorkForm.getId() == null ? idGenerator.nextID() :
-            syncWorkForm.getId();
-
-        return new SyncWorkConfig(id,
+        return new SyncWorkConfig(syncWorkForm.getId(),
             syncWorkForm.getName(),
             syncWorkForm.getDescription(),
             syncToServerConfig,

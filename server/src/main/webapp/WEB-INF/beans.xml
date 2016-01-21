@@ -4,9 +4,9 @@
   xsi:schemaLocation="
       http://xmlns.jcp.org/xml/ns/javaee
       http://xmlns.jcp.org/xml/ns/javaee/beans_1_1.xsd" bean-discovery-mode="annotated">
-  <!--<alternatives>-->
-    <!--<class>org.mycompany.mock.MockPaymentProcessor</class>-->
-  <!--</alternatives>-->
+  <alternatives>
+    <class>org.zanata.helper.repository.SyncWorkConfigDBRepository</class>
+  </alternatives>
   <decorators>
     <class>org.zanata.helper.repository.SyncWorkConfigSerializerEncryptionDecorator</class>
   </decorators>

@@ -1,5 +1,6 @@
 rootProject.name = 'Zanata Helper'
 include 'common'
+include ':database'
 include ':zanata-cli-plugin'
 include 'git-plugin'
 include ':server'
@@ -7,6 +8,7 @@ include ':server-bootstrap'
 include ':jetty-server'
 
 project(':common').projectDir = "$rootDir/common" as File
+project(':database').projectDir = "$rootDir/database" as File
 project(':zanata-cli-plugin').projectDir = "$rootDir/zanata-cli-plugin" as File
 project(':git-plugin').projectDir = "$rootDir/git-plugin" as File
 project(':server').projectDir = "$rootDir/server" as File

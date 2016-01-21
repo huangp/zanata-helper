@@ -26,6 +26,8 @@ dependencies {
     compile 'org.glassfish.web:jsp-impl:2.1'
     compile 'javax.el:el-api:2.2'
     compile 'org.glassfish.web:javax.el:2.2.6'
+
+    compile 'com.mchange:c3p0:0.9.5.2'
 //    compile "org.eclipse.jetty.websocket:javax-websocket-server-impl:$jettyVersion"
 }
 

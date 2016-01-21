@@ -21,6 +21,7 @@
 package org.zanata.helper.repository;
 
 import java.io.File;
+import java.util.Optional;
 
 import org.zanata.helper.model.SyncWorkConfig;
 
@@ -33,4 +34,6 @@ public interface SyncWorkConfigSerializer {
     SyncWorkConfig fromYaml(File file);
 
     String toYaml(SyncWorkConfig syncWorkConfig);
+
+    SyncWorkConfig fromYaml(String yaml);
 }

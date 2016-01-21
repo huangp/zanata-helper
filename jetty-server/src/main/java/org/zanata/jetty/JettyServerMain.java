@@ -10,10 +10,14 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import javax.naming.Reference;
+
+import org.eclipse.jetty.plus.jndi.Resource;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.resource.PathResource;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.WebAppContext;
+import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 public class JettyServerMain {
     private String warLocation;
@@ -55,8 +59,15 @@ public class JettyServerMain {
         context.prependServerClass("-org.eclipse.jetty.server.handler.ContextHandler");
 
         // equivalent to jetty-env.xml
-        org.eclipse.jetty.plus.jndi.Resource mydatasource = new org.eclipse.jetty.plus.jndi.Resource(context, "BeanManager",
-                new javax.naming.Reference("javax.enterprise.inject.spi.BeanManager", "org.jboss.weld.resources.ManagerObjectFactory", null));
+        Resource beanManager = new Resource(context, "BeanManager",
+                new Reference("javax.enterprise.inject.spi.BeanManager", "org.jboss.weld.resources.ManagerObjectFactory", null));
+
+        ComboPooledDataSource pooledDataSource = new ComboPooledDataSource();
+        // TODO use system property or external config file
+        pooledDataSource.setJdbcUrl("jdbc:h2:/tmp/configuration/zanata-sync;AUTO_SERVER=TRUE");
+        pooledDataSource.setDriverClass("org.h2.Driver");
+        new Resource(context, "jdbc/DataSource", pooledDataSource);
+
 
         switch (getOperationalMode()) {
             case PROD:

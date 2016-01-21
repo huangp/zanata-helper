@@ -19,6 +19,14 @@ gretty {
   port= 8081
   contextPath = ''
   scanInterval = 0
+    webappCopy {
+        // TODO we need to let users to use an system property or something
+        filesMatching 'WEB-INF/jetty-env.xml', {
+            filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [
+                jdbcUrl: 'jdbc:h2:/tmp/configuration/zanata-sync;AUTO_SERVER=TRUE'
+            ])
+        }
+    }
 }
 
 description = 'Zanata helper server'
@@ -58,6 +66,11 @@ dependencies {
     // validation
     compile 'javax.validation:validation-api:1.0.0.GA'
     compile 'org.hibernate:hibernate-validator:4.3.2.Final'
+
+    // database
+    compile project(':database')
+    compile 'com.mchange:c3p0:0.9.5.2'
+    compile 'org.liquibase:liquibase-core:3.4.2'
 
     // utilities
     compile group: 'com.google.guava', name: 'guava', version:'19.0'

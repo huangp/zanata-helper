@@ -7,6 +7,7 @@ import org.zanata.helper.exception.WorkNotFoundException;
 import org.zanata.helper.model.JobType;
 import org.zanata.helper.model.SyncWorkConfig;
 import org.zanata.helper.model.WorkSummary;
+import org.zanata.helper.repository.Repository;
 import org.zanata.helper.repository.SyncWorkConfigRepository;
 import org.zanata.helper.service.SchedulerService;
 import org.zanata.helper.service.WorkService;
@@ -26,7 +27,7 @@ public class WorkServiceImpl implements WorkService {
     private SchedulerService schedulerServiceImpl;
 
     @Inject
-    private SyncWorkConfigRepository syncWorkConfigRepository;
+    private Repository<SyncWorkConfig, Long> syncWorkConfigRepository;
 
     @Override
     public void deleteWork(Long id) throws WorkNotFoundException {
