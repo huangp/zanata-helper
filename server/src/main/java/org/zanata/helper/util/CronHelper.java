@@ -1,6 +1,5 @@
 package org.zanata.helper.util;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
@@ -8,42 +7,31 @@ import lombok.Getter;
  */
 public final class CronHelper {
     public static CronType getTypeFromExpression(String expression) {
-        if (expression.equals(CronType.THRITY_SECONDS.getExpression())) {
-            return CronType.THRITY_SECONDS;
-        } else if (expression.equals(CronType.ONE_MINUTE.getExpression())) {
-            return CronType.ONE_MINUTE;
-        } else if (expression.equals(CronType.FIVE_MINUTES.getExpression())) {
-            return CronType.FIVE_MINUTES;
-        } else if (expression.equals(CronType.TEN_MINUTES.getExpression())) {
-            return CronType.TEN_MINUTES;
-        } else if (expression
-            .equals(CronType.FIFTEEN_MINUTES.getExpression())) {
-            return CronType.FIFTEEN_MINUTES;
+        for (CronType cronType : CronType.values()) {
+            if (cronType.getExpression().equals(expression)) {
+                return cronType;
+            }
         }
-        return CronType.FIVE_MINUTES;
+        throw new IllegalArgumentException(expression);
     }
 
-    public static String getExpressionFromDisplay(String display) {
-        if (display.equals(CronType.THRITY_SECONDS.getDisplay())) {
-            return CronType.THRITY_SECONDS.getExpression();
-        } else if (display.equals(CronType.ONE_MINUTE.getDisplay())) {
-            return CronType.ONE_MINUTE.getExpression();
-        } else if (display.equals(CronType.FIVE_MINUTES.getDisplay())) {
-            return CronType.FIVE_MINUTES.getExpression();
-        } else if (display.equals(CronType.TEN_MINUTES.getDisplay())) {
-            return CronType.TEN_MINUTES.getExpression();
-        } else if (display.equals(CronType.FIFTEEN_MINUTES.getDisplay())) {
-            return CronType.FIFTEEN_MINUTES.getExpression();
+    public static CronType getTypeFromDisplay(String display) {
+        for (CronType cronType : CronType.values()) {
+            if (cronType.getDisplay().equals(display)) {
+                return cronType;
+            }
         }
-        return CronType.FIVE_MINUTES.getExpression();
+        throw new IllegalArgumentException(display);
     }
 
     @Getter
     public enum CronType {
-        THRITY_SECONDS("30 seconds", "0/30 * * * * ?"), ONE_MINUTE("1 minute",
-            "1 * * * * ?"), FIVE_MINUTES("5 minutes", "5 * * * * ?"),
-        TEN_MINUTES("10 minutes", "10 * * * * ?"), FIFTEEN_MINUTES(
-            "15 minutes", "15 * * * * ?");
+        THIRTY_SECONDS("30 seconds", "0/30 * * * * ?"), //this is for testing purposes
+        ONE_HOUR("1 hour", "0 * * * * ?"),
+        TWO_HOUR("2 hour", "0 */2 * * * ?"),
+        SIX_HOUR("6 hour", "0 */6 * * * ?"),
+        TWELVE_HOUR("12 hour", "0 */12 * * * ?"),
+        ONE_DAY("24 hour", "0 0 * * * ?");
 
         private final String display;
         private final String expression;

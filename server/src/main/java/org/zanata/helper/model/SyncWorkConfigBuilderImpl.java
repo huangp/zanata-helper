@@ -1,6 +1,7 @@
 package org.zanata.helper.model;
 
 import org.zanata.helper.controller.SyncWorkForm;
+import org.zanata.helper.util.CronHelper;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -16,11 +17,11 @@ public class SyncWorkConfigBuilderImpl implements SyncWorkConfigBuilder {
     @Override
     public SyncWorkConfig buildObject(SyncWorkForm syncWorkForm) {
         JobConfig syncToServerConfig = new JobConfig(JobType.SERVER_SYNC,
-                syncWorkForm.getSyncToServerCron(),
+                syncWorkForm.getSyncToServerCron().getExpression(),
                 syncWorkForm.getSyncToServerOption());
 
         JobConfig syncToRepoConfig = new JobConfig(JobType.REPO_SYNC,
-                syncWorkForm.getSyncToRepoCron(),
+                syncWorkForm.getSyncToRepoCron().getExpression(),
                 syncWorkForm.getSyncToRepoOption());
 
         Long id = syncWorkForm.getId() == null ? idGenerator.nextID() :
@@ -60,9 +61,11 @@ public class SyncWorkConfigBuilderImpl implements SyncWorkConfigBuilder {
         form.setSyncToServerOption(
             syncWorkConfig.getSyncToServerConfig().getOption());
 
-        form.setSyncToRepoCron(syncWorkConfig.getSyncToRepoConfig().getCron());
+        form.setSyncToRepoCron(CronHelper.getTypeFromExpression(
+                syncWorkConfig.getSyncToRepoConfig().getCron()));
         form.setSyncToServerCron(
-            syncWorkConfig.getSyncToServerConfig().getCron());
+                CronHelper.getTypeFromExpression(
+                        syncWorkConfig.getSyncToServerConfig().getCron()));
         form.setSyncToRepoEnabled(syncWorkConfig.isSyncToRepoEnabled());
         form.setSyncToServerEnabled(syncWorkConfig.isSyncToServerEnabled());
         return form;

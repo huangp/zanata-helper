@@ -8,6 +8,7 @@ import org.zanata.helper.common.plugin.RepoExecutor;
 import org.zanata.helper.common.plugin.TranslationServerExecutor;
 import org.zanata.helper.i18n.Messages;
 import org.zanata.helper.service.PluginsService;
+import org.zanata.helper.util.CronHelper;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -17,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
+
+import com.google.common.collect.Lists;
 
 /**
  * @author Alex Eng <a href="aeng@redhat.com">aeng@redhat.com</a>
@@ -111,5 +114,9 @@ public abstract class HasFormController implements Serializable {
 
     public String getErrorMessage(String fieldName) {
         return errors.get(fieldName);
+    }
+
+    public List<CronHelper.CronType> getSupportedIntervals() {
+        return Lists.newArrayList(CronHelper.CronType.values());
     }
 }

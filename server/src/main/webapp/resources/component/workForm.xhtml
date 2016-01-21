@@ -43,13 +43,13 @@
             <h:selectBooleanCheckbox styleClass="txt--mini" id="enableSyncToServer"
               value="#{cc.attrs.actionClass.form.syncToServerEnabled}" onchange="enableSection(jQuery(this))"/> #{msg['jsf.work.field.syncToServer.settings']}
           </h2>
-          <c:textfield componentId="syncToServerCron"
-            value="#{cc.attrs.actionClass.form.syncToServerCron}"
-            label="#{msg['jsf.work.field.cron.label']}"
-            placeholder="#{msg['jsf.work.field.cron.placeholder']}"
-            hasError="#{cc.attrs.actionClass.hasError('syncToServerCron')}"
-            errorMessage="#{cc.attrs.actionClass.getErrorMessage('syncToServerCron')}"
-            styleClass="form__item"/>
+          <div class="form__item">
+            <label>#{msg['jsf.work.field.cron.label']}</label>
+            <h:selectOneMenu value="#{cc.attrs.actionClass.form.syncToServerCron}">
+              <f:selectItems value="#{cc.attrs.actionClass.supportedIntervals}" var="cronType"
+                itemLabel="#{cronType.display}" itemValue="#{cronType.display}"/>
+            </h:selectOneMenu>
+          </div>
 
           <div class="form__item">
             <label>#{msg['jsf.work.field.syncType']}</label>
@@ -65,13 +65,13 @@
             <h:selectBooleanCheckbox styleClass="txt--mini" id="enableSyncToRepo"
               value="#{cc.attrs.actionClass.form.syncToRepoEnabled}" onchange="enableSection(jQuery(this))"/> #{msg['jsf.world.field.syncToRepo.settings']}
           </h2>
-          <c:textfield componentId="syncToRepoCron"
-            value="#{cc.attrs.actionClass.form.syncToRepoCron}"
-            label="#{msg['jsf.work.field.cron.label']}"
-            placeholder="#{msg['jsf.work.field.cron.placeholder']}"
-            hasError="#{cc.attrs.actionClass.hasError('syncToRepoCron')}"
-            errorMessage="#{cc.attrs.actionClass.getErrorMessage('syncToRepoCron')}"
-            styleClass="form__item"/>
+          <div class="form__item">
+            <label>#{msg['jsf.work.field.cron.label']}</label>
+            <h:selectOneMenu value="#{cc.attrs.actionClass.form.syncToRepoCron}">
+              <f:selectItems value="#{cc.attrs.actionClass.supportedIntervals}" var="cronType"
+                itemLabel="#{cronType.display}" itemValue="#{cronType.display}"/>
+            </h:selectOneMenu>
+          </div>
 
           <div class="form__item">
             <label>#{msg['jsf.work.field.syncType']}</label>
