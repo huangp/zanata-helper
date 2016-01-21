@@ -70,6 +70,8 @@ public final class PushPullOptionsUtil {
                     new File(baseDir, options.getSrcDir().getPath()));
             options.setTransDir(
                     new File(baseDir, options.getTransDir().getPath()));
+            //disable commandhook
+            options.setCommandHooks(null);
         } catch (ConfigurationException | JAXBException e) {
             throw new ZanataSyncException("Failed applying project config", e);
         }
