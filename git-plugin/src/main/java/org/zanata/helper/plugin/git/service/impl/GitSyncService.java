@@ -21,31 +21,18 @@
 package org.zanata.helper.plugin.git.service.impl;
 
 import org.eclipse.jgit.api.AddCommand;
-import org.eclipse.jgit.api.CheckoutCommand;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
-import org.eclipse.jgit.api.PullCommand;
 import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.StatusCommand;
-import org.eclipse.jgit.api.errors.CanceledException;
-import org.eclipse.jgit.api.errors.DetachedHeadException;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.InvalidConfigurationException;
-import org.eclipse.jgit.api.errors.InvalidRemoteException;
-import org.eclipse.jgit.api.errors.NoHeadException;
-import org.eclipse.jgit.api.errors.RefNotAdvertisedException;
-import org.eclipse.jgit.api.errors.RefNotFoundException;
-import org.eclipse.jgit.api.errors.TransportException;
-import org.eclipse.jgit.api.errors.WrongRepositoryStateException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.lib.RepositoryCache;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.eclipse.jgit.util.FS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zanata.helper.common.model.Credentials;
@@ -57,7 +44,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
@@ -81,20 +67,18 @@ public class GitSyncService implements RepoSyncService<String> {
             throws RepoSyncException {
         if (isGitCloneAlreadyBeenDone(destPath)) {
             log.info("git repo already exists. Skipping clone");
-            doGitPull(destPath);
+            doGitFetch(destPath);
         } else {
             // directory is not a git repository
-            doGitClone(repoUrl, destPath);
+            doGitClone(repoUrl, destPath, branch);
         }
         checkOutBranch(destPath, branch);
     }
 
-    private void doGitPull(File destPath) {
+    private void doGitFetch(File destPath) {
         try {
             Git git = Git.open(destPath);
-            PullCommand pullCommand = git.pull();
-            pullCommand.setRemote("origin").setRemoteBranchName("master");
-            pullCommand.call();
+            git.fetch().setRemote("origin").call();
         } catch (IOException ioe) {
             // ignore
         } catch (Exception e) {
@@ -118,11 +102,12 @@ public class GitSyncService implements RepoSyncService<String> {
         }
     }
 
-    private void doGitClone(String repoUrl, File destPath) {
+    private void doGitClone(String repoUrl, File destPath, String branch) {
         destPath.mkdirs();
         CloneCommand clone = Git.cloneRepository();
         clone.setBare(false);
         clone.setCloneAllBranches(false);
+        clone.setBranch(branch);
         clone.setDirectory(destPath).setURI(repoUrl);
         UsernamePasswordCredentialsProvider user =
                 new UsernamePasswordCredentialsProvider(
@@ -159,12 +144,16 @@ public class GitSyncService implements RepoSyncService<String> {
                 }
             }
 
-
-            CheckoutCommand checkoutCommand = git.checkout();
+            /**
+             * If branch found in local, delete it, create new local branch from remote.
+             * If branch does not exists in remote, create new local branch based on master branch.
+             */
             Ref ref;
             if (localBranchRef.isPresent()) {
-                ref = checkoutCommand.setName(branch).call();
-            } else if (remoteBranchRef.isPresent()) {
+                git.branchDelete().setBranchNames(branch).call();
+            }
+
+            if (remoteBranchRef.isPresent()) {
                 ref = git.branchCreate()
                         .setForce(true).setName(branch)
                         .setStartPoint("origin/" + branch)
@@ -172,7 +161,12 @@ public class GitSyncService implements RepoSyncService<String> {
                         CreateBranchCommand.SetupUpstreamMode.SET_UPSTREAM)
                         .call();
             } else {
-                ref = checkoutCommand.setName(branch).setCreateBranch(true).call();
+                ref = git.branchCreate()
+                    .setForce(true).setName(branch)
+                    .setStartPoint("origin/master")
+                    .setUpstreamMode(
+                        CreateBranchCommand.SetupUpstreamMode.SET_UPSTREAM)
+                    .call();
             }
             log.debug("checked out {}", ref);
         } catch (IOException | GitAPIException e) {
@@ -185,7 +179,6 @@ public class GitSyncService implements RepoSyncService<String> {
             throws RepoSyncException {
         try {
             Git git = Git.open(baseDir);
-            System.out.println("alex========================" + baseDir);
             StatusCommand statusCommand = git.status();
             Status status = statusCommand.call();
             Set<String> uncommittedChanges = status.getUncommittedChanges();
