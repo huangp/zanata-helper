@@ -19,14 +19,6 @@ gretty {
   port= 8081
   contextPath = ''
   scanInterval = 0
-    webappCopy {
-        // TODO we need to let users to use an system property or something
-        filesMatching 'WEB-INF/jetty-env.xml', {
-            filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [
-                jdbcUrl: 'jdbc:h2:/tmp/configuration/zanata-sync;AUTO_SERVER=TRUE'
-            ])
-        }
-    }
 }
 
 description = 'Zanata helper server'

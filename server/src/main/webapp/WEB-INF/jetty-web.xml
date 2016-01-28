@@ -6,4 +6,7 @@
       <Item>-org.eclipse.jetty.servlet.ServletContextHandler.Decorator</Item>
     </Array>
   </Set>
+  <Call name="addServerClass">
+    <Arg>-org.eclipse.jetty.servlet.</Arg>
+  </Call>
 </Configure>

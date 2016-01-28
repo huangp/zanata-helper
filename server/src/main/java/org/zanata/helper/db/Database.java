@@ -20,18 +20,14 @@
  */
 package org.zanata.helper.db;
 
-import java.io.File;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.concurrent.Callable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Disposes;
 import javax.enterprise.inject.Produces;
-import javax.inject.Inject;
 import javax.naming.InitialContext;
 import javax.servlet.ServletContext;
 import javax.sql.DataSource;
@@ -39,7 +35,6 @@ import javax.sql.DataSource;
 import org.apache.deltaspike.core.api.lifecycle.Initialized;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zanata.helper.annotation.ConfigurationDir;
 import com.google.common.base.Throwables;
 
 /**
@@ -49,10 +44,6 @@ import com.google.common.base.Throwables;
 public class Database {
     private static final Logger log = LoggerFactory.getLogger(Database.class);
 
-    @Inject
-    @ConfigurationDir
-    private File configDir;
-
     private DataSource datasource;
 
     public void onStartUp(@Observes @Initialized ServletContext servletContext) {
@@ -60,8 +51,9 @@ public class Database {
             datasource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/DataSource");
         } catch (Exception e) {
             log.error("Error while initialising the database connection pool", e);
+            throw new IllegalStateException("Error while initialising the database connection pool", e);
         }
-        log.info("Database connection pool initalized successfully");
+        log.info("Database connection pool initialized successfully");
     }
 
 

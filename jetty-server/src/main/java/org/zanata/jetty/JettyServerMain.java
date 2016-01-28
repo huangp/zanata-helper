@@ -63,9 +63,6 @@ public class JettyServerMain {
                 new Reference("javax.enterprise.inject.spi.BeanManager", "org.jboss.weld.resources.ManagerObjectFactory", null));
 
         ComboPooledDataSource pooledDataSource = new ComboPooledDataSource();
-        // TODO use system property or external config file
-        pooledDataSource.setJdbcUrl("jdbc:h2:/tmp/configuration/zanata-sync;AUTO_SERVER=TRUE");
-        pooledDataSource.setDriverClass("org.h2.Driver");
         new Resource(context, "jdbc/DataSource", pooledDataSource);
 
 

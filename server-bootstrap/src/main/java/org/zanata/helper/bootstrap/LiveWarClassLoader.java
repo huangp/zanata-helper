@@ -77,7 +77,7 @@ public class LiveWarClassLoader extends ClassLoader implements Closeable {
     private ZipEntry findEntry(String name) {
         StringBuilder path = new StringBuilder();
         path.append(CLASSES_BASE);
-        if (name.charAt(0) == '/') {
+        if (name.length() > 0 && name.charAt(0) == '/') {
             path.append(name.substring(1));
         } else {
             path.append(name);

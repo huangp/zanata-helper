@@ -6,12 +6,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
@@ -35,14 +35,22 @@ import lombok.Getter;
 import static org.apache.commons.io.Charsets.UTF_8;
 
 /**
+ * User can pass in {@link AppConfiguration#SYSTEM_SETTINGS_PATH} as system
+ * property to locate settings.yaml file. Alternatively user can just place the
+ * file in current working directory. If none of the above resolves to a file,
+ * it will try to load built-in config.properties and use values there as
+ * default. User can update it in admin page.
+ *
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
 @ApplicationScoped
 @Slf4j
 public class AppConfiguration implements Serializable {
+    public static final String SYSTEM_SETTINGS_PATH = "systemSettings";
     private final static String CONFIG_DIR = "configuration";
     private final static String REPO_DIR = "repository";
     private static final String SETTING_FILE = "settings.yaml";
+
     private final static Yaml YAML = new Yaml();
 
     private ReentrantLock lock = new ReentrantLock();
@@ -63,32 +71,35 @@ public class AppConfiguration implements Serializable {
     private File repoDir;
 
     public AppConfiguration() {
+    }
+
+    @PostConstruct
+    public void init() {
+        Properties infoProps = loadBuildInProps("info.properties");
+        buildInfo = infoProps.getProperty("build.info");
+        buildVersion = infoProps.getProperty("build.version");
+
+        Optional<SystemSettings> systemSettings = loadSettingsFromYaml();
+        if(systemSettings.isPresent()) {
+            this.systemSettings = systemSettings.get();
+            updateStorageDir();
+        } else {
+            String message = "can not locate " + SETTING_FILE +
+                    ". Please specify its path as " + SYSTEM_SETTINGS_PATH +
+                    " or put it under current working directory";
+            throw new IllegalStateException(message);
+        }
+    }
+
+    private static Properties loadBuildInProps(String propFileName) {
         ClassLoader contextClassLoader =
                 Thread.currentThread().getContextClassLoader();
-        try (InputStream config = contextClassLoader
-                .getResourceAsStream("config.properties");
-                InputStream info = contextClassLoader
-                        .getResourceAsStream("info.properties")) {
-            Properties properties = new Properties();
-            properties.load(info);
-            buildInfo = properties.getProperty("build.info");
-            buildVersion = properties.getProperty("build.version");
-            properties.load(config);
-
-            Optional<SystemSettings> systemSettings = loadSettingsFromYaml();
-            if(systemSettings.isPresent()) {
-                this.systemSettings = systemSettings.get();
-            } else {
-                String fields =
-                    properties.getProperty("fields.need.encryption", "");
-                List<String> fieldsNeedEncryption = ImmutableList.copyOf(
-                    Splitter.on(",").omitEmptyStrings().trimResults().split(fields));
-                boolean deleteJobDir = Boolean.valueOf(
-                    properties.getProperty("delete.job.dir"));
-                String storageDir = properties.getProperty("store.directory");
-                updateSettings(storageDir, deleteJobDir, fieldsNeedEncryption);
-            }
-        } catch (IOException e) {
+        try (InputStream inputStream = contextClassLoader
+                        .getResourceAsStream(propFileName)) {
+            Properties buildInProperties = new Properties();
+            buildInProperties.load(inputStream);
+            return buildInProperties;
+        } catch (Exception e) {
             throw Throwables.propagate(e);
         }
     }
@@ -124,8 +135,35 @@ public class AppConfiguration implements Serializable {
     }
 
     private Optional<SystemSettings> loadSettingsFromYaml() {
-        File config = new File(configDir, SETTING_FILE);
-        return Optional.ofNullable(fromYaml(config));
+        // first we try system property
+        String settingsPath = System.getProperty(SYSTEM_SETTINGS_PATH);
+        File settingsFile;
+        if (settingsPath == null) {
+            // second we try loading it from current working directory
+            settingsFile = Paths.get(".").toAbsolutePath().normalize()
+                    .resolve(SETTING_FILE).toFile();
+        } else {
+            settingsFile = new File(settingsPath, SETTING_FILE);
+        }
+        if (settingsFile.exists()) {
+            return Optional.ofNullable(fromYaml(settingsFile));
+        }
+
+        // if none of above works, we fall back to built-in settings
+        Properties buildInProps = loadBuildInProps("config.properties");
+        String fields =
+                buildInProps.getProperty("fields.need.encryption", "");
+        List<String> fieldsNeedEncryption = ImmutableList.copyOf(
+                Splitter.on(",").omitEmptyStrings().trimResults().split(fields));
+        boolean deleteJobDir = Boolean.valueOf(
+                buildInProps.getProperty("delete.job.dir"));
+        String storageDir = buildInProps.getProperty("store.directory");
+
+        SystemSettings systemSettings =
+                new SystemSettings(storageDir, deleteJobDir, fieldsNeedEncryption);
+
+        return Optional.of(systemSettings);
+
     }
 
     private SystemSettings fromYaml(File file) {
@@ -135,7 +173,6 @@ public class AppConfiguration implements Serializable {
             return settings;
         } catch (IOException e) {
             log.warn("No settings file found, " + SETTING_FILE);
-        } finally {
             return null;
         }
     }

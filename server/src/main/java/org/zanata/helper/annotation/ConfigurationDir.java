@@ -14,6 +14,6 @@ import javax.inject.Qualifier;
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Target({ ElementType.FIELD, ElementType.METHOD})
+@Target({ ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
 public @interface ConfigurationDir {
 }
