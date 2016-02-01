@@ -55,6 +55,14 @@ public class CronTrigger {
     @Inject
     private JobConfigListener triggerListener;
 
+    public static JobStatusType getType(Trigger.TriggerState state,
+        boolean isRunning) {
+        if(isRunning) {
+            return JobStatusType.RUNNING;
+        }
+        return JobStatusType.valueOf(state.name());
+    }
+
     @PostConstruct
     public void start() throws SchedulerException {
         scheduler = StdSchedulerFactory.getDefaultScheduler();
@@ -178,7 +186,7 @@ public class CronTrigger {
                         scheduler.getTriggerState(trigger.getKey());
 
                 return new JobStatus(
-                        JobStatusType.getType(state,
+                        getType(state,
                                 isJobRunning(trigger.getKey())),
                         trigger.getPreviousFireTime(), endTime,
                         trigger.getNextFireTime());

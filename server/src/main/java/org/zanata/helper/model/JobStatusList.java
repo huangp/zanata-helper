@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import com.google.common.collect.ImmutableList;
+
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
@@ -15,6 +17,10 @@ public class JobStatusList implements List<JobStatus> {
 
     public JobStatusList() {
         list  = new ArrayList<>();
+    }
+
+    public JobStatusList(List<JobStatus> list) {
+        this.list = ImmutableList.copyOf(list);
     }
 
     @Override

@@ -15,6 +15,7 @@ import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.events.JobRunUpdate;
 import org.zanata.helper.exception.JobNotFoundException;
 import org.zanata.helper.exception.WorkNotFoundException;
+import org.zanata.helper.interceptor.WithRequestScope;
 import org.zanata.helper.model.JobProgress;
 import org.zanata.helper.model.JobStatusList;
 import org.zanata.helper.model.JobType;
@@ -25,7 +26,7 @@ import org.zanata.helper.model.WorkSummary;
 import org.zanata.helper.quartz.CronTrigger;
 import org.zanata.helper.component.AppConfiguration;
 import org.zanata.helper.quartz.RunningJobKey;
-import org.zanata.helper.repository.JobStatusRepository;
+import org.zanata.helper.repository.JobStatusDBRepository;
 import org.zanata.helper.repository.Repository;
 import org.zanata.helper.service.PluginsService;
 import org.zanata.helper.service.SchedulerService;
@@ -59,17 +60,15 @@ public class SchedulerServiceImpl implements SchedulerService {
     private Repository<SyncWorkConfig, Long> syncWorkConfigRepository;
 
     @Inject
-    private JobStatusRepository jobStatusRepository;
+    private JobStatusDBRepository jobStatusRepository;
 
     @Inject
     private CronTrigger cronTrigger;
 
-    @Inject
-    private ContextControl contextControl;
-
     private Map<RunningJobKey, JobProgress> progressMap =
         Collections.synchronizedMap(Maps.newHashMap());
 
+    @WithRequestScope
     public void onStartUp(@Observes @Initialized ServletContext servletContext) {
         log.info("=====================================================");
         log.info("=====================================================");
@@ -91,7 +90,6 @@ public class SchedulerServiceImpl implements SchedulerService {
         log.info("Initialising jobs...");
 
         try {
-            contextControl.startContext(RequestScoped.class);
             List<SyncWorkConfig> syncWorkConfigs = syncWorkConfigRepository.getAllWorks();
             for (SyncWorkConfig syncWorkConfig : syncWorkConfigs) {
                 scheduleWork(syncWorkConfig);
@@ -99,10 +97,7 @@ public class SchedulerServiceImpl implements SchedulerService {
             log.info("Initialised {} jobs.", syncWorkConfigs.size());
         } catch (SchedulerException e) {
             throw Throwables.propagate(e);
-        } finally {
-            contextControl.stopContext(RequestScoped.class);
         }
-
     }
 
     @PreDestroy
@@ -120,6 +115,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         progressMap.put(new RunningJobKey(event.getId(), event.getJobType()), progress);
     }
 
+    @WithRequestScope
     public void onJobCompleted(@Observes JobRunCompletedEvent event)
         throws JobNotFoundException, SchedulerException {
         progressMap.remove(new RunningJobKey(event.getId(), event.getJobType()));
@@ -128,8 +124,9 @@ public class SchedulerServiceImpl implements SchedulerService {
         if (syncWorkConfigOpt.isPresent()) {
             SyncWorkConfig syncWorkConfig = syncWorkConfigOpt.get();
             log.debug(
-                "Job: " + event.getJobType() + "-" + syncWorkConfig.getName() +
-                    " is completed.");
+                    "Job: " + event.getJobType() + "-" +
+                            syncWorkConfig.getName() +
+                            " is completed.");
 
             JobStatus jobStatus = getStatus(event.getId(), event);
             jobStatusRepository.saveJobStatus(syncWorkConfig,
@@ -137,6 +134,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         }
     }
 
+    @WithRequestScope
     @Override
     public JobStatus getLatestJobStatus(Long id, JobType type) {
         Optional<SyncWorkConfig> syncWorkConfigOpt =
@@ -189,6 +187,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
+    @WithRequestScope
     public void cancelRunningJob(Long id, JobType type)
         throws UnableToInterruptJobException, JobNotFoundException {
         Optional<SyncWorkConfig> workConfigOptional =
@@ -199,6 +198,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         cronTrigger.cancelRunningJob(id, type);
     }
 
+    @WithRequestScope
     @Override
     public void deleteJob(Long id, JobType type)
         throws SchedulerException, JobNotFoundException {
@@ -220,6 +220,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         cronTrigger.enableJob(id, type);
     }
 
+    @WithRequestScope
     @Override
     public void triggerJob(Long id, JobType type)
         throws JobNotFoundException, SchedulerException {
@@ -231,6 +232,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         cronTrigger.triggerJob(id, type);
     }
 
+    @WithRequestScope
     @Override
     public SyncWorkConfig getWork(String id) throws WorkNotFoundException {
         Optional<SyncWorkConfig> syncWorkConfig =
@@ -250,6 +252,7 @@ public class SchedulerServiceImpl implements SchedulerService {
                         JobType.SERVER_SYNC));
     }
 
+    @WithRequestScope
     @Override
     public List<SyncWorkConfig> getAllWork() throws SchedulerException {
         return syncWorkConfigRepository.getAllWorks();

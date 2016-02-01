@@ -10,4 +10,7 @@
   <decorators>
     <class>org.zanata.helper.repository.SyncWorkConfigSerializerEncryptionDecorator</class>
   </decorators>
+  <interceptors>
+    <class>org.zanata.helper.interceptor.WithRequestScopeInterceptor</class>
+  </interceptors>
 </beans>

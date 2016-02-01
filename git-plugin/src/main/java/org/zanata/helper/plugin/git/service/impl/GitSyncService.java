@@ -26,6 +26,7 @@ import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
+import org.eclipse.jgit.api.MergeCommand;
 import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.StatusCommand;
@@ -70,7 +71,8 @@ public class GitSyncService implements RepoSyncService<String> {
             doGitFetch(destPath);
         } else {
             // directory is not a git repository
-            doGitClone(repoUrl, destPath, branch);
+            log.debug("doing git clone");
+            doGitClone(repoUrl, destPath);
         }
         checkOutBranch(destPath, branch);
     }
@@ -102,12 +104,11 @@ public class GitSyncService implements RepoSyncService<String> {
         }
     }
 
-    private void doGitClone(String repoUrl, File destPath, String branch) {
+    private void doGitClone(String repoUrl, File destPath) {
         destPath.mkdirs();
         CloneCommand clone = Git.cloneRepository();
         clone.setBare(false);
         clone.setCloneAllBranches(false);
-        clone.setBranch(branch);
         clone.setDirectory(destPath).setURI(repoUrl);
         UsernamePasswordCredentialsProvider user =
                 new UsernamePasswordCredentialsProvider(
@@ -132,24 +133,33 @@ public class GitSyncService implements RepoSyncService<String> {
             refs/remotes/origin/master
             refs/remotes/origin/zanata
             */
-            Optional<String> localBranchRef = Optional.empty();
-            Optional<String> remoteBranchRef = Optional.empty();
+            Optional<Ref> localBranchRef = Optional.empty();
+            Optional<Ref> remoteBranchRef = Optional.empty();
             for (Ref ref : refs) {
                 String refName = ref.getName();
                 if (refName.equals("refs/heads/" + branch)) {
-                    localBranchRef = Optional.of(refName);
+                    localBranchRef = Optional.of(ref);
                 }
                 if (refName.equals("refs/remotes/origin/" + branch)) {
-                    remoteBranchRef = Optional.of(refName);
+                    remoteBranchRef = Optional.of(ref);
                 }
             }
 
+            if (branch.equals("master")) {
+                log.debug("merging origin/master");
+                git.checkout().setName("master").call();
+                git.merge().setFastForward(MergeCommand.FastForwardMode.FF_ONLY)
+                        .include(remoteBranchRef.get()).call();
+                return;
+            }
+
             /**
-             * If branch found in local, delete it, create new local branch from remote.
+             * If branch found in local and is not master, delete it, create new local branch from remote.
              * If branch does not exists in remote, create new local branch based on master branch.
              */
             Ref ref;
             if (localBranchRef.isPresent()) {
+                git.checkout().setName("master").setForce(true).call();
                 git.branchDelete().setBranchNames(branch).call();
             }
 

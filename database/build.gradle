@@ -20,6 +20,7 @@ buildscript {
 apply plugin: 'java'
 
 dependencies {
+    compile project(':common')
     // database
     compile 'com.h2database:h2:1.4.190'
 
@@ -58,6 +59,20 @@ task jooqCodeGen << {
         }
         generator() {
             database() {
+                customTypes() {
+                    customType() {
+                        delegate.invokeMethod("name", ['jobStatusTypeConverter'])
+//                        name('JobStatusTypeConverter')
+                        type('org.zanata.helper.model.JobStatusType')
+                        converter('org.zanata.sync.JobStatusTypeConverter')
+                    }
+                }
+                forcedTypes() {
+                    forcedType() {
+                        delegate.invokeMethod("name", ['jobStatusTypeConverter'])
+                        expression('.*\\.jobStatusType')
+                    }
+                }
             }
 
             // Watch out for this caveat when using MarkupBuilder with "reserved names"
@@ -76,6 +91,7 @@ task jooqCodeGen << {
             }
         }
     }
+    println writer.toString()
     org.jooq.util.GenerationTool tool = new org.jooq.util.GenerationTool()
     tool.run(
         javax.xml.bind.JAXB.unmarshal(new StringReader(writer.toString()), org.jooq.util.jaxb.Configuration.class)
