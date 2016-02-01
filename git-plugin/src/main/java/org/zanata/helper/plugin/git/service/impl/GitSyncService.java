@@ -179,6 +179,10 @@ public class GitSyncService implements RepoSyncService<String> {
                     .call();
             }
             log.debug("checked out {}", ref);
+            git.checkout().setName(branch).call();
+            if (log.isDebugEnabled()) {
+                log.debug("current branch is: {}", git.getRepository().getBranch());
+            }
         } catch (IOException | GitAPIException e) {
             throw new RepoSyncException(e);
         }
