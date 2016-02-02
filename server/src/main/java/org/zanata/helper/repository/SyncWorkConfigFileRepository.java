@@ -209,7 +209,7 @@ public class SyncWorkConfigFileRepository implements Repository<SyncWorkConfig, 
     }
 
     @Override
-    public List<SyncWorkConfig> getAllWorks() {
+    public List<SyncWorkConfig> getAll() {
         List<SyncWorkConfig> allWorkConfig =
                 Arrays.stream(configDirectory.listFiles(File::isDirectory))
                         .map(SyncWorkConfigFileRepository::latestWorkConfig)

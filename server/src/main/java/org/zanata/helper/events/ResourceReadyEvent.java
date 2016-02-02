@@ -18,20 +18,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.zanata.helper.repository;
+package org.zanata.helper.events;
 
-import java.util.List;
-import java.util.Optional;
-
-public interface Repository<T, K> {
-
-    Optional<T> load(K id);
-
-    void persist(T T);
-
-    boolean delete(K id);
-
-    List<T> getHistory(K id);
-
-    List<T> getAll();
+/**
+ * Indicate resource is ready e.g. datasource
+ * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
+ */
+public class ResourceReadyEvent {
 }

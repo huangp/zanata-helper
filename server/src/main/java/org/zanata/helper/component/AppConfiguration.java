@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.net.URL;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
@@ -16,10 +17,15 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.joran.spi.JoranException;
+import ch.qos.logback.core.util.StatusPrinter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 import org.zanata.helper.annotation.ConfigurationDir;
@@ -79,7 +85,7 @@ public class AppConfiguration implements Serializable {
         buildInfo = infoProps.getProperty("build.info");
         buildVersion = infoProps.getProperty("build.version");
 
-        Optional<SystemSettings> systemSettings = loadSettingsFromYaml();
+        Optional<SystemSettings> systemSettings = loadSettings();
         if(systemSettings.isPresent()) {
             this.systemSettings = systemSettings.get();
             updateStorageDir();
@@ -89,6 +95,29 @@ public class AppConfiguration implements Serializable {
                     " or put it under current working directory";
             throw new IllegalStateException(message);
         }
+
+        updateLogbackConfig();
+    }
+
+    private void updateLogbackConfig() {
+        File logbackConfigurationFile = getLogbackConfigurationFile();
+        if (logbackConfigurationFile == null) {
+            return;
+        }
+        // assume SLF4J is bound to logback in the current environment
+        LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+
+        try {
+            JoranConfigurator configurator = new JoranConfigurator();
+            configurator.setContext(context);
+            // Call context.reset() to clear any previous configuration, e.g. default
+            // configuration. For multi-step configuration, omit calling context.reset().
+            context.reset();
+            configurator.doConfigure(logbackConfigurationFile);
+        } catch (JoranException je) {
+            // StatusPrinter will handle this
+        }
+        StatusPrinter.printInCaseOfErrorsOrWarnings(context);
     }
 
     private static Properties loadBuildInProps(String propFileName) {
@@ -110,22 +139,25 @@ public class AppConfiguration implements Serializable {
         this.repoDir = repoDir;
     }
 
-    public void updateSettings(String newStorageDir, boolean deleteJobDir,
-        List<String> fieldsNeedEncryption) {
+    public void updateSettingsAndSave(String newStorageDir, boolean deleteJobDir,
+            List<String> fieldsNeedEncryption, File logbackConfigFile) {
         systemSettings =
-            new SystemSettings(newStorageDir, deleteJobDir, fieldsNeedEncryption);
+            new SystemSettings(newStorageDir, deleteJobDir, fieldsNeedEncryption, logbackConfigFile);
         updateStorageDir();
+        updateLogbackConfig();
+        saveCurrentSettings();
     }
 
     /**
      * Save current settings.
-     * Use {@link #updateSettings} to update current settings.
+     * Use {@link #updateSettingsAndSave} to update current settings.
      */
-    public void saveCurrentSettings() {
+    private void saveCurrentSettings() {
         try {
             lock.tryLock(5, TimeUnit.SECONDS);
             String incomingYaml = toYaml(systemSettings);
 
+            // FIXME we should remember where we loaded the setting file and save back to that location
             File configFile = new File(configDir, SETTING_FILE);
             FileUtils.write(configFile, incomingYaml, UTF_8);
             log.info("System settings saved.");
@@ -134,7 +166,7 @@ public class AppConfiguration implements Serializable {
         }
     }
 
-    private Optional<SystemSettings> loadSettingsFromYaml() {
+    private Optional<SystemSettings> loadSettings() {
         // first we try system property
         String settingsPath = System.getProperty(SYSTEM_SETTINGS_PATH);
         File settingsFile;
@@ -159,8 +191,20 @@ public class AppConfiguration implements Serializable {
                 buildInProps.getProperty("delete.job.dir"));
         String storageDir = buildInProps.getProperty("store.directory");
 
+        File logbackConfigFile = new File(buildInProps.getProperty("logback.configurationFile"));
+        if (!logbackConfigFile.isAbsolute()) {
+            URL url = Thread.currentThread().getContextClassLoader()
+                    .getResource(logbackConfigFile.getPath());
+            if (url != null) {
+                logbackConfigFile = new File(url.getFile());
+            } else {
+                log.warn("can not locate {}", logbackConfigFile);
+                logbackConfigFile = null;
+            }
+        }
+
         SystemSettings systemSettings =
-                new SystemSettings(storageDir, deleteJobDir, fieldsNeedEncryption);
+                new SystemSettings(storageDir, deleteJobDir, fieldsNeedEncryption, logbackConfigFile);
 
         return Optional.of(systemSettings);
 
@@ -172,7 +216,7 @@ public class AppConfiguration implements Serializable {
             SystemSettings settings = (SystemSettings) YAML.load(inputStream);
             return settings;
         } catch (IOException e) {
-            log.warn("No settings file found, " + SETTING_FILE);
+            log.warn("faile to read settings file {}", file);
             return null;
         }
     }
@@ -221,6 +265,10 @@ public class AppConfiguration implements Serializable {
 
     public List<String> getFieldsNeedEncryption() {
         return systemSettings.getFieldsNeedEncryption();
+    }
+
+    public File getLogbackConfigurationFile() {
+        return systemSettings.getLogbackConfigFile();
     }
 
     public String getStorageDir() {

@@ -1,5 +1,6 @@
 package org.zanata.helper.model;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,4 +29,7 @@ public class SystemSettings implements Serializable {
 
     @NotNull
     private List<String> fieldsNeedEncryption = new ArrayList<>();
+
+    private File logbackConfigFile;
+
 }

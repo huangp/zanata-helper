@@ -87,6 +87,7 @@ public class RepoSyncJob extends SyncJob {
             updateProgress(syncWorkConfig.getId(), 80,
                 "Cleaning directory: " + destDir, JobStatusType.RUNNING);
         } catch (Exception e) {
+            // TODO shouldn't we catch the exception then fire the event and log the job status?
             throw new JobExecutionException(e);
         }
     }

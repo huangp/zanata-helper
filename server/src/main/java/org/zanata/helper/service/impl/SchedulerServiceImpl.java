@@ -4,15 +4,17 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.deltaspike.cdise.api.ContextControl;
 import org.apache.deltaspike.core.api.lifecycle.Initialized;
 import org.quartz.JobDetail;
 import org.quartz.SchedulerException;
 import org.quartz.UnableToInterruptJobException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zanata.helper.events.JobProgressEvent;
 import org.zanata.helper.events.JobRunCompletedEvent;
 import org.zanata.helper.events.JobRunUpdate;
+import org.zanata.helper.events.ResourceReadyEvent;
 import org.zanata.helper.exception.JobNotFoundException;
 import org.zanata.helper.exception.WorkNotFoundException;
 import org.zanata.helper.interceptor.WithRequestScope;
@@ -34,10 +36,8 @@ import org.zanata.helper.util.WorkUtil;
 
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.RequestScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
-import javax.servlet.ServletContext;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +69,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         Collections.synchronizedMap(Maps.newHashMap());
 
     @WithRequestScope
-    public void onStartUp(@Observes @Initialized ServletContext servletContext) {
+    public void onStartUp(@Observes ResourceReadyEvent resourceReadyEvent) {
         log.info("=====================================================");
         log.info("=====================================================");
         log.info("================Zanata helper starts=================");
@@ -82,6 +82,8 @@ public class SchedulerServiceImpl implements SchedulerService {
                 appConfiguration.getConfigDir());
         log.info("== fields to encrypt: {}",
                 appConfiguration.getFieldsNeedEncryption());
+        log.info("== logback config file: {}",
+                appConfiguration.getLogbackConfigurationFile());
         log.info("=====================================================");
         log.info("=====================================================");
 
@@ -90,7 +92,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         log.info("Initialising jobs...");
 
         try {
-            List<SyncWorkConfig> syncWorkConfigs = syncWorkConfigRepository.getAllWorks();
+            List<SyncWorkConfig> syncWorkConfigs = syncWorkConfigRepository.getAll();
             for (SyncWorkConfig syncWorkConfig : syncWorkConfigs) {
                 scheduleWork(syncWorkConfig);
             }
@@ -109,6 +111,9 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     // TODO: fire websocket
     public void onJobProgressUpdate(@Observes JobProgressEvent event) {
+        Logger jobTypeLog =
+                LoggerFactory.getLogger(event.getJobType().name());
+        jobTypeLog.info(event.toString());
         log.info(event.toString());
         JobProgress progress = new JobProgress(event.getCompletePercent(),
                 event.getDescription(), event.getJobStatusType());
@@ -255,7 +260,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     @WithRequestScope
     @Override
     public List<SyncWorkConfig> getAllWork() throws SchedulerException {
-        return syncWorkConfigRepository.getAllWorks();
+        return syncWorkConfigRepository.getAll();
     }
 
     private JobStatus getStatus(Long id, JobRunUpdate event)

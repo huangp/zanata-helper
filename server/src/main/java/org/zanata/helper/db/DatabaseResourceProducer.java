@@ -25,9 +25,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
+import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Disposes;
 import javax.enterprise.inject.Produces;
+import javax.inject.Inject;
 import javax.naming.InitialContext;
 import javax.servlet.ServletContext;
 import javax.sql.DataSource;
@@ -35,16 +37,20 @@ import javax.sql.DataSource;
 import org.apache.deltaspike.core.api.lifecycle.Initialized;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zanata.helper.events.ResourceReadyEvent;
 import com.google.common.base.Throwables;
 
 /**
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
  */
 @ApplicationScoped
-public class Database {
-    private static final Logger log = LoggerFactory.getLogger(Database.class);
+public class DatabaseResourceProducer {
+    private static final Logger log = LoggerFactory.getLogger(DatabaseResourceProducer.class);
 
     private DataSource datasource;
+
+    @Inject
+    private Event<ResourceReadyEvent> resourceReadyEvent;
 
     public void onStartUp(@Observes @Initialized ServletContext servletContext) {
         try {
@@ -54,11 +60,13 @@ public class Database {
             throw new IllegalStateException("Error while initialising the database connection pool", e);
         }
         log.info("Database connection pool initialized successfully");
+        resourceReadyEvent.fire(new ResourceReadyEvent());
     }
 
 
     @Produces
     @RequestScoped
+    // TODO should we make this dependent scope?
     protected Connection getConnection() {
         try {
             return datasource.getConnection();

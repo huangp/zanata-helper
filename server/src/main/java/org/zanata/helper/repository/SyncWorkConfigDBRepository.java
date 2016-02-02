@@ -115,7 +115,7 @@ public class SyncWorkConfigDBRepository implements Repository<SyncWorkConfig, Lo
     }
 
     @Override
-    public List<SyncWorkConfig> getAllWorks() {
+    public List<SyncWorkConfig> getAll() {
         DSLContext dslContext = DSL.using(connection, SQLDialect.H2);
 
         Result<Record> result =

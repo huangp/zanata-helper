@@ -51,6 +51,19 @@
                 </c:textfield>
               </div>
 
+              <div class="l--push-top-1">
+                <h2 class="heading--secondary">
+                  #{msg['jsf.admin.settings.logging']}
+                </h2>
+                <c:textfield componentId="loggingConfigFile" value="#{adminController.logbackConfigFile}"
+                  styleClass="form__item"
+                  label="#{msg['jsf.admin.settings.logging']}"
+                  hasError="#{adminController.hasError('logbackConfigFile')}"
+                  errorMessage="#{adminController.getErrorMessage('logbackConfigFile')}">
+                  <div class="txt--meta">#{msg['jsf.admin.settings.logging.description']}</div>
+                </c:textfield>
+              </div>
+
               <div class="form__item l--push-top-1">
                 <h:commandButton styleClass="button button--primary button--full"
                   value="#{msg['jsf.admin.settings.button.save']}"
