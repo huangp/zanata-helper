@@ -55,7 +55,7 @@ public class AppConfiguration implements Serializable {
     public static final String SYSTEM_SETTINGS_PATH = "systemSettings";
     private final static String CONFIG_DIR = "configuration";
     private final static String REPO_DIR = "repository";
-    private static final String SETTING_FILE = "settings.yaml";
+    private static final String SETTING_FILE_NAME = "settings.yaml";
 
     private final static Yaml YAML = new Yaml();
 
@@ -75,6 +75,7 @@ public class AppConfiguration implements Serializable {
 
     @Getter
     private File repoDir;
+    private File settingsFile;
 
     public AppConfiguration() {
     }
@@ -90,7 +91,7 @@ public class AppConfiguration implements Serializable {
             this.systemSettings = systemSettings.get();
             updateStorageDir();
         } else {
-            String message = "can not locate " + SETTING_FILE +
+            String message = "can not locate " + SETTING_FILE_NAME +
                     ". Please specify its path as " + SYSTEM_SETTINGS_PATH +
                     " or put it under current working directory";
             throw new IllegalStateException(message);
@@ -157,31 +158,40 @@ public class AppConfiguration implements Serializable {
             lock.tryLock(5, TimeUnit.SECONDS);
             String incomingYaml = toYaml(systemSettings);
 
-            // FIXME we should remember where we loaded the setting file and save back to that location
-            File configFile = new File(configDir, SETTING_FILE);
-            FileUtils.write(configFile, incomingYaml, UTF_8);
-            log.info("System settings saved.");
+            if (settingsFile.exists()) {
+                FileUtils.write(settingsFile, incomingYaml, UTF_8);
+                log.info("System settings saved to {}", settingsFile);
+            } else {
+                File configFile = new File(configDir, SETTING_FILE_NAME);
+                FileUtils.write(configFile, incomingYaml, UTF_8);
+                log.info("System settings saved to {}", configFile);
+            }
+
         } catch (InterruptedException | IOException e) {
             throw Throwables.propagate(e);
         }
     }
 
+    // FIXME our database file lives in config folder. Maybe we should just make system property mandatory? Otherwise once the storage directory has been changed, we need to migrate database file
     private Optional<SystemSettings> loadSettings() {
         // first we try system property
         String settingsPath = System.getProperty(SYSTEM_SETTINGS_PATH);
-        File settingsFile;
         if (settingsPath == null) {
             // second we try loading it from current working directory
             settingsFile = Paths.get(".").toAbsolutePath().normalize()
-                    .resolve(SETTING_FILE).toFile();
+                    .resolve(SETTING_FILE_NAME).toFile();
         } else {
-            settingsFile = new File(settingsPath, SETTING_FILE);
+            settingsFile = new File(settingsPath, SETTING_FILE_NAME);
         }
         if (settingsFile.exists()) {
+            log.info("=========== loading settings file from: {}", settingsFile);
             return Optional.ofNullable(fromYaml(settingsFile));
         }
 
         // if none of above works, we fall back to built-in settings
+        log.warn(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        log.warn(">>>>>> Using default settings. Please use system property {} for a more permanent settings", SYSTEM_SETTINGS_PATH);
+        log.warn(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         Properties buildInProps = loadBuildInProps("config.properties");
         String fields =
                 buildInProps.getProperty("fields.need.encryption", "");
