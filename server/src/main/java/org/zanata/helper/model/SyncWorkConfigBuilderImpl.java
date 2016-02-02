@@ -1,5 +1,6 @@
 package org.zanata.helper.model;
 
+import org.zanata.helper.common.model.SyncOption;
 import org.zanata.helper.controller.SyncWorkForm;
 import org.zanata.helper.util.CronHelper;
 
@@ -20,7 +21,8 @@ public class SyncWorkConfigBuilderImpl implements SyncWorkConfigBuilder {
 
         JobConfig syncToRepoConfig = new JobConfig(JobType.REPO_SYNC,
                 syncWorkForm.getSyncToRepoCron().getExpression(),
-                syncWorkForm.getSyncToRepoOption());
+                // repo sync should only sync translations
+                SyncOption.TRANSLATIONS);
 
         return new SyncWorkConfig(syncWorkForm.getId(),
             syncWorkForm.getName(),
@@ -51,8 +53,6 @@ public class SyncWorkConfigBuilderImpl implements SyncWorkConfigBuilder {
         form.setTransServerPluginConfig(
             syncWorkConfig.getTransServerPluginConfig());
 
-        form.setSyncToRepoOption(
-            syncWorkConfig.getSyncToRepoConfig().getOption());
         form.setSyncToServerOption(
             syncWorkConfig.getSyncToServerConfig().getOption());
 

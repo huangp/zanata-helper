@@ -75,10 +75,7 @@
 
           <div class="form__item">
             <label>#{msg['jsf.work.field.syncType']}</label>
-            <h:selectOneMenu value="#{cc.attrs.actionClass.form.syncToRepoOption}">
-              <f:selectItems value="#{cc.attrs.actionClass.syncOptions}" var="option"
-                itemLabel="#{option.label}" itemValue="#{option.key}"/>
-            </h:selectOneMenu>
+            <div class="heading--secondary txt--meta">Only allows translations to be pushed to source repository</div>
           </div>
         </div>
 

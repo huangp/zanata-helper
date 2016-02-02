@@ -43,9 +43,6 @@ public class SyncWorkForm implements Serializable {
     @Setter
     private CronHelper.CronType syncToRepoCron;
 
-    @Setter
-    private SyncOption syncToRepoOption = SyncOption.TRANSLATIONS;
-
     @NotEmpty
     @Size(max = 255)
     @Setter
