@@ -6,7 +6,7 @@ import org.zanata.sync.exception.JobNotFoundException;
 import org.zanata.sync.exception.WorkNotFoundException;
 import org.zanata.sync.model.JobType;
 import org.zanata.sync.model.SyncWorkConfig;
-import org.zanata.sync.repository.Repository;
+import org.zanata.sync.dao.Repository;
 import org.zanata.sync.service.SchedulerService;
 import org.zanata.sync.service.WorkService;
 

@@ -11,6 +11,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
@@ -31,5 +32,12 @@ public class SystemSettings implements Serializable {
     private List<String> fieldsNeedEncryption = new ArrayList<>();
 
     private File logbackConfigFile;
+    
+    public void updateSettings(boolean deleteJobDir,
+            List<String> fieldsNeedEncryption, File logbackConfigFile) {
+        this.deleteJobDir = deleteJobDir;
+        this.fieldsNeedEncryption = fieldsNeedEncryption;
+        this.logbackConfigFile = logbackConfigFile;
+    }
 
 }

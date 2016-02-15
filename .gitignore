@@ -52,3 +52,5 @@ bin/
 ehcache.disk.store.dir/
 
 .zanata-cache/
+
+*.db

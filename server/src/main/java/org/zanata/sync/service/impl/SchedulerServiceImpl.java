@@ -27,8 +27,8 @@ import org.zanata.sync.model.WorkSummary;
 import org.zanata.sync.quartz.CronTrigger;
 import org.zanata.sync.component.AppConfiguration;
 import org.zanata.sync.quartz.RunningJobKey;
-import org.zanata.sync.repository.JobStatusDBRepository;
-import org.zanata.sync.repository.Repository;
+import org.zanata.sync.dao.JobStatusDAO;
+import org.zanata.sync.dao.Repository;
 import org.zanata.sync.service.PluginsService;
 import org.zanata.sync.service.SchedulerService;
 import org.zanata.sync.util.WorkUtil;
@@ -59,7 +59,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     private Repository<SyncWorkConfig, Long> syncWorkConfigRepository;
 
     @Inject
-    private JobStatusDBRepository jobStatusRepository;
+    private JobStatusDAO jobStatusRepository;
 
     @Inject
     private CronTrigger cronTrigger;

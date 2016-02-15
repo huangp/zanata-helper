@@ -14,7 +14,6 @@ import javax.inject.Named;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.zanata.sync.component.AppConfiguration;
 import org.zanata.sync.i18n.Messages;
 
@@ -39,8 +38,6 @@ public class AdminController implements Serializable {
     private Messages msg;
 
     @Getter
-    @Setter
-    @NotEmpty
     private String storageDir;
 
     @Getter
@@ -68,7 +65,7 @@ public class AdminController implements Serializable {
 
     public String saveChanges() {
         validate();
-        appConfiguration.updateSettingsAndSave(storageDir, deleteJobDir, ImmutableList
+        appConfiguration.updateSettingsAndSave(deleteJobDir, ImmutableList
             .copyOf(Splitter.on(",").omitEmptyStrings().trimResults()
                 .split(fieldsNeedEncryption)), new File(logbackConfigFile));
 

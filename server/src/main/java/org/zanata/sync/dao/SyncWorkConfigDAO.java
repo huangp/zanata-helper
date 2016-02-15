@@ -18,7 +18,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.zanata.sync.repository;
+package org.zanata.sync.dao;
 
 import java.sql.Connection;
 import java.sql.Timestamp;
@@ -46,7 +46,7 @@ import static org.zanata.sync.db.public_.tables.SyncWorkConfigTable.SYNC_WORK_CO
  */
 @Alternative
 @RequestScoped
-public class SyncWorkConfigDBRepository implements Repository<SyncWorkConfig, Long> {
+public class SyncWorkConfigDAO implements Repository<SyncWorkConfig, Long> {
     @Inject
     private Connection connection;
 

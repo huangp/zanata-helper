@@ -1,4 +1,4 @@
-package org.zanata.sync.repository;
+package org.zanata.sync.dao;
 
 import java.sql.Connection;
 import java.sql.Timestamp;
@@ -26,9 +26,9 @@ import static org.zanata.sync.db.public_.tables.JobStatusTable.JOB_STATUS_TABLE;
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
  */
 @ApplicationScoped
-public class JobStatusDBRepository {
+public class JobStatusDAO {
     private static final Logger log =
-            LoggerFactory.getLogger(JobStatusDBRepository.class);
+            LoggerFactory.getLogger(JobStatusDAO.class);
 
     @Inject
     private Connection connection;
@@ -79,5 +79,4 @@ public class JobStatusDBRepository {
     private static Timestamp toTimestamp(Date date) {
         return new Timestamp(date.getTime());
     }
-
 }

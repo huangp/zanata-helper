@@ -24,7 +24,7 @@
                   #{msg['jsf.admin.settings.storage']}
                 </h2>
                 <c:textfield componentId="storageDir" value="#{adminController.storageDir}"
-                  styleClass="form__item"
+                  styleClass="form__item is-disabled" disabled="true"
                   label="#{msg['jsf.admin.settings.storageDir']}"
                   hasError="#{adminController.hasError('storageDir')}"
                   errorMessage="#{adminController.getErrorMessage('storageDir')}">

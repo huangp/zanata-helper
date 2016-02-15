@@ -5,10 +5,10 @@
       http://xmlns.jcp.org/xml/ns/javaee
       http://xmlns.jcp.org/xml/ns/javaee/beans_1_1.xsd" bean-discovery-mode="annotated">
   <alternatives>
-    <class>org.zanata.sync.repository.SyncWorkConfigDBRepository</class>
+    <class>org.zanata.sync.dao.SyncWorkConfigDAO</class>
   </alternatives>
   <decorators>
-    <class>org.zanata.sync.repository.SyncWorkConfigSerializerEncryptionDecorator</class>
+    <class>org.zanata.sync.dao.SyncWorkConfigSerializerEncryptionDecorator</class>
   </decorators>
   <interceptors>
     <class>org.zanata.sync.interceptor.WithRequestScopeInterceptor</class>

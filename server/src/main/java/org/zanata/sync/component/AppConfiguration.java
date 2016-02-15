@@ -21,6 +21,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.io.FileUtils;
@@ -51,6 +52,7 @@ import static org.apache.commons.io.Charsets.UTF_8;
  */
 @ApplicationScoped
 @Slf4j
+@NoArgsConstructor
 public class AppConfiguration implements Serializable {
     public static final String SYSTEM_SETTINGS_PATH = "systemSettings";
     private final static String CONFIG_DIR = "configuration";
@@ -75,10 +77,8 @@ public class AppConfiguration implements Serializable {
 
     @Getter
     private File repoDir;
-    private File settingsFile;
 
-    public AppConfiguration() {
-    }
+    private File settingsFile;
 
     @PostConstruct
     public void init() {
@@ -89,7 +89,6 @@ public class AppConfiguration implements Serializable {
         Optional<SystemSettings> systemSettings = loadSettings();
         if(systemSettings.isPresent()) {
             this.systemSettings = systemSettings.get();
-            updateStorageDir();
         } else {
             String message = "can not locate " + SETTING_FILE_NAME +
                     ". Please specify its path as " + SYSTEM_SETTINGS_PATH +
@@ -140,11 +139,10 @@ public class AppConfiguration implements Serializable {
         this.repoDir = repoDir;
     }
 
-    public void updateSettingsAndSave(String newStorageDir, boolean deleteJobDir,
+    public void updateSettingsAndSave(boolean deleteJobDir,
             List<String> fieldsNeedEncryption, File logbackConfigFile) {
-        systemSettings =
-            new SystemSettings(newStorageDir, deleteJobDir, fieldsNeedEncryption, logbackConfigFile);
-        updateStorageDir();
+        systemSettings.updateSettings(deleteJobDir, fieldsNeedEncryption,
+                logbackConfigFile);
         updateLogbackConfig();
         saveCurrentSettings();
     }
@@ -172,7 +170,7 @@ public class AppConfiguration implements Serializable {
         }
     }
 
-    // FIXME our database file lives in config folder. Maybe we should just make system property mandatory? Otherwise once the storage directory has been changed, we need to migrate database file
+    // TODO: make system property for storage directory mandatory, and remove from admin screen
     private Optional<SystemSettings> loadSettings() {
         // first we try system property
         String settingsPath = System.getProperty(SYSTEM_SETTINGS_PATH);
@@ -234,14 +232,6 @@ public class AppConfiguration implements Serializable {
     private String toYaml(SystemSettings systemSettings) {
         YAML.setBeanAccess(BeanAccess.FIELD);
         return YAML.dump(systemSettings);
-    }
-
-    private void updateStorageDir() {
-        configDir = Paths.get(buildConfigDirectory()).toFile();
-        checkDirectory(CONFIG_DIR, configDir);
-
-        repoDir = Paths.get(buildRepoDirectory()).toFile();
-        checkDirectory(REPO_DIR, repoDir);
     }
 
     private static void checkDirectory(String nameOfDirectory, File directory) {

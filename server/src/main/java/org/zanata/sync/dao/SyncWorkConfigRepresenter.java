@@ -1,4 +1,4 @@
-package org.zanata.sync.repository;
+package org.zanata.sync.dao;
 
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.nodes.NodeTuple;

@@ -1,4 +1,4 @@
-package org.zanata.sync.repository;
+package org.zanata.sync.dao;
 
 import java.io.File;
 import java.util.List;
