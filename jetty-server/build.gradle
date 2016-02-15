@@ -4,7 +4,7 @@ plugins {
 }
 
 description = 'Jetty server module - Creates a UberJar consisting of all classes needed to start Jetty'
-group 'org.zanata.helper.jetty'
+group 'org.zanata.sync.jetty'
 
 configurations {
     'shadow'

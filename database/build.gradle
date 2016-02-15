@@ -63,7 +63,7 @@ task jooqCodeGen << {
                     customType() {
                         delegate.invokeMethod("name", ['jobStatusTypeConverter'])
 //                        name('JobStatusTypeConverter')
-                        type('org.zanata.helper.model.JobStatusType')
+                        type('org.zanata.sync.model.JobStatusType')
                         converter('org.zanata.sync.JobStatusTypeConverter')
                     }
                 }

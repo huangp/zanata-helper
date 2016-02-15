@@ -1,7 +1,7 @@
 allprojects  {
   apply plugin: 'maven'
 
-  group = 'org.zanata.helper'
+  group = 'org.zanata.sync'
   version = '1.0-SNAPSHOT'
 }
 

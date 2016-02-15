@@ -1,5 +1,5 @@
-description = 'Zanata helper common module'
-group 'org.zanata.helper.common'
+description = 'Zanata sync common module'
+group 'org.zanata.sync.common'
 
 dependencies {
     compile group: 'org.projectlombok', name: 'lombok', version:'1.16.6'

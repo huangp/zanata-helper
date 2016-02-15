@@ -21,7 +21,7 @@ gretty {
   scanInterval = 0
 }
 
-description = 'Zanata helper server'
+description = 'Zanata sync server'
 dependencies {
     compile project(':common')
     compile project(':git-plugin')

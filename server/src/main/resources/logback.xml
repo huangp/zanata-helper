@@ -9,7 +9,7 @@
     </layout>
   </appender>
 
-  <logger name="org.zanata.helper" level="debug" additivity="false">
+  <logger name="org.zanata.sync" level="debug" additivity="false">
     <appender-ref ref="STDOUT" />
   </logger>
 

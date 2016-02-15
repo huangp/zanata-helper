@@ -2,7 +2,7 @@
 - To run test: `gradle dist test`
 
 - To run war: 
-    - `gradle appRunWar`, `appRunWarDebug`
+    - `gradle clean appRunWar`, `clean appRunWarDebug`
     - [http://localhost:8081/home.jsf](http://localhost:8081/home.jsf)
     - For more info, see [http://akhikhl.github.io/gretty-doc/Gretty-configuration.html]
 

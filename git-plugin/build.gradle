@@ -1,6 +1,6 @@
 
-description = 'Zanata helper git plugin'
-group 'org.zanata.helper.plugin'
+description = 'Zanata sync git plugin'
+group 'org.zanata.sync.plugin'
 
 dependencies {
     compile project(':common')

@@ -4,7 +4,7 @@
   xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
 		 http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
   version="3.1">
-  <display-name>Zanata Helper</display-name>
+  <display-name>Zanata Sync</display-name>
 
   <!-- Welcome page -->
   <welcome-file-list>
@@ -38,7 +38,7 @@
   </listener>
 
   <listener>
-    <listener-class>org.zanata.helper.db.CustomLiquibaseServletListener</listener-class>
+    <listener-class>org.zanata.sync.db.CustomLiquibaseServletListener</listener-class>
   </listener>
 
   <listener>
@@ -80,7 +80,7 @@
       <!-- for our REST resources -->
       <param-name>com.sun.jersey.config.property.packages</param-name>
       <!-- for json provider -->
-      <param-value>org.zanata.helper.api;org.codehaus.jackson.jaxrs</param-value>
+      <param-value>org.zanata.sync.api;org.codehaus.jackson.jaxrs</param-value>
       <!-- N.B. we can not use jersy pojo json support as it will interfere with zanata client rest commands -->
     </init-param>
 

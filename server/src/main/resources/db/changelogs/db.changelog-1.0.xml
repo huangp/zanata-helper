@@ -13,7 +13,7 @@
       </not>
     </preConditions>
     <comment>h2 baseline schema</comment>
-    <customChange class="org.zanata.helper.db.LiquibaseBaselineChange" />
+    <customChange class="org.zanata.sync.db.LiquibaseBaselineChange" />
   </changeSet>
 
 </databaseChangeLog>
