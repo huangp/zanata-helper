@@ -24,11 +24,11 @@ import java.io.File;
 import javax.naming.InitialContext;
 import javax.servlet.ServletContextEvent;
 
-import org.apache.deltaspike.core.api.provider.BeanProvider;
 import org.h2.Driver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zanata.sync.component.AppConfiguration;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
@@ -36,7 +36,7 @@ import liquibase.configuration.LiquibaseConfiguration;
 import liquibase.integration.servlet.LiquibaseServletListener;
 
 /**
- * We need to set jdbc url before liuquibase starts using it.
+ * We need to set jdbc url before liquibase starts using it.
  *
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
  */
@@ -61,13 +61,11 @@ public class CustomLiquibaseServletListener extends LiquibaseServletListener {
             ComboPooledDataSource dataSource = (ComboPooledDataSource) context.lookup(dataSourceStr);
             dataSource.setDriverClass(Driver.class.getName());
 
-            // injection do not work here
-            AppConfiguration appConfig = BeanProvider
-                    .getContextualReference(AppConfiguration.class);
-
             String dbFile =
-                    new File(appConfig.getConfigDir(), "zanata-sync-db").getAbsolutePath();
-            log.debug("h2 database file path: {}", dbFile);
+                    new File(AppConfiguration.DB_FILE_PATH,
+                            AppConfiguration.DB_FILE_NAME).getAbsolutePath();
+
+            log.info("h2 database file path: {}", dbFile);
             dataSource.setJdbcUrl("jdbc:h2:" + dbFile + ";AUTO_SERVER=TRUE");
         } catch (Exception e) {
             log.error("Error while initialising the database connection pool", e);

@@ -16,3 +16,8 @@ CREATE TABLE IF NOT EXISTS Job_Status_table (
     nextStartTime TIMESTAMP,
     FOREIGN KEY (workId) REFERENCES Sync_Work_Config_table (id)
 );
+
+CREATE TABLE IF NOT EXISTS System_Settings_table (
+   key VARCHAR(50) NOT NULL,
+   value VARCHAR(50) NOT NULL
+);

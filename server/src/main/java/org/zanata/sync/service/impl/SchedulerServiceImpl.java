@@ -4,6 +4,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.io.FilenameUtils;
 import org.quartz.JobDetail;
 import org.quartz.SchedulerException;
 import org.quartz.UnableToInterruptJobException;
@@ -71,18 +72,17 @@ public class SchedulerServiceImpl implements SchedulerService {
     public void onStartUp(@Observes ResourceReadyEvent resourceReadyEvent) {
         log.info("=====================================================");
         log.info("=====================================================");
-        log.info("================Zanata Sync starts=================");
-        log.info("== build :            {}-{}",
+        log.info("=================Zanata Sync starts==================");
+        log.info("=====================================================");
+        log.info("== build: {}-{}",
                 appConfiguration.getBuildVersion(),
                 appConfiguration.getBuildInfo());
-        log.info("== repo directory:    {}",
-                appConfiguration.getRepoDir());
-        log.info("== config directory:  {}",
-                appConfiguration.getConfigDir());
+        log.info("== storage directory: {}", appConfiguration.getStorageDir());
+        log.info("== repo directory: {}", appConfiguration.getRepoDir());
+        log.info("== clean directory: {}", appConfiguration.isDeleteJobDir());
         log.info("== fields to encrypt: {}",
                 appConfiguration.getFieldsNeedEncryption());
-        log.info("== logback config file: {}",
-                appConfiguration.getLogbackConfigurationFile());
+        log.info("== database path: {}", appConfiguration.getDBFilePath());
         log.info("=====================================================");
         log.info("=====================================================");
 
@@ -95,7 +95,7 @@ public class SchedulerServiceImpl implements SchedulerService {
             for (SyncWorkConfig syncWorkConfig : syncWorkConfigs) {
                 scheduleWork(syncWorkConfig);
             }
-            log.info("Initialised {} jobs.", syncWorkConfigs.size());
+            log.info("Initialised {} jobs", syncWorkConfigs.size());
         } catch (SchedulerException e) {
             throw Throwables.propagate(e);
         }

@@ -1,6 +1,5 @@
 package org.zanata.sync.controller;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,10 +47,6 @@ public class AdminController implements Serializable {
     @Setter
     private String fieldsNeedEncryption;
 
-    @Getter
-    @Setter
-    private String logbackConfigFile;
-
     private Map<String, String> errors = new HashMap<>();
 
     @PostConstruct
@@ -60,14 +55,13 @@ public class AdminController implements Serializable {
         deleteJobDir = appConfiguration.isDeleteJobDir();
         fieldsNeedEncryption =
             StringUtils.join(appConfiguration.getFieldsNeedEncryption(), ',');
-        logbackConfigFile = appConfiguration.getLogbackConfigurationFile().getAbsolutePath();
     }
 
     public String saveChanges() {
         validate();
         appConfiguration.updateSettingsAndSave(deleteJobDir, ImmutableList
             .copyOf(Splitter.on(",").omitEmptyStrings().trimResults()
-                .split(fieldsNeedEncryption)), new File(logbackConfigFile));
+                .split(fieldsNeedEncryption)));
 
         FacesMessage message = new FacesMessage(SEVERITY_INFO,
                 msg.get("jsf.admin.settings.saved.message"), "");

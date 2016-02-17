@@ -4,6 +4,7 @@
 - To run war: 
     - `gradle clean appRunWar`, `clean appRunWarDebug`
     - [http://localhost:8081/home.jsf](http://localhost:8081/home.jsf)
+    - [http://localhost:8081/admin/settings.jsf](http://localhost:8081/admin/settings.jsf)
     - For more info, see [http://akhikhl.github.io/gretty-doc/Gretty-configuration.html]
 
 API URL:
