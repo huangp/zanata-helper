@@ -71,7 +71,9 @@ dependencies {
     compile group: 'commons-codec', name: 'commons-codec', version:'1.10'
     compile group: 'org.apache.commons', name: 'commons-lang3', version:'3.4'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version:'2.6.4'
-    compile group: 'org.quartz-scheduler', name: 'quartz', version:'2.2.2'
+    compile('org.quartz-scheduler:quartz:2.2.2') {
+        exclude group: 'c3p0', module: 'c3p0' //by both name and group
+    }
     compile group: 'org.yaml', name: 'snakeyaml', version:'1.16'
     providedCompile group: 'org.projectlombok', name: 'lombok', version:'1.16.6'
     providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version:'3.1.0'
