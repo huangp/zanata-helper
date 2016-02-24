@@ -1,6 +1,9 @@
 package org.zanata.sync.controller;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
+
 import org.zanata.sync.common.model.Field;
 import org.zanata.sync.common.model.FieldType;
 import org.zanata.sync.common.model.SyncOption;
@@ -26,6 +29,7 @@ import com.google.common.collect.Lists;
  */
 public abstract class HasFormController implements Serializable {
     @Getter
+    @Setter(AccessLevel.PROTECTED)
     protected Map<String, String> errors = new HashMap<>();
 
     @Getter

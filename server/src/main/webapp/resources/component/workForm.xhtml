@@ -47,7 +47,7 @@
             <label>#{msg['jsf.work.field.cron.label']}</label>
             <h:selectOneMenu value="#{cc.attrs.actionClass.form.syncToServerCron}">
               <f:selectItems value="#{cc.attrs.actionClass.supportedIntervals}" var="cronType"
-                itemLabel="#{cronType.display}" itemValue="#{cronType.display}"/>
+                itemLabel="#{cronType.display}" itemValue="#{cronType}"/>
             </h:selectOneMenu>
           </div>
 
@@ -69,7 +69,7 @@
             <label>#{msg['jsf.work.field.cron.label']}</label>
             <h:selectOneMenu value="#{cc.attrs.actionClass.form.syncToRepoCron}">
               <f:selectItems value="#{cc.attrs.actionClass.supportedIntervals}" var="cronType"
-                itemLabel="#{cronType.display}" itemValue="#{cronType.display}"/>
+                itemLabel="#{cronType.display}" itemValue="#{cronType}"/>
             </h:selectOneMenu>
           </div>
 

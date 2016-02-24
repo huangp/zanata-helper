@@ -1,5 +1,6 @@
 package org.zanata.sync.controller;
 
+import javax.enterprise.context.ConversationScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
@@ -21,9 +22,9 @@ import static javax.faces.application.FacesMessage.SEVERITY_INFO;
 /**
  * @author Alex Eng <a href="mailto:aeng@redhat.com">aeng@redhat.com</a>
  */
-@ViewScoped
 @Slf4j
 @Named("newWorkController")
+@ConversationScoped
 public class NewWorkController extends HasFormController {
 
     @Inject
@@ -37,7 +38,7 @@ public class NewWorkController extends HasFormController {
 
     public String onSubmit() throws IOException {
         Response response = workResourceImpl.createWork(form);
-        errors = (Map<String, String>) response.getEntity();
+        setErrors((Map<String, String>) response.getEntity());
         if (!errors.isEmpty()) {
             return "/work/new.jsf";
         }
