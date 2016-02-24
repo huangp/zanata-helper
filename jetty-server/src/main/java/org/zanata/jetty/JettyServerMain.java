@@ -14,6 +14,7 @@ import javax.naming.Reference;
 
 import org.eclipse.jetty.plus.jndi.Resource;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.resource.PathResource;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -46,8 +47,17 @@ public class JettyServerMain {
     private void run() throws Throwable {
         // Set JSP to use Standard JavaC always
         System.setProperty("org.apache.jasper.compiler.disablejsr199","false");
+        String port = System.getProperty("jetty.port", "8080");
+        String host = System.getProperty("jetty.host", "0.0.0.0");
 
-        Server server = new Server(8081);
+        Server server = new Server();
+
+        // HTTP connector
+        ServerConnector http = new ServerConnector(server);
+        http.setHost(host);
+        http.setPort(Integer.parseInt(port));
+
+        server.addConnector(http);
 
         enableAnnotationScanning(server);
 

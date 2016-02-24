@@ -1,4 +1,4 @@
-rootProject.name = 'Zanata Helper'
+rootProject.name = 'Zanata Sync'
 include 'common'
 include ':database'
 include ':zanata-cli-plugin'

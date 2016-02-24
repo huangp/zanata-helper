@@ -128,7 +128,7 @@ task liveWarExploded(dependsOn: [war, ':jetty-server:shadowJar', ':server-bootst
 
 task liveWar(dependsOn: liveWarExploded, type: Zip) {
     from("$buildDir/livewar")
-    baseName "livewar"
+    baseName "$project.name-livewar"
     extension "war"
 }
 
