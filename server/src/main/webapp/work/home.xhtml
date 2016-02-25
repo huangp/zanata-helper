@@ -74,52 +74,65 @@
               #{workController.syncWorkConfig.description}
             </p>
             <h:panelGroup layout="block" id="jobStatus">
-              <div class="l--pad-all-quarter panel">
-                <ui:fragment rendered="#{not workController.isSyncToRepoRunning()}">
-                  <button class="button--small button--warning button loader" onclick="triggerSyncToRepoJob();return false">
-                    <span class="loader__label">#{msg['jsf.work.runJobNow']}</span>
-                  </button>
-                </ui:fragment>
-                <c:workstatus jobStatus="#{workController.getRepoSyncStatus()}"
-                  type="REPO_SYNC" displayType="block"/>
-                <ui:fragment rendered="#{workController.isSyncToRepoRunning()}">
-                  <div class="l--push-top-quarter">
+              <div class="panel list--panel">
+                <div class="l--pad-all-quarter">
+                  <ui:fragment rendered="#{not workController.isSyncToRepoRunning()}">
+                    <button class="button--small button--warning button loader" onclick="triggerSyncToRepoJob();return false">
+                      <span class="loader__label">#{msg['jsf.work.runJobNow']}</span>
+                    </button>
+                  </ui:fragment>
+                  <c:workstatus jobStatus="#{workController.getRepoSyncStatus()}"
+                    type="REPO_SYNC" displayType="block" styleClass="l--push-top-quarter"/>
+                </div>
+                <h:panelGroup layout="block" styleClass="list__item__content" rendered="#{workController.isSyncToRepoRunning()}">
+                  <div class="list__item__info">
+                    <div class="bx--inline-block  loader--mini is-active">
+                      <span class="loader__spinner">
+                        <span></span><span></span><span></span>
+                      </span>
+                    </div>
+                    <span class="txt--meta">
+                      #{workController.getRepoSyncStatus().currentProgress.completePercent}% #{workController.getRepoSyncStatus().currentProgress.description}
+                    </span>
+                  </div>
+                  <div class="list__item__actions">
                     <button class="button--small button--danger loader" onclick="cancelJob('REPO_SYNC')"
                       title="#{msg['jsf.job.cancel.button.title']}">
                       <span class="loader__label"><i class="i i--cancel"></i></span>
                     </button>
-                    <div class="bx--inline-block  loader--mini is-active">
-                        <span class="loader__spinner">
-                          <span></span><span></span><span></span>
-                        </span>
-                    </div>
-                    <div class="txt--meta l--push-v-quarter">#{workController.getRepoSyncStatus().currentProgress.completePercent}% #{workController.getRepoSyncStatus().currentProgress.description}</div>
                   </div>
-                </ui:fragment>
+                </h:panelGroup>
               </div>
 
-              <div class="l--pad-all-quarter l--push-top-half panel">
-                <ui:fragment rendered="#{not workController.isSyncToServerRunning()}">
-                  <button class="button--small button--warning button loader" onclick="triggerSyncToServerJob();return false">
-                    <span class="loader__label">#{msg['jsf.work.runJobNow']}</span>
-                  </button>
-                </ui:fragment>
-                <c:workstatus jobStatus="#{workController.getServerSyncStatus()}"
-                  type="SERVER_SYNC" displayType="block"/>
-                <ui:fragment rendered="#{workController.isSyncToServerRunning()}">
-                  <div class="l--push-top-quarter">
+              <div class="l--push-top-half panel list--panel">
+                <div class="l--pad-all-quarter">
+                  <ui:fragment rendered="#{not workController.isSyncToServerRunning()}">
+                    <button class="button--small button--warning button loader" onclick="triggerSyncToServerJob();return false">
+                      <span class="loader__label">#{msg['jsf.work.runJobNow']}</span>
+                    </button>
+                    <c:workstatus jobStatus="#{workController.getServerSyncStatus()}"
+                      type="SERVER_SYNC" displayType="block" styleClass="l--push-top-quarter"/>
+                  </ui:fragment>
+                </div>
+
+                <h:panelGroup layout="block" styleClass="list__item__content" rendered="#{workController.isSyncToServerRunning()}">
+                  <div class="list__item__info">
+                    <div class="bx--inline-block  loader--mini is-active">
+                      <span class="loader__spinner">
+                        <span></span><span></span><span></span>
+                      </span>
+                    </div>
+                    <span class="txt--meta">
+                      #{workController.getServerSyncStatus().currentProgress.completePercent}% #{workController.getServerSyncStatus().currentProgress.description}
+                    </span>
+                  </div>
+                  <div class="list__item__actions">
                     <button class="button--small button--danger loader" onclick="cancelJob('SERVER_SYNC')"
                       title="#{msg['jsf.job.cancel.button.title']}">
                       <span class="loader__label"><i class="i i--cancel"></i></span>
                     </button>
-                    <div class="bx--inline-block loader--mini is-active">
-                        <span class="loader__spinner">
-                          <span></span><span></span><span></span>
-                        </span>
-                    </div>
-                    <div class="txt--meta l--push-v-quarter">#{workController.getServerSyncStatus().currentProgress.completePercent}% #{workController.getServerSyncStatus().currentProgress.description}</div>
                   </div>
-                </ui:fragment>
+                </h:panelGroup>
               </div>
             </h:panelGroup>
           </div>

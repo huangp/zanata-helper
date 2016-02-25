@@ -58,7 +58,6 @@ public abstract class SyncJob implements InterruptableJob {
         } catch (JobExecutionException e) {
             log.error("Error running sync job.", e);
             hasError = true;
-
         } finally {
             if(cleanDir) {
                 cleanupDirectory(
