@@ -40,6 +40,11 @@
                           <span class="list__item__meta">#{job.description}</span>
                         </div>
                         <div class="list__item__actions">
+                          <div class="bx--inline-block  loader--mini is-active">
+                            <span class="loader__spinner">
+                              <span></span><span></span><span></span>
+                            </span>
+                          </div>
                           <button class="button--small button--danger loader" onclick="cancelJob('#{job.workId}','#{job.type}')"
                             title="#{msg['jsf.job.cancel.button.title']}">
                             <span class="loader__label">

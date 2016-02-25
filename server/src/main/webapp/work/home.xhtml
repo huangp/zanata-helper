@@ -75,47 +75,51 @@
             </p>
             <h:panelGroup layout="block" id="jobStatus">
               <div class="l--pad-all-quarter panel">
-                  <ui:fragment rendered="#{not workController.isSyncToRepoRunning()}">
-                    <button class="button--small button--warning button loader" onclick="triggerSyncToRepoJob();return false">
-                      <span class="loader__label">#{msg['jsf.work.runJobNow']}</span>
-                    </button>
-                  </ui:fragment>
-                  <ui:fragment rendered="#{workController.isSyncToRepoRunning()}">
+                <ui:fragment rendered="#{not workController.isSyncToRepoRunning()}">
+                  <button class="button--small button--warning button loader" onclick="triggerSyncToRepoJob();return false">
+                    <span class="loader__label">#{msg['jsf.work.runJobNow']}</span>
+                  </button>
+                </ui:fragment>
+                <c:workstatus jobStatus="#{workController.getRepoSyncStatus()}"
+                  type="REPO_SYNC" displayType="block"/>
+                <ui:fragment rendered="#{workController.isSyncToRepoRunning()}">
+                  <div class="l--push-top-quarter">
                     <button class="button--small button--danger loader" onclick="cancelJob('REPO_SYNC')"
                       title="#{msg['jsf.job.cancel.button.title']}">
                       <span class="loader__label"><i class="i i--cancel"></i></span>
                     </button>
                     <div class="bx--inline-block  loader--mini is-active">
-                      <span class="loader__spinner">
-                        <span></span><span></span><span></span>
-                      </span>
+                        <span class="loader__spinner">
+                          <span></span><span></span><span></span>
+                        </span>
                     </div>
                     <div class="txt--meta l--push-v-quarter">#{workController.getRepoSyncStatus().currentProgress.completePercent}% #{workController.getRepoSyncStatus().currentProgress.description}</div>
-                  </ui:fragment>
-                <c:workstatus jobStatus="#{workController.getRepoSyncStatus()}"
-                  type="REPO_SYNC" styleClass="l--pad-top-quarter" displayType="block"/>
+                  </div>
+                </ui:fragment>
               </div>
 
               <div class="l--pad-all-quarter l--push-top-half panel">
-                  <ui:fragment rendered="#{not workController.isSyncToServerRunning()}">
-                    <button class="button--small button--warning button loader" onclick="triggerSyncToServerJob();return false">
-                      <span class="loader__label">#{msg['jsf.work.runJobNow']}</span>
-                    </button>
-                  </ui:fragment>
-                  <ui:fragment rendered="#{workController.isSyncToServerRunning()}">
+                <ui:fragment rendered="#{not workController.isSyncToServerRunning()}">
+                  <button class="button--small button--warning button loader" onclick="triggerSyncToServerJob();return false">
+                    <span class="loader__label">#{msg['jsf.work.runJobNow']}</span>
+                  </button>
+                </ui:fragment>
+                <c:workstatus jobStatus="#{workController.getServerSyncStatus()}"
+                  type="SERVER_SYNC" displayType="block"/>
+                <ui:fragment rendered="#{workController.isSyncToServerRunning()}">
+                  <div class="l--push-top-quarter">
                     <button class="button--small button--danger loader" onclick="cancelJob('SERVER_SYNC')"
                       title="#{msg['jsf.job.cancel.button.title']}">
                       <span class="loader__label"><i class="i i--cancel"></i></span>
                     </button>
                     <div class="bx--inline-block loader--mini is-active">
-                      <span class="loader__spinner">
-                        <span></span><span></span><span></span>
-                      </span>
+                        <span class="loader__spinner">
+                          <span></span><span></span><span></span>
+                        </span>
                     </div>
                     <div class="txt--meta l--push-v-quarter">#{workController.getServerSyncStatus().currentProgress.completePercent}% #{workController.getServerSyncStatus().currentProgress.description}</div>
-                  </ui:fragment>
-                <c:workstatus jobStatus="#{workController.getServerSyncStatus()}"
-                  type="SERVER_SYNC" styleClass="l--pad-top-quarter" displayType="block"/>
+                  </div>
+                </ui:fragment>
               </div>
             </h:panelGroup>
           </div>
