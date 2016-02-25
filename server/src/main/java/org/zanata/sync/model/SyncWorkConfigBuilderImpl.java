@@ -14,14 +14,21 @@ public class SyncWorkConfigBuilderImpl implements SyncWorkConfigBuilder {
 
     @Override
     public SyncWorkConfig buildObject(SyncWorkForm syncWorkForm) {
-        JobConfig syncToServerConfig = new JobConfig(JobType.SERVER_SYNC,
-                syncWorkForm.getSyncToServerCron().getExpression(),
-                syncWorkForm.getSyncToServerOption());
+        JobConfig syncToServerConfig = null;
+        if (syncWorkForm.getSyncToServerCron() != null
+                && syncWorkForm.getSyncToServerOption() != null) {
+            syncToServerConfig = new JobConfig(JobType.SERVER_SYNC,
+                    syncWorkForm.getSyncToServerCron().getExpression(),
+                    syncWorkForm.getSyncToServerOption());
+        }
 
-        JobConfig syncToRepoConfig = new JobConfig(JobType.REPO_SYNC,
+        JobConfig syncToRepoConfig = null;
+        if( syncWorkForm.getSyncToRepoCron() != null) {
+            syncToRepoConfig = new JobConfig(JobType.REPO_SYNC,
                 syncWorkForm.getSyncToRepoCron().getExpression(),
                 // repo sync should only sync translations
                 SyncOption.TRANSLATIONS);
+        }
 
         return new SyncWorkConfig(syncWorkForm.getId(),
             syncWorkForm.getName(),
@@ -52,14 +59,20 @@ public class SyncWorkConfigBuilderImpl implements SyncWorkConfigBuilder {
         form.setTransServerPluginConfig(
             syncWorkConfig.getTransServerPluginConfig());
 
-        form.setSyncToServerOption(
-            syncWorkConfig.getSyncToServerConfig().getOption());
+        if(syncWorkConfig.getSyncToServerConfig() != null) {
+            form.setSyncToServerOption(
+                syncWorkConfig.getSyncToServerConfig().getOption());
 
-        form.setSyncToRepoCron(CronHelper.getTypeFromExpression(
-                syncWorkConfig.getSyncToRepoConfig().getCron()));
-        form.setSyncToServerCron(
+            form.setSyncToServerCron(
                 CronHelper.getTypeFromExpression(
-                        syncWorkConfig.getSyncToServerConfig().getCron()));
+                    syncWorkConfig.getSyncToServerConfig().getCron()));
+        }
+
+        if(syncWorkConfig.getSyncToRepoConfig() != null) {
+            form.setSyncToRepoCron(CronHelper.getTypeFromExpression(
+                syncWorkConfig.getSyncToRepoConfig().getCron()));
+        }
+
         form.setSyncToRepoEnabled(syncWorkConfig.isSyncToRepoEnabled());
         form.setSyncToServerEnabled(syncWorkConfig.isSyncToServerEnabled());
         return form;

@@ -9,7 +9,6 @@ import org.apache.commons.lang.StringUtils;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
-import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -21,12 +20,11 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.zanata.sync.common.plugin.RepoExecutor;
 import org.zanata.sync.common.plugin.TranslationServerExecutor;
-import org.zanata.sync.events.JobRunUpdate;
+import org.zanata.sync.events.JobRunCompletedEvent;
 import org.zanata.sync.exception.UnableLoadPluginException;
 import org.zanata.sync.model.JobType;
 import org.zanata.sync.model.SyncWorkConfig;
 import org.zanata.sync.model.JobStatus;
-import org.zanata.sync.model.JobStatusType;
 import org.zanata.sync.component.AppConfiguration;
 import org.zanata.sync.service.PluginsService;
 
@@ -54,14 +52,6 @@ public class CronTrigger {
 
     @Inject
     private JobConfigListener triggerListener;
-
-    public static JobStatusType getType(Trigger.TriggerState state,
-        boolean isRunning) {
-        if(isRunning) {
-            return JobStatusType.RUNNING;
-        }
-        return JobStatusType.valueOf(state.name());
-    }
 
     @PostConstruct
     public void start() throws SchedulerException {
@@ -117,15 +107,16 @@ public class CronTrigger {
         try {
             String cronExp;
             Class jobClass;
-            if (type.equals(JobType.REPO_SYNC)) {
+            if (type.equals(JobType.REPO_SYNC)
+                    && syncWorkConfig.getSyncToRepoConfig() != null) {
                 cronExp = syncWorkConfig.getSyncToRepoConfig().getCron();
                 jobClass = RepoSyncJob.class;
-            } else if (type.equals(JobType.SERVER_SYNC)) {
+            } else if (type.equals(JobType.SERVER_SYNC)
+                    && syncWorkConfig.getSyncToServerConfig() != null) {
                 cronExp = syncWorkConfig.getSyncToServerConfig().getCron();
                 jobClass = TransServerSyncJob.class;
             } else {
-                throw new IllegalStateException(
-                    "can not determine what job to run for " + type);
+                return Optional.empty();
             }
 
             JobDetail jobDetail =
@@ -136,7 +127,8 @@ public class CronTrigger {
             jobDetail.getJobDataMap()
                     .put("basedir", type.baseWorkDir(
                             appConfiguration.getRepoDir()));
-
+            jobDetail.getJobDataMap().put("cleanDir",
+                    appConfiguration.isDeleteJobDir());
             jobDetail.getJobDataMap().put("jobType", type);
 
             jobDetail.getJobDataMap()
@@ -173,7 +165,7 @@ public class CronTrigger {
     }
 
     public JobStatus getTriggerStatus(Long id,
-            JobRunUpdate event) throws SchedulerException {
+        JobRunCompletedEvent event) throws SchedulerException {
         JobKey key = event.getJobType().toJobKey(id);
 
         if (scheduler.checkExists(key)) {
@@ -185,26 +177,12 @@ public class CronTrigger {
                 Trigger.TriggerState state =
                         scheduler.getTriggerState(trigger.getKey());
 
-                return new JobStatus(
-                        getType(state,
-                                isJobRunning(trigger.getKey())),
+                return new JobStatus(event.getJobStatusType(),
                         trigger.getPreviousFireTime(), endTime,
                         trigger.getNextFireTime());
             }
         }
         return JobStatus.EMPTY;
-    }
-
-    public boolean isJobRunning(TriggerKey key) throws SchedulerException {
-        List<JobExecutionContext> currentJobs =
-            scheduler.getCurrentlyExecutingJobs();
-
-        for (JobExecutionContext jobCtx : currentJobs) {
-            if (jobCtx.getTrigger().getKey().equals(key)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public List<JobDetail> getJobs() throws SchedulerException {

@@ -26,12 +26,13 @@ public final class CronHelper {
 
     @Getter
     public enum CronType {
-        THIRTY_SECONDS("30 seconds", "0/30 * * * * ?"), //this is for testing purposes
-        ONE_HOUR("1 hour", "0 * * * * ?"),
-        TWO_HOUR("2 hour", "0 */2 * * * ?"),
-        SIX_HOUR("6 hour", "0 */6 * * * ?"),
-        TWELVE_HOUR("12 hour", "0 */12 * * * ?"),
-        ONE_DAY("24 hour", "0 0 * * * ?");
+        ONE_HOUR("Hourly", "0 0 0/1 * * ?"),
+        TWO_HOUR("2 hourly", "0 0 0/2 * * ?"),
+        SIX_HOUR("6 hourly (6:00am,12:00am,6pm,12pm)", "0 0 0/6 * * ?"),
+        TWELVE_HOUR("12 hour (12:00am/pm)", "0 0 0,12 * * ?"),
+        ONE_DAY("24 hour(12:00am)", "0 0 0 * * ?"),
+        //this is for testing purposes
+        THIRTY_SECONDS("30 seconds", "0/30 * * * * ?");
 
         private final String display;
         private final String expression;

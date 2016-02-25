@@ -50,6 +50,11 @@ public class TransServerSyncJob extends SyncJob {
             log.info("No plugin in job. Skipping." + syncWorkConfig.toString());
             return;
         }
+        if(syncWorkConfig.getSyncToServerConfig() == null) {
+            log.info("SyncToServer is disabled. Skipping." + syncWorkConfig.toString());
+            return;
+        }
+
         try {
             if (interrupted) {
                 return;

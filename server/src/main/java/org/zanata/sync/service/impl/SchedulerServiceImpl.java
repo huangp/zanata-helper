@@ -4,7 +4,6 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.commons.io.FilenameUtils;
 import org.quartz.JobDetail;
 import org.quartz.SchedulerException;
 import org.quartz.UnableToInterruptJobException;
@@ -13,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zanata.sync.events.JobProgressEvent;
 import org.zanata.sync.events.JobRunCompletedEvent;
-import org.zanata.sync.events.JobRunUpdate;
 import org.zanata.sync.events.ResourceReadyEvent;
 import org.zanata.sync.exception.JobNotFoundException;
 import org.zanata.sync.exception.WorkNotFoundException;
@@ -116,7 +114,9 @@ public class SchedulerServiceImpl implements SchedulerService {
         log.info(event.toString());
         JobProgress progress = new JobProgress(event.getCompletePercent(),
                 event.getDescription(), event.getJobStatusType());
-        progressMap.put(new RunningJobKey(event.getId(), event.getJobType()), progress);
+        progressMap
+            .put(new RunningJobKey(event.getId(), event.getJobType()),
+                progress);
     }
 
     @WithRequestScope
@@ -132,7 +132,7 @@ public class SchedulerServiceImpl implements SchedulerService {
                             syncWorkConfig.getName() +
                             " is completed.");
 
-            JobStatus jobStatus = getStatus(event.getId(), event);
+            JobStatus jobStatus = getStatus(event);
             jobStatusRepository.saveJobStatus(syncWorkConfig,
                     event.getJobType(), jobStatus);
         }
@@ -262,16 +262,14 @@ public class SchedulerServiceImpl implements SchedulerService {
         return syncWorkConfigRepository.getAll();
     }
 
-    private JobStatus getStatus(Long id, JobRunUpdate event)
+    private JobStatus getStatus(JobRunCompletedEvent event)
         throws SchedulerException, JobNotFoundException {
         Optional<SyncWorkConfig> workConfigOptional =
-                syncWorkConfigRepository.load(id);
+                syncWorkConfigRepository.load(event.getId());
         if (!workConfigOptional.isPresent()) {
-            String stringId = id.toString();
-            throw new JobNotFoundException(stringId);
+            throw new JobNotFoundException(event.getId().toString());
         }
-
-        return cronTrigger.getTriggerStatus(id, event);
+        return cronTrigger.getTriggerStatus(event.getId(), event);
     }
 
     private JobSummary convertToJobSummary(JobDetail jobDetail) {

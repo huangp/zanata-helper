@@ -38,6 +38,9 @@ public class ZanataSyncServiceImpl implements ZanataSyncService {
     private final PullOptions pullOptions;
     private final PushOptions pushOptions;
 
+    private final PushServiceImpl pushService = new PushServiceImpl();
+    private final PullServiceImpl pullService = new PullServiceImpl();
+
     public ZanataSyncServiceImpl(PullOptions pullOptions,
             PushOptions pushOptions, String username, String apiKey) {
         this.pullOptions = pullOptions;
@@ -49,8 +52,7 @@ public class ZanataSyncServiceImpl implements ZanataSyncService {
         this.pushOptions.setUsername(username);
         this.pushOptions.setKey(apiKey);
         this.pushOptions.setLogHttp(true);
-        this.pullOptions.setErrors(true);
-        this.pullOptions.setDebug(true);
+        this.pullOptions.setLogHttp(true);
     }
 
     @Override
@@ -70,7 +72,7 @@ public class ZanataSyncServiceImpl implements ZanataSyncService {
 
         projectConfig.ifPresent((file) -> {
             PushPullOptionsUtil.applyProjectConfig(getPushOptions(), projectConfig.get());
-            new PushServiceImpl().pushToZanata(getPushOptions());
+            pushService.pushToZanata(getPushOptions());
         });
         // TODO handle where project config can not be found in repo
     }
@@ -82,7 +84,7 @@ public class ZanataSyncServiceImpl implements ZanataSyncService {
 
         projectConfig.ifPresent((file) -> {
             PushPullOptionsUtil.applyProjectConfig(getPullOptions(), projectConfig.get());
-            new PullServiceImpl().pullFromZanata(getPullOptions());
+            pullService.pullFromZanata(getPullOptions());
         });
         // TODO handle where project config can not be found in repo
     }

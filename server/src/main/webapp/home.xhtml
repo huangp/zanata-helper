@@ -17,8 +17,8 @@
         <a4j:param name="val2" assignTo="#{type}"/>
       </a4j:jsFunction>
 
-      <a4j:poll id="running-jobs-poll" interval="15000"
-        render="running-jobs-content" limitRender="true"/>
+      <a4j:poll id="running-jobs-poll" interval="10000"
+        render="running-jobs-content, main-content" limitRender="true"/>
     </h:form>
 
     <div class="l__wrapper">
@@ -57,7 +57,7 @@
         </div>
 
         <div class="g__item w--1-m w--5-8-l w--3-4">
-          <div class="panel">
+          <h:panelGroup layout="block" styleClass="panel" id="main-content">
             <div class="panel__header">
               <div class="panel__header__actions">
                 <div class="dropdown dropdown--header dropdown--small dropdown--right js-dropdown">
@@ -75,7 +75,7 @@
                 </div>
               </div>
               <h2 class="panel__heading">
-                #{msg['jsp.allJobs.title']}
+                #{msg['jsp.works.title']}
               </h2>
             </div>
 
@@ -105,7 +105,7 @@
                 </ui:repeat>
               </ul>
             </ui:fragment>
-          </div>
+          </h:panelGroup>
         </div>
       </div>
     </div>

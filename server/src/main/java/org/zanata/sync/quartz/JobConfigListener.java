@@ -23,13 +23,10 @@ package org.zanata.sync.quartz;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.enterprise.context.Dependent;
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
 
 import org.quartz.JobExecutionContext;
 import org.quartz.Trigger;
 import org.quartz.TriggerListener;
-import org.zanata.sync.events.JobRunCompletedEvent;
 import org.zanata.sync.model.JobType;
 import org.zanata.sync.model.SyncWorkConfig;
 import com.google.common.collect.Maps;
@@ -41,9 +38,6 @@ import lombok.extern.slf4j.Slf4j;
 @Dependent
 public class JobConfigListener implements TriggerListener {
     public static final String LISTENER_NAME = "JobConfigListener";
-
-    @Inject
-    private Event<JobRunCompletedEvent> jobRunCompletedEvent;
 
     private static Map<RunningJobKey, AtomicInteger> runningJobs = Maps.newConcurrentMap();
 
@@ -92,12 +86,6 @@ public class JobConfigListener implements TriggerListener {
 
         SyncWorkConfig syncWorkConfig = getJobConfigJob(context);
         runningJobs.remove(new RunningJobKey(syncWorkConfig.getId(), getJobTypeFromContext(context)));
-
-        jobRunCompletedEvent.fire(
-            new JobRunCompletedEvent(syncWorkConfig.getId(),
-                context.getJobRunTime(),
-                context.getFireTime(),
-                getJobTypeFromContext(context)));
     }
 
     private static SyncWorkConfig getJobConfigJob(JobExecutionContext context) {

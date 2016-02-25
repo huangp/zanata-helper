@@ -51,6 +51,11 @@ public class RepoSyncJob extends SyncJob {
                 syncWorkConfig.toString());
             return;
         }
+        if (syncWorkConfig.getSyncToRepoConfig() == null) {
+            log.info("SyncToRepo is disabled. Skipping."
+                    + syncWorkConfig.toString());
+            return;
+        }
 
         try {
             if (interrupted) {
@@ -73,6 +78,7 @@ public class RepoSyncJob extends SyncJob {
             updateProgress(syncWorkConfig.getId(), 40,
                 "Pulling files from translation server to " + destDir,
                 JobStatusType.RUNNING);
+
             transServerExecutor.pullFromServer(destDir,
                 syncWorkConfig.getSyncToRepoConfig().getOption());
 
