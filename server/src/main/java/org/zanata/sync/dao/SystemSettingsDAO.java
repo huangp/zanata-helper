@@ -28,7 +28,6 @@ public class SystemSettingsDAO {
     private static final Logger log =
             LoggerFactory.getLogger(SystemSettingsDAO.class);
     
-    public static final String STORAGE_DIR = "STORAGE_DIR";
     public static final String DELETE_JOB_DIR = "DELETE_JOB_DIR";
     public static final String ENCRYPTION_FIELDS = "ENCRYPTION_FIELDS";
 
@@ -54,9 +53,7 @@ public class SystemSettingsDAO {
     
     private void populateSystemSettings(String key, String value,
             SystemSettings systemSettings) {
-        if(key.equals(STORAGE_DIR)) {
-            systemSettings.setStorageDir(value);
-        } else if(key.equals(DELETE_JOB_DIR)) {
+       if(key.equals(DELETE_JOB_DIR)) {
             systemSettings.setDeleteJobDir(Boolean.valueOf(value));
         } else if(key.equals(ENCRYPTION_FIELDS)) {
             systemSettings.setFieldsNeedEncryption(ImmutableList.copyOf(
@@ -70,7 +67,6 @@ public class SystemSettingsDAO {
 
         dslContext.insertInto(SYSTEM_SETTINGS_TABLE, SYSTEM_SETTINGS_TABLE.KEY,
                 SYSTEM_SETTINGS_TABLE.VALUE)
-                .values(STORAGE_DIR, systemSettings.getStorageDir())
                 .values(DELETE_JOB_DIR,
                         Boolean.toString(systemSettings.isDeleteJobDir()))
                 .values(ENCRYPTION_FIELDS, Joiner.on(",")

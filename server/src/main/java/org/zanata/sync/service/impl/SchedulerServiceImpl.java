@@ -75,7 +75,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         log.info("== build: {}-{}",
                 appConfiguration.getBuildVersion(),
                 appConfiguration.getBuildInfo());
-        log.info("== storage directory: {}", appConfiguration.getStorageDir());
+        log.info("== data directory: {}", appConfiguration.getDataPath());
         log.info("== repo directory: {}", appConfiguration.getRepoDir());
         log.info("== clean directory: {}", appConfiguration.isDeleteJobDir());
         log.info("== fields to encrypt: {}",
@@ -127,10 +127,8 @@ public class SchedulerServiceImpl implements SchedulerService {
                 syncWorkConfigRepository.load(event.getId());
         if (syncWorkConfigOpt.isPresent()) {
             SyncWorkConfig syncWorkConfig = syncWorkConfigOpt.get();
-            log.debug(
-                    "Job: " + event.getJobType() + "-" +
-                            syncWorkConfig.getName() +
-                            " is completed.");
+            log.debug("Job: " + event.getJobType() + "-" +
+                            syncWorkConfig.getName() + " is completed.");
 
             JobStatus jobStatus = getStatus(event);
             jobStatusRepository.saveJobStatus(syncWorkConfig,

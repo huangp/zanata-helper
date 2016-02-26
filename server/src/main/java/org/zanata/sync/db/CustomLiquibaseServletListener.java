@@ -20,7 +20,6 @@
  */
 package org.zanata.sync.db;
 
-import java.io.File;
 import javax.naming.InitialContext;
 import javax.servlet.ServletContextEvent;
 
@@ -55,15 +54,15 @@ public class CustomLiquibaseServletListener extends LiquibaseServletListener {
             LiquibaseConfiguration.getInstance().init(servletValueContainer);
 
             String dataSourceStr =
-                    (String) servletValueContainer.getValue("liquibase.datasource");
-            Preconditions.checkState(!Strings.isNullOrEmpty(dataSourceStr), "liquibase.datasource is not set");
+                    (String) servletValueContainer.getValue(
+                        "liquibase.datasource");
+            Preconditions.checkState(!Strings.isNullOrEmpty(dataSourceStr),
+                "liquibase.datasource is not set");
 
             ComboPooledDataSource dataSource = (ComboPooledDataSource) context.lookup(dataSourceStr);
             dataSource.setDriverClass(Driver.class.getName());
 
-            String dbFile =
-                    new File(AppConfiguration.DB_FILE_PATH,
-                            AppConfiguration.DB_FILE_NAME).getAbsolutePath();
+            String dbFile = AppConfiguration.getDBFilePathFromSystemProp();
 
             log.info("h2 database file path: {}", dbFile);
             dataSource.setJdbcUrl("jdbc:h2:" + dbFile + ";AUTO_SERVER=TRUE");

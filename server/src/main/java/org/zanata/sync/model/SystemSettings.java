@@ -1,9 +1,6 @@
 package org.zanata.sync.model;
 
-import java.io.File;
 import java.io.Serializable;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
@@ -11,7 +8,6 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.google.common.collect.Lists;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,12 +19,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class SystemSettings implements Serializable {
-    /**
-     * Must have read write access
-     * i.e /tmp/zanataHelperRoot
-     */
     @NotEmpty
-    private String storageDir = "/tmp";
+    private String dataPath;
 
     private boolean deleteJobDir = true;
 

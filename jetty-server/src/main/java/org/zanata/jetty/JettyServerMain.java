@@ -21,6 +21,9 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 public class JettyServerMain {
+    private static final String SYS_PROP_PORT = "jetty.port";
+    private static final String SYS_PROP_HOST = "jetty.host";
+
     private String warLocation;
 
     public JettyServerMain(String warLocation) {
@@ -47,8 +50,8 @@ public class JettyServerMain {
     private void run() throws Throwable {
         // Set JSP to use Standard JavaC always
         System.setProperty("org.apache.jasper.compiler.disablejsr199","false");
-        String port = System.getProperty("jetty.port", "8080");
-        String host = System.getProperty("jetty.host", "0.0.0.0");
+        String port = System.getProperty(SYS_PROP_PORT, "8080");
+        String host = System.getProperty(SYS_PROP_HOST, "0.0.0.0");
 
         Server server = new Server();
 

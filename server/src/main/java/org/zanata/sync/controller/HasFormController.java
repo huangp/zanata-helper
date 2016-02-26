@@ -100,14 +100,14 @@ public abstract class HasFormController implements Serializable {
             syncOptions.add(new Field(SyncOption.SOURCE.name(),
                     getMessage()
                             .get("jsf.work.syncType.sourceOnly.explanation"),
-                    "", "", FieldType.TEXT));
+                    "", "", false, FieldType.TEXT));
             syncOptions
                     .add(new Field(SyncOption.TRANSLATIONS.name(), getMessage()
                             .get("jsf.work.syncType.translationsOnly.explanation"),
-                            "", "", FieldType.TEXT));
+                            "", "", false, FieldType.TEXT));
             syncOptions.add(new Field(SyncOption.BOTH.name(), getMessage()
                     .get("jsf.work.syncType.both.explanation"), "", "",
-                    FieldType.TEXT));
+                    false, FieldType.TEXT));
         }
         return syncOptions;
     }

@@ -50,7 +50,7 @@
     class="#{cc.attrs.hasError ? 'form__item--error' : ''} #{cc.attrs.styleClass}" title="#{cc.attrs.tooltip}" id="#{cc.attrs.componentId}">
     <h:outputLabel for="input" styleClass="#{cc.attrs.labelStyle}"><h:outputText value="#{cc.attrs.label}" escape="false"/></h:outputLabel>
 
-    <h:inputSecret maxlength="#{cc.attrs.maxlength}" pt:placeholder="#{cc.attrs.placeholder}" id="input" disabled="#{cc.attrs.disabled}"
+    <h:inputSecret maxlength="#{cc.attrs.maxlength}" pt:placeholder="#{cc.attrs.placeholder}" id="inputsecret" disabled="#{cc.attrs.disabled}"
       styleClass="l--push-bottom-quarter #{cc.attrs.disabled ? 'is-disabled' : ''}" value="#{cc.attrs.value}" rendered="#{cc.attrs.masked}"/>
 
     <h:inputText maxlength="#{cc.attrs.maxlength}" pt:placeholder="#{cc.attrs.placeholder}" id="input" disabled="#{cc.attrs.disabled}"

@@ -37,7 +37,7 @@ public class AdminController implements Serializable {
     private Messages msg;
 
     @Getter
-    private String storageDir;
+    private String dataDir;
 
     @Getter
     @Setter
@@ -51,7 +51,7 @@ public class AdminController implements Serializable {
 
     @PostConstruct
     public void init() {
-        storageDir = appConfiguration.getStorageDir();
+        dataDir = appConfiguration.getDataPath();
         deleteJobDir = appConfiguration.isDeleteJobDir();
         fieldsNeedEncryption =
             StringUtils.join(appConfiguration.getFieldsNeedEncryption(), ',');
