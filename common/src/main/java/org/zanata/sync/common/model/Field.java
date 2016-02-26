@@ -22,19 +22,21 @@ public class Field implements Serializable {
     private final String placeholder;
     private final String tooltip;
     private final Validator validator;
+    private final boolean isMasked;
 
     public Field(String key, String label, String placeholder, String tooltip,
-            FieldType type) {
-        this(key, label, placeholder, tooltip, null, type);
+        boolean isMasked, FieldType type) {
+        this(key, label, placeholder, tooltip, null, isMasked, type);
     }
 
     public Field(String key, String label, String placeholder, String tooltip,
-        Validator validator, FieldType type) {
+        Validator validator, boolean isMasked, FieldType type) {
         this.key = key;
         this.label = label;
         this.placeholder = placeholder;
         this.tooltip = tooltip;
         this.validator = validator;
+        this.isMasked = isMasked;
         this.type = type;
     }
 }

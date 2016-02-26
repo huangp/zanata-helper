@@ -34,6 +34,9 @@
   <composite:attribute name="disabled" type="java.lang.Boolean"
     shortDescription="readonly text field" default="false"/>
 
+  <composite:attribute name="masked" type="java.lang.Boolean"
+    shortDescription="mask the field" default="false"/>
+
   <composite:attribute name="labelStyle" type="java.lang.String"
     shortDescription="css style for label"/>
 
@@ -47,8 +50,11 @@
     class="#{cc.attrs.hasError ? 'form__item--error' : ''} #{cc.attrs.styleClass}" title="#{cc.attrs.tooltip}" id="#{cc.attrs.componentId}">
     <h:outputLabel for="input" styleClass="#{cc.attrs.labelStyle}"><h:outputText value="#{cc.attrs.label}" escape="false"/></h:outputLabel>
 
+    <h:inputSecret maxlength="#{cc.attrs.maxlength}" pt:placeholder="#{cc.attrs.placeholder}" id="input" disabled="#{cc.attrs.disabled}"
+      styleClass="l--push-bottom-quarter #{cc.attrs.disabled ? 'is-disabled' : ''}" value="#{cc.attrs.value}" rendered="#{cc.attrs.masked}"/>
+
     <h:inputText maxlength="#{cc.attrs.maxlength}" pt:placeholder="#{cc.attrs.placeholder}" id="input" disabled="#{cc.attrs.disabled}"
-      styleClass="l--push-bottom-quarter #{cc.attrs.disabled ? 'is-disabled' : ''}" value="#{cc.attrs.value}"/>
+      styleClass="l--push-bottom-quarter #{cc.attrs.disabled ? 'is-disabled' : ''}" value="#{cc.attrs.value}" rendered="#{not cc.attrs.masked}"/>
     <h:message for="input" styleClass="l--pad-all-quarter" errorClass="message--danger" />
     <ui:fragment rendered="#{cc.attrs.hasError}">
       <span class="l--pad-all-quarter message--danger">#{cc.attrs.errorMessage}</span>

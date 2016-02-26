@@ -107,6 +107,7 @@
                       value="#{cc.attrs.actionClass.form.srcRepoPluginConfig[srcRepoField.key]}"
                       styleClass="form__item" tooltip="#{srcRepoField.tooltip}"
                       placeholder="#{srcRepoField.placeholder}"
+                      masked="#{srcRepoField.masked}"
                       hasError="#{cc.attrs.actionClass.hasError(key)}"
                       errorMessage="#{cc.attrs.actionClass.getErrorMessage(key)}">
                     </c:textfield>
@@ -153,6 +154,7 @@
                       styleClass="form__item" tooltip="#{transPluginField.tooltip}"
                       placeholder="#{transPluginField.placeholder}"
                       hasError="#{cc.attrs.actionClass.hasError(key)}"
+                      masked="#{transPluginField.masked}"
                       errorMessage="#{cc.attrs.actionClass.getErrorMessage(key)}">
                     </c:textfield>
                   </ui:fragment>

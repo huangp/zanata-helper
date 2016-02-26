@@ -42,17 +42,17 @@ public class Plugin extends TranslationServerExecutor {
     public void initFields() {
         Field urlField = new Field("url", Messages.getString("field.url.label"),
                 "https://translate.zanata.org/zanata/iteration/view/zanata-server/master",
-                null, new UrlValidator(), FieldType.TEXT);
+                null, new UrlValidator(), false, FieldType.TEXT);
         Field usernameField =
                 new Field("username",
                         Messages.getString("field.username.label"),
                         "", Messages.getString("field.username.tooltip"),
-                        new StringValidator(1, null, true), FieldType.TEXT);
+                        new StringValidator(1, null, true), false, FieldType.TEXT);
         Field apiKeyField =
                 new Field("apiKey", Messages.getString("field.apiKey.label"),
                         "",
                         Messages.getString("field.apiKey.tooltip"),
-                        new StringValidator(1, null, true), FieldType.TEXT);
+                        new StringValidator(1, null, true), true, FieldType.TEXT);
 
         fields.put(urlField.getKey(), urlField);
         fields.put(usernameField.getKey(), usernameField);
