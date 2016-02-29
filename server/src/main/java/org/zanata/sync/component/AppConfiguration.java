@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 import org.zanata.sync.dao.SystemSettingsDAO;
@@ -42,6 +43,9 @@ public class AppConfiguration implements Serializable {
     private static final String SYS_PROP_DATA_PATH = "data.path";
     private static final String REPO_DIR = "repository";
     private static final Yaml YAML = new Yaml();
+
+    private static final String DEFAULT_PATH =
+        SystemUtils.IS_OS_WINDOWS ? "C:\\temp" : "/tmp";
 
     @Inject
     private SystemSettingsDAO systemSettingsDAO;
@@ -160,9 +164,8 @@ public class AppConfiguration implements Serializable {
         return FilenameUtils.concat(dbDir, DB_FILE_NAME);
     }
 
-    //TODO: need to check for windows system C:/temp
     private static String getDataPathSystemProp() {
-        String dataPath = System.getProperty(SYS_PROP_DATA_PATH, "/tmp");
+        String dataPath = System.getProperty(SYS_PROP_DATA_PATH, DEFAULT_PATH);
         return removeTrailingSlash(dataPath);
     }
 }
