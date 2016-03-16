@@ -3,7 +3,11 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
   xmlns:ui="http://java.sun.com/jsf/facelets"
   xmlns:c="http://java.sun.com/jsf/composite/component"
+  xmlns:f="http://java.sun.com/jsf/core"
   template="/WEB-INF/includes/template.xhtml">
+  <f:metadata>
+    <f:event type="preRenderView" listener="#{newWorkController.check()}"/>
+  </f:metadata>
 
   <ui:define name="content">
     <div class="l__wrapper">

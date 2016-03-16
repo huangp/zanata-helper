@@ -12,5 +12,6 @@
   </decorators>
   <interceptors>
     <class>org.zanata.sync.interceptor.WithRequestScopeInterceptor</class>
+    <class>org.apache.deltaspike.security.impl.extension.SecurityInterceptor</class>
   </interceptors>
 </beans>
