@@ -16,8 +16,10 @@ import org.apache.oltu.oauth2.client.response.OAuthAuthzResponse;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.google.common.base.Strings;
 
 /**
+ * This filter should only be accessed by Zanata after a successful OAuth authentication
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
  */
 //@WebFilter(filterName = "authorizationCodeFilter", urlPatterns = "/auth/*")
@@ -45,10 +47,10 @@ public class AuthorizationCodeFilter implements Filter {
             OAuthAuthzResponse oAuthResponse = OAuthAuthzResponse
                     .oauthCodeAuthzResponse(httpServletRequest);
             String code = oAuthResponse.getCode();
-            securityTokens.setAuthorizationCode(code);
+
+            securityTokens.requestOAuthTokens(code);
             // see org.zanata.sync.controller.ZanataSignIn
-            String originalRequest = httpServletRequest.getRequestURI()
-                    .replaceFirst("/auth/", "");
+            String originalRequest = httpServletRequest.getParameter("origin");
             httpServletResponse.sendRedirect(originalRequest);
         } catch (OAuthProblemException e) {
             log.warn("=== problem with OAuth", e);
@@ -57,9 +59,10 @@ public class AuthorizationCodeFilter implements Filter {
             httpServletResponse.setContentType("text/html");
             PrintWriter writer = httpServletResponse.getWriter();
             writer.print("<h2>error:</h2>");
-            writer.println(e.getError());
+            writer.println(e.getError() + ":" +  e.getDescription());
             writer.flush();
             writer.close();
+            return;
         }
         chain.doFilter(request, response);
     }

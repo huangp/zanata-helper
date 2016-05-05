@@ -48,11 +48,6 @@ public class SyncWorkForm implements Serializable {
     @Setter
     private String srcRepoPluginName;
 
-    @NotEmpty
-    @Size(max = 255)
-    @Setter
-    private String transServerPluginName;
-
     /**
      * If specified, it will encrypt field listed in config properties whose
      * value matches key in {@link SyncWorkForm#srcRepoPluginConfig} and {@link
@@ -84,7 +79,4 @@ public class SyncWorkForm implements Serializable {
         return repoSettingsPrefix;
     }
 
-    public static String getTransSettingsPrefix() {
-        return transSettingsPrefix;
-    }
 }

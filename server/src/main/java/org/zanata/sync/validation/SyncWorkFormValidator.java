@@ -61,8 +61,8 @@ public class SyncWorkFormValidator {
 
         errors.putAll(validateRepoFields(form.getSrcRepoPluginConfig(),
                 form.getSrcRepoPluginName()));
-        errors.putAll(validateTransFields(form.getTransServerPluginConfig(),
-                form.getTransServerPluginName()));
+        errors.putAll(validateTransFields(form.getTransServerPluginConfig()
+        ));
 
         return errors;
     }
@@ -78,9 +78,8 @@ public class SyncWorkFormValidator {
     }
 
     private Map<String, String> validateTransFields(
-            Map<String, String> config, String executorClass) {
-        TranslationServerExecutor executor =
-                pluginsService.getNewTransServerPlugin(executorClass);
+            Map<String, String> config) {
+        TranslationServerExecutor executor = new org.zanata.sync.plugin.zanata.Plugin(null);
         if(executor == null) {
             return new HashMap<>();
         }

@@ -4,6 +4,7 @@
   xmlns:ui="http://java.sun.com/jsf/facelets"
   xmlns:c="http://java.sun.com/jsf/composite/component"
   xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:h="http://java.sun.com/jsf/html"
   template="/WEB-INF/includes/template.xhtml">
   <f:metadata>
     <f:event type="preRenderView" listener="#{newWorkController.check()}"/>
@@ -17,6 +18,11 @@
             <a href="/home.jsf">#{msg['jsf.home']}</a>
           </p>
           <h1>#{msg['jsf.newWork']}</h1>
+
+          <h:panelGroup rendered="#{not empty securityTokens.zanataServerUrl}">
+            <p>#{securityTokens.zanataServerUrl}</p>
+            <h:link value="Connect to another Zanata server" outcome="/sign_in.xhtml?original=/work/new.jsf" />
+          </h:panelGroup>
 
           <c:workForm actionClass="#{newWorkController}" id="new-work-form"
             submitText="#{msg['jsf.newWork.createWork.button']}" styleClass="l--push-top-1"/>

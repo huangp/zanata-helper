@@ -56,6 +56,9 @@ public class JobStatusDAO {
     }
 
     private static Date toDate(Timestamp timestamp) {
+        if (timestamp == null) {
+            return null;
+        }
         return new Date(timestamp.getTime());
     }
 
@@ -68,6 +71,7 @@ public class JobStatusDAO {
                 JOB_STATUS_TABLE.STARTTIME, JOB_STATUS_TABLE.ENDTIME,
                 JOB_STATUS_TABLE.NEXTSTARTTIME)
                 .values(config.getId(), type.name(), jobStatus.getStatus(),
+                        // TODO pahuang lastStartTime can be null
                         toTimestamp(jobStatus.getLastStartTime()),
                         toTimestamp(jobStatus.getLastEndTime()),
                         toTimestamp(jobStatus.getNextStartTime()))
@@ -77,6 +81,10 @@ public class JobStatusDAO {
     }
 
     private static Timestamp toTimestamp(Date date) {
+        // TODO pahuang for manual fired job, some of the fireTime will be null
+        if (date == null) {
+            return null;
+        }
         return new Timestamp(date.getTime());
     }
 }

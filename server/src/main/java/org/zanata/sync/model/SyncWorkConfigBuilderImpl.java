@@ -38,7 +38,6 @@ public class SyncWorkConfigBuilderImpl implements SyncWorkConfigBuilder {
             syncWorkForm.getSrcRepoPluginConfig(),
             syncWorkForm.getSrcRepoPluginName(),
             syncWorkForm.getTransServerPluginConfig(),
-            syncWorkForm.getTransServerPluginName(),
             syncWorkForm.getEncryptionKey(),
             syncWorkForm.isSyncToServerEnabled(),
             syncWorkForm.isSyncToRepoEnabled());
@@ -53,7 +52,6 @@ public class SyncWorkConfigBuilderImpl implements SyncWorkConfigBuilder {
         form.setDescription(syncWorkConfig.getDescription());
         form.setEncryptionKey(syncWorkConfig.getEncryptionKey());
         form.setSrcRepoPluginName(syncWorkConfig.getSrcRepoPluginName());
-        form.setTransServerPluginName(syncWorkConfig.getTransServerPluginName());
 
         form.setSrcRepoPluginConfig(syncWorkConfig.getSrcRepoPluginConfig());
         form.setTransServerPluginConfig(

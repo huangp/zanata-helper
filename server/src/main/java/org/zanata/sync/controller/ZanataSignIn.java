@@ -13,6 +13,7 @@ import org.apache.oltu.oauth2.client.request.OAuthClientRequest;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zanata.sync.security.SecurityTokens;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
@@ -41,8 +42,12 @@ public class ZanataSignIn {
     @Getter
     private String originalRequest;
 
+    @Inject
+    private SecurityTokens securityTokens;
+
     @Getter
     private List<String> productionServerUrls = ImmutableList.<String>builder()
+            .add("http://localhost:8180/zanata")
             .add("http://localhost:8080/zanata")
             .add("https://translate.zanata.org")
             .add("https://translate.jboss.org")
@@ -70,10 +75,14 @@ public class ZanataSignIn {
                 return;
             }
 
+            securityTokens.setZanataServerUrl(selectedUrl);
+
+            // we prepend /auth/ to redirect url so that it can hit the web filter
+            // see AuthorizationCodeFilter
             OAuthClientRequest request = OAuthClientRequest
                     .authorizationLocation(zanataAuthUrl)
                     .setClientId("zanata_sync")
-                    .setRedirectURI(appRoot() + "/auth/" + originalRequest)
+                    .setRedirectURI(appRoot() + "/auth/?origin=" + Strings.nullToEmpty(originalRequest))
                     .buildQueryMessage();
 
             log.info("=========== redirecting to {}", request.getLocationUri());

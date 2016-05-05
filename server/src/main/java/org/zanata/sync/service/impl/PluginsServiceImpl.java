@@ -5,9 +5,7 @@ import org.scannotation.AnnotationDB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zanata.sync.common.annotation.RepoPlugin;
-import org.zanata.sync.common.annotation.TranslationServerPlugin;
 import org.zanata.sync.common.plugin.RepoExecutor;
-import org.zanata.sync.common.plugin.TranslationServerExecutor;
 import org.zanata.sync.exception.UnableLoadPluginException;
 import org.zanata.sync.service.PluginsService;
 
@@ -41,9 +39,6 @@ public class PluginsServiceImpl implements PluginsService {
     private static Map<String, Class<? extends RepoExecutor>>
         sourceRepoPluginMap;
 
-    private static Map<String, Class<? extends TranslationServerExecutor>>
-        transServerPluginMap;
-
     /**
      * Initiate all plugins available
      */
@@ -71,8 +66,6 @@ public class PluginsServiceImpl implements PluginsService {
             db.scanArchives(urls);
 
             sourceRepoPluginMap = buildPluginMap(db, cl, RepoPlugin.class);
-            transServerPluginMap =
-                    buildPluginMap(db, cl, TranslationServerPlugin.class);
         } catch (IOException | ClassNotFoundException e) {
             throw Throwables.propagate(e);
         }
@@ -112,40 +105,11 @@ public class PluginsServiceImpl implements PluginsService {
     }
 
     @Override
-    public List<TranslationServerExecutor> getAvailableTransServerPlugins() {
-        List<TranslationServerExecutor> result = new ArrayList<>();
-        for (Class plugin : transServerPluginMap.values()) {
-            try {
-                TranslationServerExecutor executor =
-                    getNewTransServerPlugin(plugin.getName(), null);
-                result.add(executor);
-            } catch (UnableLoadPluginException e) {
-                log.warn("Unable to load plugin " + e.getMessage());
-            }
-        }
-        return result;
-    }
-
-    @Override
     public RepoExecutor getNewSourceRepoPlugin(String className) {
         for (Class plugin : sourceRepoPluginMap.values()) {
             if (plugin.getName().equals(className)) {
                 try {
                     return getNewSourceRepoPlugin(plugin.getName(), null);
-                } catch (UnableLoadPluginException e) {
-                    log.warn("Unable to load plugin " + e.getMessage());
-                }
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public TranslationServerExecutor getNewTransServerPlugin(String className) {
-        for (Class plugin : transServerPluginMap.values()) {
-            if (plugin.getName().equals(className)) {
-                try {
-                    return getNewTransServerPlugin(plugin.getName(), null);
                 } catch (UnableLoadPluginException e) {
                     log.warn("Unable to load plugin " + e.getMessage());
                 }
@@ -168,18 +132,4 @@ public class PluginsServiceImpl implements PluginsService {
         }
     }
 
-    @Override
-    public TranslationServerExecutor getNewTransServerPlugin(
-        String className,
-        Map<String, String> fields) throws UnableLoadPluginException {
-        Class<? extends TranslationServerExecutor>
-            executor = transServerPluginMap.get(className);
-        try {
-            return executor.getDeclaredConstructor(Map.class)
-                .newInstance(fields);
-        } catch (Exception e) {
-            log.error("failed to get new trans server plugin", e);
-            throw new UnableLoadPluginException(className);
-        }
-    }
 }

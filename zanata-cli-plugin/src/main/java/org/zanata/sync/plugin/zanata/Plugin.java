@@ -21,7 +21,7 @@ import java.util.Map;
 @TranslationServerPlugin
 public class Plugin extends TranslationServerExecutor {
 
-    private final String name = "Zanata Server plugin";
+    private final String name = "Zanata Server";
     private final String description = Messages.getString("plugin.description");
     private final ZanataSyncServiceImpl zanataSyncService;
 
@@ -40,9 +40,7 @@ public class Plugin extends TranslationServerExecutor {
 
     @Override
     public void initFields() {
-        Field urlField = new Field("url", Messages.getString("field.url.label"),
-                "https://translate.zanata.org/zanata/iteration/view/zanata-server/master",
-                null, new UrlValidator(), false, FieldType.TEXT);
+
         Field usernameField =
                 new Field("username",
                         Messages.getString("field.username.label"),
@@ -52,9 +50,8 @@ public class Plugin extends TranslationServerExecutor {
                 new Field("apiKey", Messages.getString("field.apiKey.label"),
                         "",
                         Messages.getString("field.apiKey.tooltip"),
-                        new StringValidator(1, null, true), true, FieldType.TEXT);
+                        new StringValidator(1, null, true), false, FieldType.TEXT);
 
-        fields.put(urlField.getKey(), urlField);
         fields.put(usernameField.getKey(), usernameField);
         fields.put(apiKeyField.getKey(), apiKeyField);
     }

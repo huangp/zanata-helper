@@ -23,7 +23,13 @@ public class UrlValidatorTest {
 
     @Test
     public void localUrlIsValid() {
-        String invalidUrl = "http://localhost:8080/zanata/";
-        Assertions.assertThat(urlValidator.validate(invalidUrl)).isNull();
+        String validUrl = "http://localhost:8080/zanata/";
+        Assertions.assertThat(urlValidator.validate(validUrl)).isNull();
+    }
+
+    @Test
+    public void fileUrlIsValid() {
+        String fileUrl = "file:///home/work/project.git";
+        Assertions.assertThat(urlValidator.validate(fileUrl)).isNull();
     }
 }

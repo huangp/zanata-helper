@@ -45,12 +45,12 @@ public class Plugin extends RepoExecutor {
                 new Field("username",
                         Messages.getString("field.username.label"),
                         "", Messages.getString("field.username.tooltip"),
-                        new StringValidator(1, null, true), false, FieldType.TEXT);
+                        new StringValidator(1, null, false), false, FieldType.TEXT);
         Field apiKeyField =
                 new Field("apiKey", Messages.getString("field.apiKey.label"),
                         "",
                         Messages.getString("field.apiKey.tooltip"),
-                        new StringValidator(1, null, true), true, FieldType.TEXT);
+                        new StringValidator(1, null, false), true, FieldType.TEXT);
 
         fields.put(urlField.getKey(), urlField);
         fields.put(branchField.getKey(), branchField);

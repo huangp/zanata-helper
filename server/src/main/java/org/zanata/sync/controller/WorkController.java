@@ -126,7 +126,7 @@ public class WorkController extends HasFormController {
         Response response = workResourceImpl.updateWork(form);
         errors = (Map<String, String>) response.getEntity();
         if (!errors.isEmpty()) {
-            return "/work/home.jsf";
+            return null;
         }
         FacesContext.getCurrentInstance().getExternalContext()
             .redirect("/home.jsf");

@@ -21,6 +21,10 @@
     <appender-ref ref="STDOUT" />
   </logger>
 
+  <logger name="org.zanata.client" level="info" additivity="false">
+    <appender-ref ref="STDOUT" />
+  </logger>
+
   <logger name="com.sun.faces.context.ExceptionHandlerImpl" level="error" additivity="false">
     <appender-ref ref="STDOUT" />
   </logger>

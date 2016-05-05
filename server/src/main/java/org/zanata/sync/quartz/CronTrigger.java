@@ -26,6 +26,7 @@ import org.zanata.sync.model.JobType;
 import org.zanata.sync.model.SyncWorkConfig;
 import org.zanata.sync.model.JobStatus;
 import org.zanata.sync.component.AppConfiguration;
+import org.zanata.sync.plugin.zanata.Plugin;
 import org.zanata.sync.service.PluginsService;
 
 import java.util.ArrayList;
@@ -139,11 +140,8 @@ public class CronTrigger {
 
             jobDetail.getJobDataMap()
                 .put(TranslationServerExecutor.class.getSimpleName(),
-                    pluginsService
-                        .getNewTransServerPlugin(
-                            syncWorkConfig
-                                .getTransServerPluginName(),
-                            syncWorkConfig.getTransServerPluginConfig()));
+                        new Plugin(syncWorkConfig.getTransServerPluginConfig())
+                    );
 
             if (scheduler.getListenerManager().getJobListeners().isEmpty()) {
                 scheduler.getListenerManager()

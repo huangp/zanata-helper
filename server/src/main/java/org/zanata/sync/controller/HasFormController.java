@@ -10,6 +10,7 @@ import org.zanata.sync.common.model.SyncOption;
 import org.zanata.sync.common.plugin.RepoExecutor;
 import org.zanata.sync.common.plugin.TranslationServerExecutor;
 import org.zanata.sync.i18n.Messages;
+import org.zanata.sync.plugin.zanata.Plugin;
 import org.zanata.sync.service.PluginsService;
 import org.zanata.sync.util.CronHelper;
 
@@ -40,11 +41,9 @@ public abstract class HasFormController implements Serializable {
 
     protected SyncWorkForm form;
 
-    protected List<RepoExecutor> repoExecutors;
+    private List<RepoExecutor> repoExecutors;
 
-    protected List<TranslationServerExecutor> transServerExecutors;
-
-    protected List<Field> syncOptions;
+    private List<Field> syncOptions;
 
     abstract protected Messages getMessage();
 
@@ -59,9 +58,7 @@ public abstract class HasFormController implements Serializable {
         if(!getRepoExecutors().isEmpty()) {
             selectedSrcPlugin = getRepoExecutors().get(0);
         }
-        if(!getTransServerExecutors().isEmpty()) {
-            selectedServerPlugin = getTransServerExecutors().get(0);
-        }
+        selectedServerPlugin = new Plugin(null);
     }
 
     public List<RepoExecutor> getRepoExecutors() {
@@ -72,24 +69,16 @@ public abstract class HasFormController implements Serializable {
         return repoExecutors;
     }
 
-    public List<TranslationServerExecutor> getTransServerExecutors() {
-        if (transServerExecutors == null) {
-            transServerExecutors =
-                getPluginService().getAvailableTransServerPlugins();
-        }
-        return transServerExecutors;
-    }
-
     public List<Field> getSelectedSrcPluginFields() {
         if(selectedSrcPlugin != null) {
-            return new ArrayList(selectedSrcPlugin.getFields().values());
+            return new ArrayList<>(selectedSrcPlugin.getFields().values());
         }
         return Collections.emptyList();
     }
 
     public List<Field> getSelectedServerPluginFields() {
         if(selectedServerPlugin != null) {
-            return new ArrayList(selectedServerPlugin.getFields().values());
+            return new ArrayList<>(selectedServerPlugin.getFields().values());
         }
         return Collections.emptyList();
     }

@@ -31,7 +31,6 @@ public class SyncWorkConfig extends PersistModel {
             new HashMap<>();
 
     private String srcRepoPluginName;
-    private String transServerPluginName;
 
     private String encryptionKey;
 
@@ -46,8 +45,8 @@ public class SyncWorkConfig extends PersistModel {
             JobConfig syncToServerConfig, JobConfig syncToRepoConfig,
             Map<String, String> srcRepoPluginConfig, String srcRepoPluginName,
             Map<String, String> transServerPluginConfig,
-            String transServerPluginName, String encryptionKey,
-            boolean syncToServerEnabled,  boolean syncToRepoEnabled) {
+            String encryptionKey,
+            boolean syncToServerEnabled, boolean syncToRepoEnabled) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -56,7 +55,6 @@ public class SyncWorkConfig extends PersistModel {
         this.srcRepoPluginConfig = srcRepoPluginConfig;
         this.srcRepoPluginName = srcRepoPluginName;
         this.transServerPluginConfig = transServerPluginConfig;
-        this.transServerPluginName = transServerPluginName;
         this.encryptionKey = encryptionKey;
         this.syncToServerEnabled = syncToServerEnabled;
         this.syncToRepoEnabled = syncToRepoEnabled;
@@ -81,7 +79,6 @@ public class SyncWorkConfig extends PersistModel {
                 Objects.equals(transServerPluginConfig,
                         that.transServerPluginConfig) &&
                 Objects.equals(srcRepoPluginName, that.srcRepoPluginName) &&
-                Objects.equals(transServerPluginName, that.transServerPluginName) &&
                 Objects.equals(syncToServerEnabled, that.syncToServerEnabled) &&
                 Objects.equals(syncToRepoEnabled, that.syncToRepoEnabled);
     }
@@ -92,7 +89,7 @@ public class SyncWorkConfig extends PersistModel {
             .hash(id, name, description, syncToServerConfig,
                 syncToRepoConfig, srcRepoPluginConfig,
                 transServerPluginConfig, srcRepoPluginName,
-                transServerPluginName, createdDate, syncToServerEnabled,
+                createdDate, syncToServerEnabled,
                 syncToRepoEnabled);
     }
 

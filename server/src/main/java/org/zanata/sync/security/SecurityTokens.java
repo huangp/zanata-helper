@@ -2,6 +2,8 @@ package org.zanata.sync.security;
 
 import java.io.Serializable;
 import javax.enterprise.context.SessionScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.oltu.oauth2.client.OAuthClient;
 import org.apache.oltu.oauth2.client.URLConnectionClient;
@@ -11,34 +13,45 @@ import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.apache.oltu.oauth2.common.token.OAuthToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.zanata.rest.dto.Account;
+import org.zanata.sync.util.ZanataRestClient;
 import com.google.common.base.Throwables;
 
 /**
  * @author Patrick Huang <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
  */
 @SessionScoped
+@Named("securityTokens")
 public class SecurityTokens implements Serializable {
-    private String authorizationCode;
+    private static final Logger log =
+            LoggerFactory.getLogger(SecurityTokens.class);
+    @Inject
+    private ZanataRestClient zanataRestClient;
 
-    public void setAuthorizationCode(String authorizationCode) {
-        this.authorizationCode = authorizationCode;
+    private String accessToken;
+    private String refreshToken;
+    private String zanataServerUrl;
+    private String zanataUsername;
+    private String zanataApiKey;
+
+    boolean hasAccess() {
+        return refreshToken != null;
     }
 
-    public boolean hasAccess() {
-        return authorizationCode != null;
-    }
-
-    public OAuthToken getOAuthToken() {
-        if (!hasAccess()) {
-            throw new IllegalStateException("You do not have authorization code");
+    OAuthToken requestOAuthTokens(String authorizationCode) {
+        if (zanataServerUrl == null) {
+            throw new IllegalStateException("You are not authorized to one Zanata server");
         }
         try {
+            // TODO pahuang we only need to get access token and refresh token once (then we should persist the refresh token)
             OAuthClientRequest request = OAuthClientRequest
-                    .tokenLocation("http://localhost:8080/zanata/rest/oauth/token")
+                    .tokenLocation(zanataServerUrl + "/rest/oauth/token")
                     .setGrantType(GrantType.AUTHORIZATION_CODE)
                     .setClientId("zanata_sync")
                     .setClientSecret("we_do_not_have_a_secret")
-                    .setRedirectURI("http://www.example.com/redirect")
+                    .setRedirectURI("http://www.not.in.use.but.required")
                     .setCode(authorizationCode)
                     .buildBodyMessage();
 
@@ -48,9 +61,48 @@ public class SecurityTokens implements Serializable {
             OAuthJSONAccessTokenResponse accessTokenResponse =
                     oAuthClient.accessToken(request, "POST");
 
-            return accessTokenResponse.getOAuthToken();
+            OAuthToken oAuthToken = accessTokenResponse.getOAuthToken();
+            accessToken = oAuthToken.getAccessToken();
+            refreshToken = oAuthToken.getRefreshToken();
+
+            System.out.println("================== ac " + accessToken);
+            System.out.println("================== refresh " + refreshToken);
+            System.out.println("================== expires in " + oAuthToken.getExpiresIn());
+
+
+            // this should change once we have Zanata all converted to use OAuth
+            Account account = zanataRestClient.getAuthorizedAccount();
+            log.info("========= my account: {}", account);
+            zanataUsername = account.getUsername();
+            zanataApiKey = account.getApiKey();
+
+            return oAuthToken;
         } catch (OAuthSystemException | OAuthProblemException e) {
             throw Throwables.propagate(e);
         }
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public String getZanataServerUrl() {
+        return zanataServerUrl;
+    }
+
+    public void setZanataServerUrl(String zanataServerUrl) {
+        this.zanataServerUrl = zanataServerUrl;
+    }
+
+    public String getZanataUsername() {
+        return zanataUsername;
+    }
+
+    public String getZanataApiKey() {
+        return zanataApiKey;
     }
 }

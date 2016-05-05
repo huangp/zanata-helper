@@ -125,49 +125,6 @@
         </div>
 
         <div class="l--push-top-1">
-          <h2 class="heading--secondary l--push-top-half">
-            #{msg['jsf.work.transServer.settings']}
-          </h2>
-
-          <h:selectOneMenu value="#{cc.attrs.actionClass.form.transServerPluginName}">
-            <f:selectItems value="#{cc.attrs.actionClass.transServerExecutors}"
-              var="plugin"
-              itemLabel="#{plugin.getName()}"
-              itemValue="#{plugin.getClass().getName()}"/>
-            <a4j:ajax event="change" render="selectedServerPlugin"/>
-          </h:selectOneMenu>
-
-          <h:panelGroup layout="block" id="selectedServerPlugin">
-            <ui:fragment rendered="#{cc.attrs.actionClass.selectedServerPlugin ne null}">
-              <div
-                class="txt--meta l--push-v-quarter">#{cc.attrs.actionClass.selectedServerPlugin.getDescription()}</div>
-              <hr class="l--push-top-quarter"/>
-              <div class="form__item">
-                <ui:repeat value="#{cc.attrs.actionClass.selectedServerPluginFields}"
-                  var="transPluginField">
-                  <ui:param name="key"
-                    value="#{cc.attrs.actionClass.form.getTransSettingsPrefix()}#{transPluginField.key}"/>
-                  <ui:fragment rendered="#{transPluginField.type eq 'TEXT'}">
-                    <c:textfield componentId="#{key}"
-                      label="#{transPluginField.label}"
-                      value="#{cc.attrs.actionClass.form.transServerPluginConfig[transPluginField.key]}"
-                      styleClass="form__item" tooltip="#{transPluginField.tooltip}"
-                      placeholder="#{transPluginField.placeholder}"
-                      hasError="#{cc.attrs.actionClass.hasError(key)}"
-                      masked="#{transPluginField.masked}"
-                      errorMessage="#{cc.attrs.actionClass.getErrorMessage(key)}">
-                    </c:textfield>
-                  </ui:fragment>
-                  <ui:fragment rendered="#{transPluginField.type eq 'CHECKBOX'}">
-                    <c:checkbox componentId="#{key}" styleClass="form__item"
-                      value="#{cc.attrs.actionClass.form.transServerPluginConfig[transPluginField.key]}"
-                      label="#{transPluginField.label}"
-                      tooltip="#{transPluginField.tooltip}"/>
-                  </ui:fragment>
-                </ui:repeat>
-              </div>
-            </ui:fragment>
-          </h:panelGroup>
 
           <div class="form__item l--push-top-1">
             <h:commandButton styleClass="button button--primary button--full"

@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS Job_Status_table (
     startTime TIMESTAMP,
     endTime TIMESTAMP,
     nextStartTime TIMESTAMP,
-    FOREIGN KEY (workId) REFERENCES Sync_Work_Config_table (id)
+    FOREIGN KEY (workId) REFERENCES Sync_Work_Config_table (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS System_Settings_table (
