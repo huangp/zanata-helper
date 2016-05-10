@@ -18,15 +18,18 @@ import org.zanata.sync.model.SyncWorkConfig;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Slf4j
-public abstract class SyncJob implements InterruptableJob {
+abstract class SyncJob implements InterruptableJob {
 
-    protected File basedir;
+    private File basedir;
     protected SyncWorkConfig syncWorkConfig;
-    protected boolean cleanDir = true;
-    protected boolean interrupted = false;
-    protected JobType jobType;
+    boolean interrupted = false;
+    private JobType jobType;
 
     @Override
     public final void execute(JobExecutionContext context)
@@ -39,8 +42,6 @@ public abstract class SyncJob implements InterruptableJob {
             basedir =
                     (File) context.getJobDetail().getJobDataMap()
                             .get("basedir");
-
-            cleanDir = (Boolean) context.getJobDetail().getJobDataMap().get("cleanDir");
 
             jobType = (JobType) context.getJobDetail().getJobDataMap().get("jobType");
 
@@ -59,10 +60,21 @@ public abstract class SyncJob implements InterruptableJob {
             log.error("Error running sync job.", e);
             hasError = true;
         } finally {
-            if(cleanDir) {
-                cleanupDirectory(
-                    new File(basedir, syncWorkConfig.getId().toString()));
+            File workingDir = new File(basedir, syncWorkConfig.getId().toString());
+            if (log.isDebugEnabled()) {
+                try {
+                    Path tempDir =
+                            Files.createTempDirectory(LocalDate.now().format(
+                                    DateTimeFormatter.ofPattern("yyyy-MM-dd_")));
+                    log.debug("======= move job working directory to {}", tempDir);
+                    FileUtils.copyDirectory(workingDir, tempDir.toFile());
+                } catch (IOException e) {
+                    log.debug(
+                            "error copying working dir to temp folder for work: {}",
+                            syncWorkConfig.getId());
+                }
             }
+            cleanupDirectory(workingDir);
             if(!interrupted) {
                 JobRunCompletedEvent event;
                 if (hasError) {

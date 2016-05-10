@@ -27,8 +27,7 @@ import com.google.common.collect.ImmutableList;
 public class SystemSettingsDAO {
     private static final Logger log =
             LoggerFactory.getLogger(SystemSettingsDAO.class);
-    
-    public static final String DELETE_JOB_DIR = "DELETE_JOB_DIR";
+
     public static final String ENCRYPTION_FIELDS = "ENCRYPTION_FIELDS";
 
     @Inject
@@ -50,12 +49,10 @@ public class SystemSettingsDAO {
         }
         return systemSettings;
     }
-    
+
     private void populateSystemSettings(String key, String value,
             SystemSettings systemSettings) {
-       if(key.equals(DELETE_JOB_DIR)) {
-            systemSettings.setDeleteJobDir(Boolean.valueOf(value));
-        } else if(key.equals(ENCRYPTION_FIELDS)) {
+        if(key.equals(ENCRYPTION_FIELDS)) {
             systemSettings.setFieldsNeedEncryption(ImmutableList.copyOf(
                 Splitter.on(",").omitEmptyStrings().trimResults().split(value)));
         }
@@ -67,8 +64,6 @@ public class SystemSettingsDAO {
 
         dslContext.insertInto(SYSTEM_SETTINGS_TABLE, SYSTEM_SETTINGS_TABLE.KEY,
                 SYSTEM_SETTINGS_TABLE.VALUE)
-                .values(DELETE_JOB_DIR,
-                        Boolean.toString(systemSettings.isDeleteJobDir()))
                 .values(ENCRYPTION_FIELDS, Joiner.on(",")
                         .join(systemSettings.getFieldsNeedEncryption()))
                 .execute();

@@ -22,14 +22,10 @@ public class SystemSettings implements Serializable {
     @NotEmpty
     private String dataPath;
 
-    private boolean deleteJobDir = true;
-
     @NotNull
     private List<String> fieldsNeedEncryption = Lists.newArrayList("apiKey");
 
-    public void updateSettings(boolean deleteJobDir,
-            List<String> fieldsNeedEncryption) {
-        this.deleteJobDir = deleteJobDir;
+    public void updateSettings(List<String> fieldsNeedEncryption) {
         this.fieldsNeedEncryption = fieldsNeedEncryption;
     }
 }

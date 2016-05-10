@@ -52,7 +52,6 @@ public class AdminController implements Serializable {
     @PostConstruct
     public void init() {
         dataDir = appConfiguration.getDataPath();
-        deleteJobDir = appConfiguration.isDeleteJobDir();
         fieldsNeedEncryption =
             StringUtils.join(appConfiguration.getFieldsNeedEncryption(), ',');
     }

@@ -128,8 +128,6 @@ public class CronTrigger {
             jobDetail.getJobDataMap()
                     .put("basedir", type.baseWorkDir(
                             appConfiguration.getRepoDir()));
-            jobDetail.getJobDataMap().put("cleanDir",
-                    appConfiguration.isDeleteJobDir());
             jobDetail.getJobDataMap().put("jobType", type);
 
             jobDetail.getJobDataMap()

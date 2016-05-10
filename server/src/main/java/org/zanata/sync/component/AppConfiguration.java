@@ -101,7 +101,7 @@ public class AppConfiguration implements Serializable {
 
     public void updateSettingsAndSave(boolean deleteJobDir,
             List<String> fieldsNeedEncryption) {
-        systemSettings.updateSettings(deleteJobDir, fieldsNeedEncryption);
+        systemSettings.updateSettings(fieldsNeedEncryption);
         systemSettingsDAO.persist(systemSettings);
     }
 
@@ -146,10 +146,6 @@ public class AppConfiguration implements Serializable {
 
     public String getDataPath() {
         return systemSettings.getDataPath();
-    }
-
-    public boolean isDeleteJobDir() {
-        return systemSettings.isDeleteJobDir();
     }
 
     public String getDBFilePath() {
