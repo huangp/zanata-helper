@@ -32,7 +32,6 @@ import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.StatusCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,42 +65,10 @@ public class GitSyncService implements RepoSyncService<String> {
 
     public void cloneRepo(String repoUrl, String branch, File destPath)
             throws RepoSyncException {
-        if (isGitCloneAlreadyBeenDone(destPath)) {
-            log.info("git repo already exists. Skipping clone");
-            doGitFetch(destPath);
-        } else {
-            // directory is not a git repository
-            log.debug("doing git clone");
-            doGitClone(repoUrl, destPath);
-        }
+
+        log.debug("doing git clone");
+        doGitClone(repoUrl, destPath);
         checkOutBranch(destPath, branch);
-    }
-
-    private void doGitFetch(File destPath) {
-        try {
-            Git git = Git.open(destPath);
-            git.fetch().setRemote("origin").call();
-        } catch (IOException ioe) {
-            // ignore
-        } catch (Exception e) {
-            log.error("fail to call git pull", e);
-            throw new RepoSyncException(e);
-        }
-    }
-
-    private boolean isGitCloneAlreadyBeenDone(File folder) {
-        return /*RepositoryCache.FileKey.isGitRepository(folder, FS.DETECTED) &&*/
-                hasAtLeastOneReference(folder);
-    }
-
-    private static boolean hasAtLeastOneReference(File folder) {
-        try {
-            Repository repo = Git.open(folder).getRepository();
-            return repo.getAllRefs().values().stream()
-                    .anyMatch(ref -> ref.getObjectId() != null);
-        } catch (IOException e) {
-            return false;
-        }
     }
 
     private void doGitClone(String repoUrl, File destPath) {
@@ -154,31 +121,24 @@ public class GitSyncService implements RepoSyncService<String> {
             }
 
             /**
-             * If branch found in local and is not master, delete it, create new local branch from remote.
+             * If branch found in local, use it.
              * If branch does not exists in remote, create new local branch based on master branch.
              */
-            Ref ref;
-            if (localBranchRef.isPresent()) {
-                git.checkout().setName("master").setForce(true).call();
-                git.branchDelete().setBranchNames(branch).call();
-            }
-
-            if (remoteBranchRef.isPresent()) {
-                ref = git.branchCreate()
+            if (!localBranchRef.isPresent() && remoteBranchRef.isPresent()) {
+                git.branchCreate()
                         .setForce(true).setName(branch)
                         .setStartPoint("origin/" + branch)
                         .setUpstreamMode(
                         CreateBranchCommand.SetupUpstreamMode.SET_UPSTREAM)
                         .call();
-            } else {
-                ref = git.branchCreate()
+            } else if (!localBranchRef.isPresent()) {
+                git.branchCreate()
                     .setForce(true).setName(branch)
                     .setStartPoint("origin/master")
                     .setUpstreamMode(
                         CreateBranchCommand.SetupUpstreamMode.SET_UPSTREAM)
                     .call();
             }
-            log.debug("checked out {}", ref);
             git.checkout().setName(branch).call();
             if (log.isDebugEnabled()) {
                 log.debug("current branch is: {}", git.getRepository().getBranch());
