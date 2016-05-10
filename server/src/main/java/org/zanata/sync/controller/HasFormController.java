@@ -12,7 +12,7 @@ import org.zanata.sync.common.plugin.TranslationServerExecutor;
 import org.zanata.sync.i18n.Messages;
 import org.zanata.sync.plugin.zanata.Plugin;
 import org.zanata.sync.service.PluginsService;
-import org.zanata.sync.util.CronHelper;
+import org.zanata.sync.util.CronType;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -109,7 +109,7 @@ public abstract class HasFormController implements Serializable {
         return errors.get(fieldName);
     }
 
-    public List<CronHelper.CronType> getSupportedIntervals() {
-        return Lists.newArrayList(CronHelper.CronType.values());
+    public List<CronType> getSupportedIntervals() {
+        return Lists.newArrayList(CronType.values());
     }
 }

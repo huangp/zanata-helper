@@ -7,7 +7,7 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.NotEmpty;
 import org.zanata.sync.common.model.SyncOption;
-import org.zanata.sync.util.CronHelper;
+import org.zanata.sync.util.CronType;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,13 +35,13 @@ public class SyncWorkForm implements Serializable {
     private String description;
 
     @Setter
-    private CronHelper.CronType syncToServerCron;
+    private CronType syncToServerCron;
 
     @Setter
     private SyncOption syncToServerOption = SyncOption.SOURCE;
 
     @Setter
-    private CronHelper.CronType syncToRepoCron;
+    private CronType syncToRepoCron;
 
     @NotEmpty
     @Size(max = 255)

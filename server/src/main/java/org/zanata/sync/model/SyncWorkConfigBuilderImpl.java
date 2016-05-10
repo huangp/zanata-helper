@@ -2,7 +2,7 @@ package org.zanata.sync.model;
 
 import org.zanata.sync.common.model.SyncOption;
 import org.zanata.sync.controller.SyncWorkForm;
-import org.zanata.sync.util.CronHelper;
+import org.zanata.sync.util.CronType;
 
 import javax.enterprise.context.RequestScoped;
 
@@ -62,12 +62,12 @@ public class SyncWorkConfigBuilderImpl implements SyncWorkConfigBuilder {
                 syncWorkConfig.getSyncToServerConfig().getOption());
 
             form.setSyncToServerCron(
-                CronHelper.getTypeFromExpression(
+                CronType.getTypeFromExpression(
                     syncWorkConfig.getSyncToServerConfig().getCron()));
         }
 
         if(syncWorkConfig.getSyncToRepoConfig() != null) {
-            form.setSyncToRepoCron(CronHelper.getTypeFromExpression(
+            form.setSyncToRepoCron(CronType.getTypeFromExpression(
                 syncWorkConfig.getSyncToRepoConfig().getCron()));
         }
 
