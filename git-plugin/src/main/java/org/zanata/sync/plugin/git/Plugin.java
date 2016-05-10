@@ -8,7 +8,6 @@ import org.zanata.sync.common.exception.RepoSyncException;
 import org.zanata.sync.common.model.Field;
 import org.zanata.sync.common.annotation.RepoPlugin;
 import org.zanata.sync.common.plugin.RepoExecutor;
-import org.zanata.sync.common.validator.StringValidator;
 import org.zanata.sync.plugin.git.service.impl.GitSyncService;
 import org.zanata.sync.common.validator.UrlValidator;
 
@@ -45,12 +44,12 @@ public class Plugin extends RepoExecutor {
                 new Field("username",
                         Messages.getString("field.username.label"),
                         "", Messages.getString("field.username.tooltip"),
-                        new StringValidator(1, null, false), false, FieldType.TEXT);
+                        false, FieldType.TEXT);
         Field apiKeyField =
                 new Field("apiKey", Messages.getString("field.apiKey.label"),
                         "",
                         Messages.getString("field.apiKey.tooltip"),
-                        new StringValidator(1, null, false), true, FieldType.TEXT);
+                        true, FieldType.TEXT);
 
         fields.put(urlField.getKey(), urlField);
         fields.put(branchField.getKey(), branchField);

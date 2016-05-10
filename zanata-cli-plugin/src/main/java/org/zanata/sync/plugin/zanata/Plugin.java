@@ -8,7 +8,6 @@ import org.zanata.sync.common.model.SyncOption;
 import org.zanata.sync.common.model.Field;
 import org.zanata.sync.common.plugin.TranslationServerExecutor;
 import org.zanata.sync.common.validator.StringValidator;
-import org.zanata.sync.common.validator.UrlValidator;
 import org.zanata.sync.plugin.zanata.exception.ZanataSyncException;
 import org.zanata.sync.plugin.zanata.service.impl.ZanataSyncServiceImpl;
 

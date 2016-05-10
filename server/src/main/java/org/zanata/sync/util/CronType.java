@@ -7,6 +7,7 @@ import lombok.Getter;
  */
 @Getter
 public enum CronType {
+    MANUAL("Only run manually by user", ""),
     ONE_HOUR("Hourly", "0 0 0/1 * * ?"),
     TWO_HOUR("2 hourly", "0 0 0/2 * * ?"),
     SIX_HOUR("6 hourly (6:00am,12:00am,6pm,12pm)", "0 0 0/6 * * ?"),

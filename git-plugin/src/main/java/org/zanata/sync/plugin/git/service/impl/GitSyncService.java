@@ -106,15 +106,15 @@ public class GitSyncService implements RepoSyncService<String> {
 
     private void doGitClone(String repoUrl, File destPath) {
         destPath.mkdirs();
-        CloneCommand clone = Git.cloneRepository();
-        clone.setBare(false);
-        clone.setCloneAllBranches(false);
-        clone.setDirectory(destPath).setURI(repoUrl);
         UsernamePasswordCredentialsProvider user =
                 new UsernamePasswordCredentialsProvider(
                         getCredentials().getUsername(),
                         getCredentials().getSecret());
-        clone.setCredentialsProvider(user);
+        CloneCommand clone = Git.cloneRepository();
+        clone.setBare(false)
+                .setCloneAllBranches(true)
+                .setDirectory(destPath).setURI(repoUrl)
+                .setCredentialsProvider(user);
         try {
             clone.call();
         } catch (GitAPIException e) {
