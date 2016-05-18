@@ -72,7 +72,6 @@ public class WorkResourceImpl implements WorkResource {
         // TODO pahuang here we should persist the refresh token
         try {
             workServiceImpl.updateOrPersist(syncWorkConfig);
-            // TODO pahuang check if cron expression is given. if not it's a manual work
             schedulerServiceImpl.scheduleWork(syncWorkConfig);
         } catch (SchedulerException e) {
             log.error("Error trying to schedule job", e);

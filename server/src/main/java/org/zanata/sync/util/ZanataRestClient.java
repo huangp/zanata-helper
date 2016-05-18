@@ -63,22 +63,6 @@ public class ZanataRestClient {
         client = Client.create(clientConfig);
     }
 
-
-    public List<Project> getMaintainedProjects() {
-        Map<String, Object> accessTokenMap = Maps.newHashMap();
-
-        accessTokenMap.put(OAuth.OAUTH_ACCESS_TOKEN, securityTokens.getAccessToken());
-
-        return client.resource(
-                securityTokens.getZanataServerUrl() + "/rest/oauth/authorized/projects")
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-//                    .header("Content-Type", MediaType.APPLICATION_FORM_URLENCODED)
-                .header(OAuth.HeaderType.AUTHORIZATION, OAuthUtils.encodeAuthorizationBearerHeader(
-                        accessTokenMap))
-                .get(new GenericType<List<Project>>() {
-                });
-    }
-
     public Account getAuthorizedAccount() {
         Map<String, Object> accessTokenMap = Maps.newHashMap();
         accessTokenMap.put(OAuth.OAUTH_ACCESS_TOKEN, securityTokens.getAccessToken());

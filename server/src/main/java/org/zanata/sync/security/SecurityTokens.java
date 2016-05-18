@@ -1,9 +1,11 @@
 package org.zanata.sync.security;
 
 import java.io.Serializable;
+import java.util.Set;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.ws.rs.NotAuthorizedException;
 
 import org.apache.oltu.oauth2.client.OAuthClient;
 import org.apache.oltu.oauth2.client.URLConnectionClient;
@@ -40,7 +42,8 @@ public class SecurityTokens implements Serializable {
         return refreshToken != null;
     }
 
-    OAuthToken requestOAuthTokens(String authorizationCode) {
+    OAuthToken requestOAuthTokens(String authorizationCode)
+            throws OAuthProblemException {
         if (zanataServerUrl == null) {
             throw new IllegalStateException("You are not authorized to one Zanata server");
         }
@@ -65,19 +68,19 @@ public class SecurityTokens implements Serializable {
             accessToken = oAuthToken.getAccessToken();
             refreshToken = oAuthToken.getRefreshToken();
 
-            System.out.println("================== ac " + accessToken);
-            System.out.println("================== refresh " + refreshToken);
-            System.out.println("================== expires in " + oAuthToken.getExpiresIn());
-
-
             // this should change once we have Zanata all converted to use OAuth
             Account account = zanataRestClient.getAuthorizedAccount();
-            log.info("========= my account: {}", account);
+            log.debug("========= my account: {}", account);
+            // for the time being, we only allow Zanata admin to create jobs
+            if (!account.getRoles().contains("admin")) {
+                throw OAuthProblemException.error("Only Zanata admin can create sync job");
+            }
+
             zanataUsername = account.getUsername();
             zanataApiKey = account.getApiKey();
 
             return oAuthToken;
-        } catch (OAuthSystemException | OAuthProblemException e) {
+        } catch (OAuthSystemException e) {
             throw Throwables.propagate(e);
         }
     }

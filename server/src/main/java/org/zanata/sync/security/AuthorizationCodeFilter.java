@@ -11,6 +11,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.NotAuthorizedException;
 
 import org.apache.oltu.oauth2.client.response.OAuthAuthzResponse;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
@@ -49,6 +50,9 @@ public class AuthorizationCodeFilter implements Filter {
             String code = oAuthResponse.getCode();
 
             securityTokens.requestOAuthTokens(code);
+            log.debug("authorization code: {}", code);
+            log.debug("access token: {}", securityTokens.getAccessToken());
+            log.debug("refresh token: {}", securityTokens.getRefreshToken());
             // see org.zanata.sync.controller.ZanataSignIn
             String originalRequest = httpServletRequest.getParameter("origin");
             httpServletResponse.sendRedirect(originalRequest);
