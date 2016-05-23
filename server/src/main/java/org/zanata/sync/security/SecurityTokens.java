@@ -47,6 +47,7 @@ public class SecurityTokens implements Serializable {
         if (zanataServerUrl == null) {
             throw new IllegalStateException("You are not authorized to one Zanata server");
         }
+        OAuthClient oAuthClient = null;
         try {
             // TODO pahuang we only need to get access token and refresh token once (then we should persist the refresh token)
             OAuthClientRequest request = OAuthClientRequest
@@ -59,10 +60,10 @@ public class SecurityTokens implements Serializable {
                     .buildBodyMessage();
 
             //create OAuth client that uses custom http client under the hood
-            OAuthClient oAuthClient = new OAuthClient(new URLConnectionClient());
+            oAuthClient = new OAuthClient(new URLConnectionClient());
 
             OAuthJSONAccessTokenResponse accessTokenResponse =
-                    oAuthClient.accessToken(request, "POST");
+                    oAuthClient.accessToken(request, "POST", StatusCodeAwareOAuthJSONAccessTokenResponse.class);
 
             OAuthToken oAuthToken = accessTokenResponse.getOAuthToken();
             accessToken = oAuthToken.getAccessToken();
@@ -82,6 +83,10 @@ public class SecurityTokens implements Serializable {
             return oAuthToken;
         } catch (OAuthSystemException e) {
             throw Throwables.propagate(e);
+        } finally {
+            if (oAuthClient != null) {
+                oAuthClient.shutdown();
+            }
         }
     }
 
@@ -107,5 +112,18 @@ public class SecurityTokens implements Serializable {
 
     public String getZanataApiKey() {
         return zanataApiKey;
+    }
+
+    public static class StatusCodeAwareOAuthJSONAccessTokenResponse extends OAuthJSONAccessTokenResponse {
+
+        @Override
+        protected void init(String body, String contentType, int responseCode)
+                throws OAuthProblemException {
+            if (responseCode < 300) {
+                super.init(body, contentType, responseCode);
+            } else {
+                throw OAuthProblemException.error("invalid status code:" + responseCode);
+            }
+        }
     }
 }
